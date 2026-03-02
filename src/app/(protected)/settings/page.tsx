@@ -188,6 +188,155 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      {/* ── Braille Display Setup Instructions ── */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Braille Display Setup</CardTitle>
+          <CardDescription>
+            Step-by-step instructions to connect and configure a braille display with your screen reader
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+
+          {/* VoiceOver + Orbit Reader 20 (macOS) */}
+          <details className="group rounded-lg border border-border">
+            <summary
+              className="flex cursor-pointer items-center justify-between px-4 py-3 font-semibold text-sm hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-ring rounded-lg"
+              aria-label="VoiceOver and Orbit Reader 20 setup instructions for macOS"
+            >
+              <span>VoiceOver + Orbit Reader 20 (macOS)</span>
+              <span className="text-muted-foreground text-xs group-open:rotate-90 transition-transform" aria-hidden="true">▶</span>
+            </summary>
+            <div className="px-4 pb-4 pt-2 space-y-3 text-sm text-muted-foreground">
+
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">1. Enable VoiceOver</h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">⌘ Cmd + F5</kbd> to toggle VoiceOver on or off.</li>
+                  <li>A Quick Start tutorial will appear on first launch — complete it or press <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">V</kbd> to skip.</li>
+                  <li>The VoiceOver modifier keys (VO) are <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">Ctrl + Option</kbd> by default.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">2. Connect the Orbit Reader 20</h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li><strong>USB:</strong> Plug in the Orbit Reader 20. macOS detects it automatically.</li>
+                  <li><strong>Bluetooth:</strong> Pair in System Settings → Bluetooth first, then select it in VoiceOver Utility.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">3. Open VoiceOver Utility</h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">VO + F8</kbd> (Ctrl + Option + F8).</li>
+                  <li>Or: System Settings → Accessibility → VoiceOver → Open VoiceOver Utility.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">4. Configure Braille Display</h4>
+                <p>Navigate to <strong>VoiceOver Utility → Braille → Displays</strong>:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Check the box next to <strong>&quot;Orbit Reader 20&quot;</strong> in the Displays list.</li>
+                  <li>Set <strong>Output</strong> to Contracted (Grade 2) or Uncontracted (Grade 1) based on your preference.</li>
+                  <li>Set <strong>Input</strong> similarly.</li>
+                  <li>Enable <strong>&quot;Show Braille Cursor&quot;</strong> — shows cursor position on the display.</li>
+                  <li>Enable <strong>&quot;Cursor Routing&quot;</strong> — pressing routing buttons on the display moves VoiceOver focus.</li>
+                  <li>Under Braille Display Output, select <strong>&quot;Show VoiceOver Cursor&quot;</strong>.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">5. Enable Live Region Updates</h4>
+                <p>In <strong>VoiceOver Utility → Braille → General</strong>:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Set <strong>&quot;Show alert messages&quot;</strong> to <strong>&quot;All&quot;</strong> or <strong>&quot;Timed&quot;</strong>.</li>
+                  <li>This ensures Tack&apos;s status messages appear on the braille display.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">6. Test It</h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Navigate this page with <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">VO + Right</kbd>. Labels should appear on the braille display.</li>
+                  <li>Focus a text input and type on the Orbit Reader&apos;s braille keyboard — characters should appear in the field.</li>
+                </ul>
+              </div>
+
+            </div>
+          </details>
+
+          {/* NVDA + Orbit Reader 20 (Windows) */}
+          <details className="group rounded-lg border border-border">
+            <summary
+              className="flex cursor-pointer items-center justify-between px-4 py-3 font-semibold text-sm hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-ring rounded-lg"
+              aria-label="NVDA and Orbit Reader 20 setup instructions for Windows"
+            >
+              <span>NVDA + Orbit Reader 20 (Windows)</span>
+              <span className="text-muted-foreground text-xs group-open:rotate-90 transition-transform" aria-hidden="true">▶</span>
+            </summary>
+            <div className="px-4 pb-4 pt-2 space-y-3 text-sm text-muted-foreground">
+
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">1. Install &amp; Launch NVDA</h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Download NVDA free from <strong>nvaccess.org</strong>.</li>
+                  <li>The NVDA modifier key is <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">Insert</kbd> (or <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">Caps Lock</kbd> in laptop layout).</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">2. Connect the Orbit Reader 20</h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li><strong>USB:</strong> Plug in the device. NVDA should auto-detect it.</li>
+                  <li><strong>Bluetooth:</strong> Pair in Windows Settings → Bluetooth &amp; devices first.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">3. Open NVDA Braille Settings</h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">Insert + N</kbd> to open the NVDA menu.</li>
+                  <li>Navigate to: <strong>Preferences → Settings → Braille</strong>.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">4. Configure the Display</h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Set <strong>Braille display</strong> to <strong>&quot;Orbit Reader 20&quot;</strong> (or &quot;Auto detect&quot;).</li>
+                  <li>Set <strong>Port</strong> to the correct COM port (USB) or Bluetooth.</li>
+                  <li>Set <strong>Output table</strong> to your preferred braille table (e.g., &quot;English (Unified) Grade 2&quot; for contracted).</li>
+                  <li>Set <strong>Input table</strong> similarly.</li>
+                  <li>Set <strong>Tether Braille</strong> to <strong>&quot;Automatically&quot;</strong> — so the display follows focus.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">5. Enable Live Region Updates</h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>In the same Braille settings panel, set <strong>&quot;Show Messages&quot;</strong> to <strong>&quot;Use timeout&quot;</strong>.</li>
+                  <li>Increase the <strong>Message timeout</strong> (4–5 seconds works well) so status messages stay visible long enough to read.</li>
+                  <li>This ensures Tack&apos;s announcements appear on the braille display.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">6. Test It</h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Open Tack in Chrome or Edge.</li>
+                  <li>Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">Tab</kbd> through the page. Each focused element&apos;s label should appear on the braille display.</li>
+                  <li>If the display doesn&apos;t update, check that <strong>Tether Braille</strong> is set to &quot;Automatically&quot;.</li>
+                </ul>
+              </div>
+
+            </div>
+          </details>
+
+        </CardContent>
+      </Card>
+
       <Button onClick={savePreferences} disabled={saving}>
         {saving ? "Saving..." : "Save Settings"}
       </Button>
