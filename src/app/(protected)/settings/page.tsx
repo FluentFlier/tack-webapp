@@ -10,6 +10,49 @@ import { insforge } from "@/lib/insforge";
 import { useUser } from "@insforge/nextjs";
 import type { UserPreferences } from "@/types";
 
+// ── Font-size enum → pixel mapping ──
+const FONT_SIZE_MAP: Record<string, number> = {
+  small: 14,
+  medium: 16,
+  large: 20,
+  "x-large": 24,
+};
+
+/**
+ * Apply the current preference values directly to the <html> element.
+ * This activates the CSS rules already defined in globals.css:
+ *   - data-color-profile="high-contrast"  → high contrast palette
+ *   - --base-font-size                    → scales all rem-based text
+ *   - .reduced-motion class               → disables animations/transitions
+ * Also persists to localStorage so the blocking <Script> in layout.tsx
+ * can restore settings before first paint on future page loads.
+ */
+function applySettingsToDOM(prefs: Omit<UserPreferences, "user_id">) {
+  const root = document.documentElement;
+
+  // High contrast
+  if (prefs.high_contrast) {
+    root.setAttribute("data-color-profile", "high-contrast");
+  } else {
+    root.removeAttribute("data-color-profile");
+  }
+
+  // Font size
+  const px = FONT_SIZE_MAP[prefs.font_size] ?? FONT_SIZE_MAP.medium;
+  root.style.setProperty("--base-font-size", `${px}px`);
+
+  // Reduced motion
+  root.classList.toggle("reduced-motion", prefs.reduced_motion);
+  if (prefs.reduced_motion) {
+    root.style.setProperty("--motion-duration", "0.001ms");
+  } else {
+    root.style.removeProperty("--motion-duration");
+  }
+
+  // Persist to localStorage for the blocking restore script in layout.tsx
+  localStorage.setItem("tack_preferences", JSON.stringify(prefs));
+}
+
 export default function SettingsPage() {
   const { user, isLoaded } = useUser();
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
@@ -42,6 +85,16 @@ export default function SettingsPage() {
     loadPreferences();
   }, [user]);
 
+  // ── Apply settings on initial load and whenever preferences change ──
+  // This covers: first mount after DB fetch, navigating back to the page,
+  // and refreshes (the blocking script handles the very first paint,
+  // but this useEffect keeps React state and DOM in sync).
+  useEffect(() => {
+    if (!preferences) return;
+    const { user_id, ...displayPrefs } = preferences;
+    applySettingsToDOM(displayPrefs);
+  }, [preferences]);
+
   const savePreferences = async () => {
     if (!preferences || !user) return;
     setSaving(true);
@@ -64,6 +117,10 @@ export default function SettingsPage() {
         })
         .eq("user_id", user.id);
     }
+
+    // Apply to DOM immediately so the user sees the change
+    const { user_id, ...displayPrefs } = preferences;
+    applySettingsToDOM(displayPrefs);
 
     setSaving(false);
     setStatusMessage("Settings saved successfully.");

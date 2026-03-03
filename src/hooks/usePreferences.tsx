@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, createContext, useContext } from "react";
+import { useEffect, useState, useCallback, createContext, useContext, useRef } from "react";
 import { insforge } from "@/lib/insforge";
 import { useUser } from "@insforge/nextjs";
 import type { UserPreferences } from "@/types";
@@ -13,11 +13,21 @@ const DEFAULT_PREFERENCES: Omit<UserPreferences, "user_id"> = {
     reduced_motion: false,
 };
 
+// ── Font-size enum → pixel mapping ──
+// The CSS (globals.css) uses `html { font-size: var(--base-font-size, 16px); }`
+// so all rem-based sizes automatically scale from this root value.
+const FONT_SIZE_PX: Record<string, number> = {
+    small: 14,
+    medium: 16,
+    large: 20,
+    "x-large": 24,
+};
+
 // ── Context ──
 interface PreferencesContextValue {
     preferences: Omit<UserPreferences, "user_id">;
     isLoaded: boolean;
-    /** Call after saving to the DB to re-apply classes immediately. */
+    /** Call after saving to the DB to re-apply settings immediately. */
     applyPreferences: (prefs: Omit<UserPreferences, "user_id">) => void;
 }
 
@@ -31,35 +41,51 @@ export function usePreferences() {
     return useContext(PreferencesContext);
 }
 
-// ── Font-size → CSS class mapping ──
-const FONT_SIZE_CLASSES: Record<string, string> = {
-    small: "font-size-small",
-    medium: "font-size-medium",
-    large: "font-size-large",
-    "x-large": "font-size-x-large",
-};
-
 /**
- * Apply preference classes to the <html> element so CSS rules activate globally.
+ * Apply preference settings to the <html> element using CSS variables and
+ * data attributes so the palette/font/motion CSS rules in globals.css activate.
  *
- * Classes applied:
- *   .high-contrast    — increases contrast ratios
- *   .font-size-*      — scales the base font size
- *   .reduced-motion   — disables transitions and animations
+ * How it works:
+ *   - high_contrast → sets data-color-profile="high-contrast" on <html>
+ *     (matched by [data-color-profile="high-contrast"] in globals.css)
+ *   - font_size → maps enum to px, sets --base-font-size CSS variable
+ *     (matched by `html { font-size: var(--base-font-size); }` in globals.css)
+ *   - reduced_motion → toggles .reduced-motion class + --motion-duration
+ *     (matched by `.reduced-motion *` rules in globals.css)
  */
-function applyClassesToRoot(prefs: Omit<UserPreferences, "user_id">) {
+function applySettingsToRoot(prefs: Omit<UserPreferences, "user_id">) {
     const root = document.documentElement;
 
-    // ── High contrast ──
-    root.classList.toggle("high-contrast", prefs.high_contrast);
+    // ── Color profile via data attribute ──
+    // When high_contrast is true, use the high-contrast palette.
+    // When false, remove the attribute so the default palette applies.
+    if (prefs.high_contrast) {
+        root.setAttribute("data-color-profile", "high-contrast");
+    } else {
+        root.removeAttribute("data-color-profile");
+    }
 
-    // ── Font size (remove all, add correct one) ──
-    Object.values(FONT_SIZE_CLASSES).forEach((cls) => root.classList.remove(cls));
-    const fontClass = FONT_SIZE_CLASSES[prefs.font_size] || FONT_SIZE_CLASSES.medium;
-    root.classList.add(fontClass);
+    // ── Font size via CSS variable ──
+    // The enum ("small"/"medium"/"large"/"x-large") maps to pixel values.
+    // Setting --base-font-size on the root element scales all rem units.
+    const pxValue = FONT_SIZE_PX[prefs.font_size] || FONT_SIZE_PX.medium;
+    root.style.setProperty("--base-font-size", `${pxValue}px`);
 
     // ── Reduced motion ──
+    // Toggles the .reduced-motion class which globals.css uses to override
+    // animation-duration, transition-duration, and transform properties.
     root.classList.toggle("reduced-motion", prefs.reduced_motion);
+
+    // Also set --motion-duration so any components using it get instant transitions
+    if (prefs.reduced_motion) {
+        root.style.setProperty("--motion-duration", "0.001ms");
+        // Pause autoplay videos programmatically
+        document.querySelectorAll("video[autoplay]").forEach((v) => {
+            (v as HTMLVideoElement).pause();
+        });
+    } else {
+        root.style.removeProperty("--motion-duration");
+    }
 }
 
 // ── Provider component ──
@@ -68,6 +94,7 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
     const [preferences, setPreferences] =
         useState<Omit<UserPreferences, "user_id">>(DEFAULT_PREFERENCES);
     const [isLoaded, setIsLoaded] = useState(false);
+    const listenersRef = useRef<Array<(prefs: Omit<UserPreferences, "user_id">) => void>>([]);
 
     // Load preferences from DB when user is available
     useEffect(() => {
@@ -80,12 +107,12 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
                 try {
                     const parsed = JSON.parse(stored);
                     setPreferences(parsed);
-                    applyClassesToRoot(parsed);
+                    applySettingsToRoot(parsed);
                 } catch {
-                    applyClassesToRoot(DEFAULT_PREFERENCES);
+                    applySettingsToRoot(DEFAULT_PREFERENCES);
                 }
             } else {
-                applyClassesToRoot(DEFAULT_PREFERENCES);
+                applySettingsToRoot(DEFAULT_PREFERENCES);
             }
             setIsLoaded(true);
             return;
@@ -107,11 +134,11 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
                         reduced_motion: data.reduced_motion ?? false,
                     };
                     setPreferences(prefs);
-                    applyClassesToRoot(prefs);
+                    applySettingsToRoot(prefs);
                     // Also cache locally for faster future loads
                     localStorage.setItem("tack_preferences", JSON.stringify(prefs));
                 } else {
-                    applyClassesToRoot(DEFAULT_PREFERENCES);
+                    applySettingsToRoot(DEFAULT_PREFERENCES);
                 }
             } catch {
                 // Network error — fall back to localStorage cache
@@ -120,12 +147,12 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
                     try {
                         const parsed = JSON.parse(stored);
                         setPreferences(parsed);
-                        applyClassesToRoot(parsed);
+                        applySettingsToRoot(parsed);
                     } catch {
-                        applyClassesToRoot(DEFAULT_PREFERENCES);
+                        applySettingsToRoot(DEFAULT_PREFERENCES);
                     }
                 } else {
-                    applyClassesToRoot(DEFAULT_PREFERENCES);
+                    applySettingsToRoot(DEFAULT_PREFERENCES);
                 }
             }
             setIsLoaded(true);
@@ -138,11 +165,48 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
     const applyPreferences = useCallback(
         (prefs: Omit<UserPreferences, "user_id">) => {
             setPreferences(prefs);
-            applyClassesToRoot(prefs);
+            applySettingsToRoot(prefs);
             localStorage.setItem("tack_preferences", JSON.stringify(prefs));
+            // Notify subscribers
+            listenersRef.current.forEach((cb) => {
+                try { cb(prefs); } catch { /* ignore listener errors */ }
+            });
         },
         []
     );
+
+    // ── Expose developer API on window ──
+    // Allows programmatic access from non-React code and developer tools.
+    // Example: window.AccessibilitySettings.reducedMotionEnabled()
+    useEffect(() => {
+        const api = {
+            /** Returns a copy of the current settings */
+            getSettings: () => ({ ...preferences }),
+
+            /** Applies settings programmatically */
+            applySettings: (s: Partial<Omit<UserPreferences, "user_id">>) => {
+                const merged = { ...preferences, ...s };
+                applyPreferences(merged);
+            },
+
+            /** Subscribe to changes. Returns unsubscribe function. */
+            onChange: (cb: (prefs: Omit<UserPreferences, "user_id">) => void) => {
+                listenersRef.current.push(cb);
+                return () => {
+                    listenersRef.current = listenersRef.current.filter((c) => c !== cb);
+                };
+            },
+
+            /** Returns true if reduced motion is currently enabled */
+            reducedMotionEnabled: () => preferences.reduced_motion,
+        };
+
+        (window as unknown as Record<string, unknown>).AccessibilitySettings = api;
+
+        return () => {
+            delete (window as unknown as Record<string, unknown>).AccessibilitySettings;
+        };
+    }, [preferences, applyPreferences]);
 
     return (
         <PreferencesContext.Provider value={{ preferences, isLoaded, applyPreferences }}>

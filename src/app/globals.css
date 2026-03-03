@@ -71,45 +71,117 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    PREFERENCE-DRIVEN STYLES
-   Applied via classes on <html> by the PreferencesProvider.
+   Applied via CSS variables and data attributes on <html> by the
+   PreferencesProvider. No class-based font sizing — we use a single
+   CSS variable (--base-font-size) so all rem-based text scales.
    ═══════════════════════════════════════════════════════════════════ */
 
-/* ── Font Size ──────────────────────────────────────────────────── */
-.font-size-small {
-  font-size: 14px;
+/* ── Font Sizing via CSS Variable ─────────────────────────────────
+   The PreferencesProvider sets --base-font-size on <html>.
+   All rem-based sizes automatically scale from this root value.
+   Enum mapping: small→14px, medium→16px, large→20px, x-large→24px */
+html {
+  font-size: var(--base-font-size, 16px);
 }
 
-.font-size-medium {
-  font-size: 16px;
+/* ── Color-Blindness Palettes ─────────────────────────────────────
+   Applied via data-color-profile attribute on <html>.
+   Each palette overrides the shadcn/ui HSL design tokens.
+
+   APPROACH: CSS custom properties (preferred over CSS filters)
+   - Pros: precise control over every UI color, guarantees text contrast
+   - Cons: does not recolor raster images or videos
+   For image simulation, apply SVG filters to image containers.
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Protanopia (red-blind) — blues/yellows replace red/green signals */
+[data-color-profile="protanopia"] {
+  --primary: 200 80% 55%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 200 80% 55%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 40 90% 50%;
+  --destructive-foreground: 0 0% 0%;
+  --ring: 200 80% 55%;
+  --chart-1: 200 70% 50%;
+  --chart-2: 50 80% 50%;
+  --chart-3: 200 40% 35%;
+  --chart-4: 45 85% 60%;
+  --chart-5: 30 90% 55%;
 }
 
-.font-size-large {
-  font-size: 20px;
+/* Deuteranopia (green-blind) — blues/yellows, similar to protanopia */
+[data-color-profile="deuteranopia"] {
+  --primary: 205 75% 55%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 205 75% 55%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 42 90% 50%;
+  --destructive-foreground: 0 0% 0%;
+  --ring: 205 75% 55%;
+  --chart-1: 205 70% 50%;
+  --chart-2: 48 80% 50%;
+  --chart-3: 205 40% 35%;
+  --chart-4: 42 85% 60%;
+  --chart-5: 28 90% 55%;
 }
 
-.font-size-x-large {
-  font-size: 24px;
+/* Tritanopia (blue-blind) — reds/cyans replace blue/yellow signals */
+[data-color-profile="tritanopia"] {
+  --primary: 15 85% 55%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 15 85% 55%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 15 90% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --ring: 15 85% 55%;
+  --chart-1: 15 80% 50%;
+  --chart-2: 175 60% 40%;
+  --chart-3: 15 40% 35%;
+  --chart-4: 170 65% 55%;
+  --chart-5: 10 85% 55%;
 }
 
-/* Scale all rem-based spacing proportionally */
-.font-size-small * {
-  --text-scale: 0.875;
+/* Protanomaly (red-weak) — subtle blue/yellow shift */
+[data-color-profile="protanomaly"] {
+  --primary: 210 65% 55%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 210 65% 55%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 38 80% 50%;
+  --destructive-foreground: 0 0% 0%;
+  --ring: 210 65% 55%;
 }
 
-.font-size-medium * {
-  --text-scale: 1;
+/* Deuteranomaly (green-weak) — subtle blue/yellow shift */
+[data-color-profile="deuteranomaly"] {
+  --primary: 215 60% 55%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 215 60% 55%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 40 80% 50%;
+  --destructive-foreground: 0 0% 0%;
+  --ring: 215 60% 55%;
 }
 
-.font-size-large * {
-  --text-scale: 1.25;
+/* Achromatopsia (monochrome) — grayscale palette */
+[data-color-profile="achromatopsia"] {
+  --primary: 0 0% 65%;
+  --primary-foreground: 0 0% 0%;
+  --accent: 0 0% 65%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 0% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --ring: 0 0% 65%;
+  --chart-1: 0 0% 80%;
+  --chart-2: 0 0% 60%;
+  --chart-3: 0 0% 40%;
+  --chart-4: 0 0% 70%;
+  --chart-5: 0 0% 50%;
 }
 
-.font-size-x-large * {
-  --text-scale: 1.5;
-}
-
-/* ── High Contrast ──────────────────────────────────────────────── */
-.high-contrast {
+/* High Contrast — maximum contrast palette (activated by high_contrast toggle) */
+[data-color-profile="high-contrast"] {
   --background: 0 0% 0%;
   --foreground: 0 0% 100%;
   --card: 0 0% 5%;
@@ -131,30 +203,59 @@
   --ring: 210 100% 60%;
 }
 
-/* Boost text contrast and add visible borders in high contrast */
-.high-contrast * {
+/* Boost borders and focus rings in high contrast mode */
+[data-color-profile="high-contrast"] * {
   border-color: hsl(var(--border)) !important;
 }
 
-.high-contrast button,
-.high-contrast a,
-.high-contrast select,
-.high-contrast input,
-.high-contrast textarea {
+[data-color-profile="high-contrast"] button,
+[data-color-profile="high-contrast"] a,
+[data-color-profile="high-contrast"] select,
+[data-color-profile="high-contrast"] input,
+[data-color-profile="high-contrast"] textarea {
   border: 1px solid hsl(var(--border));
 }
 
-.high-contrast :focus-visible {
+[data-color-profile="high-contrast"] :focus-visible {
   outline: 3px solid hsl(var(--ring));
   outline-offset: 2px;
 }
 
-/* ── Reduced Motion ─────────────────────────────────────────────── */
+/* ── Reduced Motion ───────────────────────────────────────────────
+   When .reduced-motion is on <html>, ALL non-essential animations stop.
+   Uses !important because these are user accessibility overrides.
+   ─────────────────────────────────────────────────────────────────── */
 .reduced-motion *,
 .reduced-motion *::before,
 .reduced-motion *::after {
-  animation-duration: 0.01ms !important;
+  animation-duration: 0.001ms !important;
   animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
+  transition-duration: 0.001ms !important;
   scroll-behavior: auto !important;
+}
+
+/* Disable transform-based decorative effects */
+.reduced-motion .parallax,
+.reduced-motion .spin,
+.reduced-motion .scale,
+.reduced-motion .bounce,
+.reduced-motion .pulse-animation {
+  transform: none !important;
+}
+
+/* JS in usePreferences pauses autoplay videos programmatically
+   when reduced motion is enabled — no CSS rule needed here. */
+
+/* OS-level prefers-reduced-motion fallback.
+   Respects the user's system preference even if the toggle isn't set. */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
