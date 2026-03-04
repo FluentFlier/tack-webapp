@@ -56,11 +56,3 @@ export interface ExtractedContent {
   url: string;
   images: { src: string; alt: string }[];
 }
-
-export interface PDFContent {
-  text: string;
-  numPages: number;
-  title: string | null;
-  author: string | null;
-  simplified: string;
-}
