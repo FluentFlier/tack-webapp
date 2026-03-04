@@ -18,6 +18,7 @@ export interface Message {
 export interface MessageMetadata {
   command?: string;
   source_url?: string;
+  sources?: { title: string; url: string }[];
   processing_time_ms?: number;
 }
 
@@ -44,4 +45,22 @@ export interface SlashCommand {
   description: string;
   usage: string;
   execute: (args: string) => string;
+}
+
+export interface ExtractedContent {
+  title: string;
+  content: string;
+  excerpt: string;
+  byline: string | null;
+  siteName: string | null;
+  url: string;
+  images: { src: string; alt: string }[];
+}
+
+export interface PDFContent {
+  text: string;
+  numPages: number;
+  title: string | null;
+  author: string | null;
+  simplified: string;
 }

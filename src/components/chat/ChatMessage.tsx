@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import type { Message } from "@/types";
-import { Bot, User } from "lucide-react";
+import { Bot, User, ExternalLink } from "lucide-react";
 
 interface ChatMessageProps {
   message: Message;
@@ -8,6 +8,7 @@ interface ChatMessageProps {
 
 export function ChatMessage({ message }: ChatMessageProps) {
   const isAssistant = message.role === "assistant";
+  const sources = message.metadata?.sources;
 
   return (
     <div
@@ -34,11 +35,29 @@ export function ChatMessage({ message }: ChatMessageProps) {
         <div className="prose prose-sm max-w-none dark:prose-invert">
           <p className="whitespace-pre-wrap">{message.content}</p>
         </div>
-        {message.metadata?.source_url && (
+        {sources && sources.length > 0 && (
+          <div className="mt-2 space-y-1" aria-label="Sources">
+            <p className="text-xs font-medium text-muted-foreground">Sources:</p>
+            <ul className="list-none space-y-1">
+              {sources.map((source: { title: string; url: string }, i: number) => (
+                <li key={i}>
+                  <a
+                    href={`/reader?url=${encodeURIComponent(source.url)}`}
+                    className="inline-flex items-center gap-1 text-xs text-primary underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-ring rounded"
+                  >
+                    <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                    {source.title || source.url}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {!sources && message.metadata?.source_url && (
           <p className="text-xs text-muted-foreground">
             Source:{" "}
             <a
-              href={message.metadata.source_url}
+              href={`/reader?url=${encodeURIComponent(message.metadata.source_url)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="underline focus:outline-none focus:ring-2 focus:ring-ring"

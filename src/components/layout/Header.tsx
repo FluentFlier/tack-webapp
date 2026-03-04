@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@insforge/nextjs";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Settings } from "lucide-react";
+import { MessageSquare, Settings, FileText } from "lucide-react";
 
 export function Header() {
   return (
@@ -27,6 +27,12 @@ export function Header() {
               <Button variant="ghost" size="sm">
                 <MessageSquare className="h-4 w-4 mr-2" aria-hidden="true" />
                 Chat
+              </Button>
+            </Link>
+            <Link href="/pdf" aria-label="PDF Reader">
+              <Button variant="ghost" size="sm">
+                <FileText className="h-4 w-4 mr-2" aria-hidden="true" />
+                PDF Reader
               </Button>
             </Link>
             <Link href="/settings" aria-label="Settings">
