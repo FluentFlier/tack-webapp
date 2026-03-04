@@ -9,18 +9,13 @@ import {
 export async function POST(request: NextRequest) {
   try {
     const { token, userId } = await auth();
-
     if (!token || !userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { message, conversation_id } = await request.json();
-
     if (!message || typeof message !== "string") {
-      return NextResponse.json(
-        { error: "Message is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
     const insforge = createClient({
@@ -28,7 +23,6 @@ export async function POST(request: NextRequest) {
       edgeFunctionToken: token,
     });
 
-    // Create or use existing conversation
     let convId = conversation_id;
     if (!convId) {
       const { data: conv, error: convError } = await insforge.database
@@ -38,15 +32,11 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (convError || !conv) {
-        return NextResponse.json(
-          { error: "Failed to create conversation" },
-          { status: 500 }
-        );
+        return NextResponse.json({ error: "Failed to create conversation" }, { status: 500 });
       }
       convId = conv.id;
     }
 
-    // Save user message
     await insforge.database.from("messages").insert({
       conversation_id: convId,
       role: "user",
@@ -54,7 +44,25 @@ export async function POST(request: NextRequest) {
       metadata: {},
     });
 
-    // Build system prompt for accessibility focus
+    const urls = extractUrls(message);
+    const extractions = await Promise.all(urls.map(extractContent));
+    const validExtractions = extractions.filter(Boolean) as {
+      title: string;
+      content: string;
+      url: string;
+    }[];
+
+    let contextBlock = "";
+    const sources: { title: string; url: string }[] = [];
+    if (validExtractions.length > 0) {
+      contextBlock = "\n\n--- EXTRACTED WEB CONTENT ---\n";
+      for (const ext of validExtractions) {
+        contextBlock += `\nSource: ${ext.title} (${ext.url})\n${ext.content}\n---\n`;
+        sources.push({ title: ext.title, url: ext.url });
+      }
+      contextBlock += "\n--- END EXTRACTED CONTENT ---\n";
+    }
+
     const systemPrompt = `You are Tack, an AI assistant designed to help blind and visually impaired users access the internet.
 
 FORMATTING RULES (follow these strictly):
@@ -237,27 +245,17 @@ ${searchContext}
       .single();
 
     if (msgError) {
-      return NextResponse.json(
-        { error: "Failed to save response" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Failed to save response" }, { status: 500 });
     }
 
-    // Update conversation timestamp
     await insforge.database
       .from("conversations")
       .update({ updated_at: new Date().toISOString() })
       .eq("id", convId);
 
-    return NextResponse.json({
-      message: savedMessage,
-      conversation_id: convId,
-    });
+    return NextResponse.json({ message: savedMessage, conversation_id: convId });
   } catch (error) {
     console.error("Chat API error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

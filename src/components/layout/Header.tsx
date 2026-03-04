@@ -43,6 +43,12 @@ export function Header() {
                 Chat
               </Button>
             </Link>
+            <Link href="/pdf" aria-label="PDF Reader">
+              <Button variant="ghost" size="sm">
+                <FileText className="h-4 w-4 mr-2" aria-hidden="true" />
+                PDF Reader
+              </Button>
+            </Link>
             <Link href="/settings" aria-label="Settings">
               <Button variant="ghost" size="sm" className="text-[rgba(240,237,237,0.6)] hover:text-[rgba(240,237,237,0.9)] hover:bg-[rgba(140,100,220,0.08)]">
                 <Settings className="h-4 w-4 mr-1.5" aria-hidden="true" />
