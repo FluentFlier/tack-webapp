@@ -94,6 +94,7 @@ export function useChat(initialConversationId?: string) {
           setConversationId(data.conversation_id);
           // Update URL without full navigation
           window.history.pushState(null, "", `/chat/${data.conversation_id}`);
+          window.dispatchEvent(new CustomEvent("sidebar:refresh"));
         }
 
         setMessages((prev) => [...prev, data.message]);

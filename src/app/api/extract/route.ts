@@ -3,12 +3,21 @@ import { auth } from "@insforge/nextjs/server";
 import { createClient } from "@insforge/sdk";
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
     const { token, userId } = await auth();
     if (!token || !userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { allowed } = checkRateLimit(`extract:${userId}`, 10, 60000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please wait a moment." },
+        { status: 429 }
+      );
     }
 
     const { url } = await request.json();

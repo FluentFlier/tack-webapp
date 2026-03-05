@@ -3,6 +3,7 @@ import { auth } from "@insforge/nextjs/server";
 import { createClient } from "@insforge/sdk";
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 function extractUrls(text: string): string[] {
   const urlRegex = /https?:\/\/[^\s<>"{}|\\^`[\]]+/g;
@@ -44,8 +45,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { allowed } = checkRateLimit(userId, 20, 60000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please wait a moment." },
+        { status: 429 }
+      );
+    }
+
     const { message, conversation_id } = await request.json();
     if (!message || typeof message !== "string") {
+      return NextResponse.json({ error: "Message is required" }, { status: 400 });
+    }
+
+    const sanitizedMessage = message.slice(0, 10000).trim();
+    if (!sanitizedMessage) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
@@ -58,7 +72,7 @@ export async function POST(request: NextRequest) {
     if (!convId) {
       const { data: conv, error: convError } = await insforge.database
         .from("conversations")
-        .insert({ user_id: userId, title: message.slice(0, 100) })
+        .insert({ user_id: userId, title: sanitizedMessage.slice(0, 100) })
         .select()
         .single();
 
@@ -71,11 +85,11 @@ export async function POST(request: NextRequest) {
     await insforge.database.from("messages").insert({
       conversation_id: convId,
       role: "user",
-      content: message,
+      content: sanitizedMessage,
       metadata: {},
     });
 
-    const urls = extractUrls(message);
+    const urls = extractUrls(sanitizedMessage);
     const extractions = await Promise.all(urls.map(extractContent));
     const validExtractions = extractions.filter(Boolean) as {
       title: string;
@@ -106,8 +120,8 @@ Your responses should be:
 - If the extracted content is insufficient to answer the user's question, say so clearly`;
 
     const userContent = validExtractions.length > 0
-      ? `${message}${contextBlock}\nBased on the extracted content above, please respond to my message. Cite sources by title when referencing information.`
-      : message;
+      ? `${sanitizedMessage}${contextBlock}\nBased on the extracted content above, please respond to my message. Cite sources by title when referencing information.`
+      : sanitizedMessage;
 
     const completion = await insforge.ai.chat.completions.create({
       model: "openai/gpt-4o-mini",
