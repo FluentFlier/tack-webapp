@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Plus, MessageSquare } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Plus, MessageSquare, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { insforge } from "@/lib/insforge";
 import { useAuth } from "@insforge/nextjs";
@@ -14,26 +14,52 @@ export function Sidebar() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
+  const router = useRouter();
   const { isSignedIn } = useAuth();
 
-  useEffect(() => {
+  const loadConversations = useCallback(async () => {
     if (!isSignedIn) return;
+    const { data, error } = await insforge.database
+      .from("conversations")
+      .select("id, title, updated_at")
+      .order("updated_at", { ascending: false })
+      .limit(50);
 
-    async function loadConversations() {
-      const { data, error } = await insforge.database
-        .from("conversations")
-        .select("id, title, updated_at")
-        .order("updated_at", { ascending: false })
-        .limit(50);
-
-      if (!error && data) {
-        setConversations(data as Conversation[]);
-      }
-      setLoading(false);
+    if (!error && data) {
+      setConversations(data as Conversation[]);
     }
-
-    loadConversations();
+    setLoading(false);
   }, [isSignedIn]);
+
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
+
+  // Listen for custom event to refresh sidebar
+  useEffect(() => {
+    const handleRefresh = () => loadConversations();
+    window.addEventListener("sidebar:refresh", handleRefresh);
+    return () => window.removeEventListener("sidebar:refresh", handleRefresh);
+  }, [loadConversations]);
+
+  const deleteConversation = async (e: React.MouseEvent, convId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const confirmed = window.confirm("Delete this conversation?");
+    if (!confirmed) return;
+
+    await insforge.database
+      .from("conversations")
+      .delete()
+      .eq("id", convId);
+
+    setConversations((prev) => prev.filter((c) => c.id !== convId));
+
+    if (pathname === `/chat/${convId}`) {
+      router.push("/chat");
+    }
+  };
 
   return (
     <aside
@@ -71,7 +97,7 @@ export function Sidebar() {
             {conversations.map((conv) => {
               const isActive = pathname === `/chat/${conv.id}`;
               return (
-                <li key={conv.id}>
+                <li key={conv.id} className="group relative">
                   <Link
                     href={`/chat/${conv.id}`}
                     className={cn(
@@ -87,6 +113,13 @@ export function Sidebar() {
                     />
                     <span className="truncate">{conv.title}</span>
                   </Link>
+                  <button
+                    onClick={(e) => deleteConversation(e, conv.id)}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-destructive/10 focus:outline-none focus:ring-2 focus:ring-ring transition-opacity"
+                    aria-label={`Delete conversation: ${conv.title}`}
+                  >
+                    <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" aria-hidden="true" />
+                  </button>
                 </li>
               );
             })}

@@ -13,8 +13,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { allowed } = checkRateLimit(userId, 20, 60000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please wait a moment." },
+        { status: 429 }
+      );
+    }
+
     const { message, conversation_id } = await request.json();
     if (!message || typeof message !== "string") {
+      return NextResponse.json({ error: "Message is required" }, { status: 400 });
+    }
+
+    const sanitizedMessage = message.slice(0, 10000).trim();
+    if (!sanitizedMessage) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
@@ -27,7 +40,7 @@ export async function POST(request: NextRequest) {
     if (!convId) {
       const { data: conv, error: convError } = await insforge.database
         .from("conversations")
-        .insert({ user_id: userId, title: message.slice(0, 100) })
+        .insert({ user_id: userId, title: sanitizedMessage.slice(0, 100) })
         .select()
         .single();
 
@@ -40,11 +53,11 @@ export async function POST(request: NextRequest) {
     await insforge.database.from("messages").insert({
       conversation_id: convId,
       role: "user",
-      content: message,
+      content: sanitizedMessage,
       metadata: {},
     });
 
-    const urls = extractUrls(message);
+    const urls = extractUrls(sanitizedMessage);
     const extractions = await Promise.all(urls.map(extractContent));
     const validExtractions = extractions.filter(Boolean) as {
       title: string;
