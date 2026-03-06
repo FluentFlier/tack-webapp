@@ -62,8 +62,8 @@ function ReaderContent() {
       <div className="max-w-3xl mx-auto p-6">
         <p role="alert" className="text-destructive">{error || "Failed to load content"}</p>
         <Link href="/chat">
-          <Button variant="outline" className="mt-4">
-            <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
+          <Button variant="ghost" className="mt-4 gap-2 text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Back to Chat
           </Button>
         </Link>
@@ -77,8 +77,8 @@ function ReaderContent() {
 
       <nav aria-label="Reader navigation" className="flex items-center gap-2">
         <Link href="/chat">
-          <Button variant="outline" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
+          <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Back to Chat
           </Button>
         </Link>
@@ -86,18 +86,18 @@ function ReaderContent() {
 
       <article aria-label={content.title}>
         <header className="space-y-2 mb-6">
-          <h1 className="text-2xl font-bold">{content.title}</h1>
+          <h1 className="text-3xl font-bold font-serif italic mb-4">{content.title}</h1>
           {content.byline && (
-            <p className="text-sm text-muted-foreground">By {content.byline}</p>
+            <p className="text-muted-foreground text-sm">By {content.byline}</p>
           )}
           {content.siteName && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               From {content.siteName} —{" "}
               <a
                 href={content.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline focus:outline-none focus:ring-2 focus:ring-ring"
+                className="text-primary underline underline-offset-2 decoration-primary/30 hover:decoration-primary/60 focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 View original
               </a>
@@ -106,12 +106,12 @@ function ReaderContent() {
         </header>
 
         {content.excerpt && (
-          <div className="border-l-4 border-primary pl-4 mb-6">
+          <div className="border-l-2 border-primary/40 pl-4 mb-6">
             <p className="text-muted-foreground italic">{content.excerpt}</p>
           </div>
         )}
 
-        <div className="prose prose-lg max-w-none dark:prose-invert leading-relaxed">
+        <div className="prose prose-lg dark:prose-invert max-w-none leading-relaxed">
           {content.content.split("\n\n").map((paragraph, i) =>
             paragraph.trim() ? (
               <p key={i} className="mb-4">{paragraph.trim()}</p>

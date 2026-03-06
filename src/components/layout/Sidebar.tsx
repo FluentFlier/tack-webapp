@@ -65,12 +65,12 @@ export function Sidebar() {
     <aside
       role="complementary"
       aria-label="Conversation history"
-      className="w-64 border-r bg-muted/40 flex flex-col h-full"
+      className="w-64 border-r border-border/50 bg-card/30 flex flex-col h-full"
     >
       <div className="p-3">
         <Link href="/chat">
           <Button
-            className="w-full justify-start"
+            className="w-full justify-start gap-2"
             variant="outline"
             aria-label="Start a new chat"
           >
@@ -101,9 +101,9 @@ export function Sidebar() {
                   <Link
                     href={`/chat/${conv.id}`}
                     className={cn(
-                      "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors pr-8",
+                      "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all pr-8",
                       "hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring",
-                      isActive && "bg-accent font-medium"
+                      isActive && "bg-primary/10 border border-primary/20 text-primary font-medium"
                     )}
                     aria-current={isActive ? "page" : undefined}
                   >
@@ -115,10 +115,10 @@ export function Sidebar() {
                   </Link>
                   <button
                     onClick={(e) => deleteConversation(e, conv.id)}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-destructive/10 focus:outline-none focus:ring-2 focus:ring-ring transition-opacity"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-md opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-destructive/10 focus:outline-none focus:ring-2 focus:ring-ring transition-all"
                     aria-label={`Delete conversation: ${conv.title}`}
                   >
-                    <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" aria-hidden="true" />
+                    <Trash2 className="h-3.5 w-3.5 text-muted-foreground/60 hover:text-destructive" aria-hidden="true" />
                   </button>
                 </li>
               );

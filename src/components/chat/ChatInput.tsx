@@ -81,7 +81,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   };
 
   return (
-    <div className="border-t p-4">
+    <div className="border-t border-border/50 p-4 bg-background/50 backdrop-blur-sm">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -103,10 +103,10 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
           value={input}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          placeholder={isListening ? "Listening..." : "Type a message or /help for commands..."}
+          placeholder={isListening ? "Listening..." : "Ask anything or paste a URL..."}
           disabled={disabled || isListening}
           rows={1}
-          className="min-h-[44px] max-h-32 resize-none"
+          className="min-h-[48px] max-h-32 resize-none rounded-xl bg-card border-border/60 focus:border-primary/40 text-[0.9375rem] placeholder:text-muted-foreground/60"
           aria-describedby="input-hint"
         />
         <span id="input-hint" className="sr-only">
@@ -120,7 +120,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
             variant={isListening ? "destructive" : "outline"}
             onClick={() => (isListening ? stopListening() : startListening())}
             aria-label={isListening ? "Stop listening" : "Start voice input (Alt+V)"}
-            className="shrink-0 h-[44px] w-[44px]"
+            className="shrink-0 h-[48px] w-[48px] rounded-xl"
           >
             {isListening ? (
               <MicOff className="h-4 w-4" aria-hidden="true" />
@@ -134,7 +134,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
           size="icon"
           disabled={disabled || !input.trim()}
           aria-label="Send message"
-          className="shrink-0 h-[44px] w-[44px]"
+          className="shrink-0 h-[48px] w-[48px] rounded-xl"
         >
           <SendHorizontal className="h-4 w-4" aria-hidden="true" />
         </Button>
