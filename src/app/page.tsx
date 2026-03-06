@@ -4,7 +4,7 @@ import { SignedIn, SignedOut, SignInButton } from "@insforge/nextjs";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
-export default function HomePage() {
+export default function Home() {
   return (
     <div className="landing-root">
       {/* ─── Background image layer ─── */}

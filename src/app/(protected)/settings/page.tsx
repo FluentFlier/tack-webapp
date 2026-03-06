@@ -300,7 +300,7 @@ export default function SettingsPage() {
                   reduced_motion: e.target.checked,
                 })
               }
-              className="h-5 w-5 rounded border-gray-300 focus:ring-2 focus:ring-ring"
+              className="h-5 w-5 rounded border-border accent-primary focus:ring-2 focus:ring-ring"
             />
           </div>
         </CardContent>

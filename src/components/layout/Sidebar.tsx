@@ -115,10 +115,10 @@ export function Sidebar() {
                   </Link>
                   <button
                     onClick={(e) => deleteConversation(e, conv.id)}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-destructive/10 focus:outline-none focus:ring-2 focus:ring-ring transition-opacity"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-md opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-destructive/10 focus:outline-none focus:ring-2 focus:ring-ring transition-all"
                     aria-label={`Delete conversation: ${conv.title}`}
                   >
-                    <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" aria-hidden="true" />
+                    <Trash2 className="h-3.5 w-3.5 text-muted-foreground/60 hover:text-destructive" aria-hidden="true" />
                   </button>
                 </li>
               );

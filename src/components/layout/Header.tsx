@@ -55,7 +55,9 @@ export function Header() {
                 Settings
               </Button>
             </Link>
-            <UserButton />
+            <div className="ml-2 pl-2 border-l border-border/50">
+              <UserButton />
+            </div>
           </SignedIn>
           <SignedOut>
             <SignInButton>

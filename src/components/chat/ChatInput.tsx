@@ -110,7 +110,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
           value={input}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          placeholder={isListening ? "Listening..." : "Type a message or /help for commands..."}
+          placeholder={isListening ? "Listening..." : "Ask anything or paste a URL..."}
           disabled={disabled || isListening}
           rows={1}
           className="app-chat-textarea min-h-[44px] max-h-32 resize-none"
@@ -127,7 +127,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
             variant={isListening ? "destructive" : "outline"}
             onClick={() => (isListening ? stopListening() : startListening())}
             aria-label={isListening ? "Stop listening" : "Start voice input (Alt+V)"}
-            className="shrink-0 h-[44px] w-[44px]"
+            className="shrink-0 h-[48px] w-[48px] rounded-xl"
           >
             {isListening ? (
               <MicOff className="h-4 w-4" aria-hidden="true" />
