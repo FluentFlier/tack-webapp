@@ -19,14 +19,14 @@ export async function POST(request: Request) {
 
     // Best-effort: try calling InsForge model gateway if env is configured.
     if (base && apiKey) {
-      try {
+      
         const host = base.replace(/\/?$/g, "");
         const endpoint = `${host}/api/ai/chat/completion`;
 
         const prompt = `Shorten the following paragraph to approximately ${targetLen} characters (preserve meaning and key points).\n\nParagraph:\n${text}`;
 
         const body = {
-          model: "openai/gpt-4",
+          model: "openai/gpt-4o-mini",
           messages: [{ role: "user", content: prompt }],
           maxTokens: 1024,
         };
@@ -43,12 +43,22 @@ export async function POST(request: Request) {
         const json = await r.json().catch(() => ({}));
 
         // InsForge documented response shape: { success: true, text: "..." }
-        if (r.ok && json && json.success && typeof json.text === "string") {
+        if (r.ok && json && typeof json.text === "string") {
           return NextResponse.json({ shortened: json.text });
         }
-      } catch (err) {
-        console.error("InsForge chat/completion call failed:", err);
-      }
+        else if (!r.ok) {
+          return NextResponse.json({ error: "!r.ok" }, { status: 500 });
+        }
+        else if (!json) {
+          return NextResponse.json({ error: "!json" }, { status: 500 });
+        }
+        else if (!(typeof json.text === "string")) {
+          return NextResponse.json({ error: "!(typeof json.txt === 'string')" }, { status: 500 });
+        }
+      
+    }
+    else {
+        return NextResponse.json({ error: "InsForge API not configured" }, { status: 500 });
     }
 
   }
