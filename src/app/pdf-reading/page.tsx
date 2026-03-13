@@ -20,6 +20,18 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(true);
 
+
+
+
+  //USER SETTINGS
+  let displayPageNumbers = false;
+
+
+
+
+
+
+
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -81,7 +93,8 @@ export default function Page() {
         }
 
         //build a list containing all the pdf from the pdf with the relative text sizes
-        let docText= [];
+        let docText: { text: string; headingLevel: number }[] = [];
+
         //create a list of all the text heights in the document to sort by
         let heights : number[] = [];
         for (let item of textContents) {
@@ -105,16 +118,84 @@ export default function Page() {
             heightToHeading[heights[i]] = level;
           }
         }
-
+        console.log("textContent: ");
+        console.log(textContents);
         
 
+        let lastXIndent = -999;
         //populate docText as a simplified version of textContents (only the text and height properties)
-        for (let item of textContents) {
-          //if the text is empty or only whitespace, skip it
-          if (item.str.trim() === "") continue;
+        for (let i = 0; i < textContents.length; i++) {
+          const item = textContents[i] as TextItem;
+          let lineText = item.str;
 
-          //otherwise add the text and the corresponding heading level to docText
-          docText.push({"text": item.str, "headingLevel": heightToHeading[item.height]});
+          //if the text is empty or only whitespace, skip it
+          if (lineText.trim() === "") continue;
+
+          //check whether this is a new page
+          let newPage = false;
+          if (i == 0) {
+            newPage = true;
+          }
+          else if (item.transform[5] > textContents[i-1].transform[5]) { //if the y position has increased, it's a new page
+            newPage = true;
+          }
+
+          //check the heading level
+          const headingLevel = heightToHeading[item.height] || 6; //default to 6 if height not recognized
+          
+
+          //if it's a new page then check whether this line or the last line is likely a page number and reformat it
+          if (newPage) {
+            //check whether the lineText is a arabic or roman numeral
+            let pageNum = Number(lineText.trim());
+            if (isNaN(pageNum)) {
+              //try parsing as a roman numeral
+              pageNum = parseRomanNumeral(lineText.trim());
+              if (isNaN(pageNum)) {
+                //probably not a page num
+              }
+            }
+
+            //if the lineText is likely a page number, reformat it to "Page X"
+            if (!isNaN(pageNum)) {
+              lineText = "Page " + pageNum;
+
+              if (displayPageNumbers) {
+                docText.push({"text": lineText, "headingLevel": headingLevel});
+              }
+              continue; //skip the other parsing logic for this line
+            }
+          }
+
+          //check whether this is the start of a new paragraph
+          let isNewParagraph = false;
+          if ((item.transform[4]-lastXIndent)/lastXIndent > .05) { //if the x position has increased significantly, assume it's a new paragraph
+            isNewParagraph = true;
+          }
+          else {
+            lastXIndent = item.transform[4]; //only update lastXIndent if we are not starting a new paragraph, to allow for multiple lines of the same paragraph to have slightly different indents without breaking the paragraph
+          }
+
+          
+
+          //if this is not a new paragraph and the height is the same as the previous item, assume it's a continuation of the same line and concatenate the text
+          if (!isNewParagraph && i > 0 && headingLevel == docText[docText.length-1].headingLevel) {
+
+            //if the last character of the last line is a "-" then remove it before combining (since a word was likely broken across two lines)
+            let lastLine = docText[docText.length - 1].text;
+            if (lastLine[lastLine.length-1] === "-") {
+              lastLine = lastLine.slice(0, -1);
+              docText[docText.length - 1].text = lastLine + lineText; //also combine the lines wihtout adding a space (in the middle of a word)
+            }
+            else {
+              docText[docText.length - 1].text += " " + lineText;
+            }
+            
+          }
+          else {
+            //otherwise add the text and the corresponding heading level to docText
+            docText.push({"text": lineText, "headingLevel": headingLevel});
+          }
         }
 
 
@@ -220,4 +301,42 @@ function escapeHtml(str: string) {
     .replace(/>/g, "&gt;")
     .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+// Client helper: shorten a paragraph by a given percent using the InsForge model gateway
+// `percent` is the percentage to shorten by (e.g. 30 means reduce length by 30%)
+export async function shortenWithInsforge(text: string, percent: number) {
+  const res = await fetch("/api/insforge/shorten", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text, percent }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(body || "Request failed");
+  }
+  const json = await res.json();
+  return json.shortened as string;
+}
+
+//This function was written by GPT-5 mini
+// Accepts values up to 3999 (standard Roman numeral form).
+export function parseRomanNumeral(input: string): number {
+  if (typeof input !== "string") return NaN;
+  const s = input.trim().toUpperCase();
+  if (s.length === 0) return NaN;
+
+  // Strict validation for standard Roman numerals (0-3999)
+  const valid = /^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/;
+  if (!valid.test(s)) return NaN;
+
+  const map: Record<string, number> = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
+  let total = 0;
+  for (let i = 0; i < s.length; i++) {
+    const value = map[s[i]];
+    const next = map[s[i + 1]] ?? 0;
+    if (value < next) total -= value;
+    else total += value;
+  }
+  return total;
 }
