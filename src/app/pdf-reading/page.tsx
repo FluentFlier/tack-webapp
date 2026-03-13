@@ -5,6 +5,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { Header } from "@/components/layout";
+import PdfReadableLine from "@/components/pdf-reading/PdfReadableLine";
 import { Readability } from "@mozilla/readability";
 import DOMPurify from "dompurify";
 import { getResolvedPDFJS, extractText, getDocumentProxy } from 'unpdf';
@@ -15,7 +16,7 @@ import type { TextItem, TextContent } from 'pdfjs-dist/types/src/display/api';
 export default function Page() {
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [readableHtml, setReadableHtml] = useState<string | null>(null);
+  const [readableHtml, setReadableHtml] = useState<React.ReactNode | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(true);
@@ -208,38 +209,12 @@ export default function Page() {
 
         if (cancelled) return;
 
-        // Build a minimal HTML document for Readability
-        const bodyHtml = docText
-          .map((line) => {
-            switch (line.headingLevel) {
-              case 1: return '<p class="text-2xl font-bold mt-4 mb-2">' + escapeHtml(line.text) + '</p>';
-              case 2: return '<p class="text-xl font-bold mt-3 mb-1.5">' + escapeHtml(line.text) + '</p>';
-              case 3: return '<p class="text-lg mt-2 mb-1">' + escapeHtml(line.text) + '</p>';
-              case 4: return '<p class="text-md mt-1.5 mb-1">' + escapeHtml(line.text) + '</p>';
-              case 5: return '<p class="text-base mt-1 mb-0.5">' + escapeHtml(line.text) + '</p>';
-              case 6: return '<p class="text-sm mt-1 mb-0.5">' + escapeHtml(line.text) + '</p>';
-              default:
-                console.log("invalid heading level: " + line.headingLevel);
-                return '<p>' + escapeHtml(line.text) + '</p>';
-              
-            }
-        })
-        console.log("bodyHtml: " + bodyHtml);
-          
-        const docHtml = `<!doctype html><html><head><meta charset=\"utf-8\"></head><body><article>${bodyHtml.join("")}</article></body></html>`;
+        
+        const elements = docText.map((line, idx) => (
+          <PdfReadableLine key={idx} headingLevel={line.headingLevel} content={line.text} />
+        ));
 
-        // Sanitize before parsing into DOM
-        const sanitized = DOMPurify.sanitize(docHtml);
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(sanitized, "text/html");
-
-        // send html through Readability Library
-        //const reader = new Readability(doc);
-        //const article = reader.parse();
-        //const content = article?.content ?? `<p>No readable content could be extracted.</p>`;
-
-        const final = DOMPurify.sanitize(docHtml);
-        if (!cancelled && mounted.current) setReadableHtml(final);
+        if (!cancelled && mounted.current) setReadableHtml(elements);
       } catch (err: any) {
         if (!cancelled && mounted.current) setError(String(err.message ?? err));
       } finally {
@@ -273,14 +248,13 @@ export default function Page() {
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h2 className="text-lg font-medium mb-2">Preview</h2>
               <div>
-                <h2 className="text-lg font-medium mb-2">Readability Output</h2>
+                <h2 className="text-lg font-medium mb-2">Output</h2>
                 <div className="border rounded p-4 h-[600px] overflow-auto bg-white">
                   {loading && <p className="text-sm text-gray-500">Processing PDF...</p>}
                   {error && <p className="text-sm text-red-500">Error: {error}</p>}
                   {!loading && !error && readableHtml && (
-                    <div dangerouslySetInnerHTML={{ __html: readableHtml }} />
+                    <div>{readableHtml}</div>
                   )}
                   {!loading && !error && !readableHtml && (
                     <p className="text-sm text-gray-500">Upload a PDF to extract readable content.</p>
