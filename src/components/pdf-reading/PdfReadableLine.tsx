@@ -9,7 +9,7 @@ type Props = {
     summarizePercent?: number; // percent to shorten by when summarizing
 };
 
-export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen, summarizePercent = 30 }) => {
+export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen, summarizePercent = 50 }) => {
     const classMap: Record<number, string> = {
     1: "text-2xl font-bold mt-4 mb-2",
     2: "text-xl font-bold mt-3 mb-1.5",

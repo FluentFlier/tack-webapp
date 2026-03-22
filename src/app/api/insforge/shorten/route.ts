@@ -23,7 +23,7 @@ export async function POST(request: Request) {
         const host = base.replace(/\/?$/g, "");
         const endpoint = `${host}/api/ai/chat/completion`;
 
-        const prompt = `Shorten the following paragraph to approximately ${targetLen} characters (preserve meaning and key points).\n\nParagraph:\n${text}`;
+        const prompt = `Shorten the following paragraph to approximately ${targetLen} characters (preserve meaning and key points). Any quotes should be left intact even if it means not shortening the paragraph. \n\nParagraph:\n${text}`;
 
         const body = {
           model: "openai/gpt-4o-mini",
