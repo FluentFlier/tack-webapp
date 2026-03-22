@@ -6,9 +6,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Header } from "@/components/layout";
 import PdfReadableLine from "@/components/pdf-reading/PdfReadableLine";
+import PdfImageLine from "@/components/pdf-reading/PdfImageLine";
 import { Readability } from "@mozilla/readability";
 import DOMPurify from "dompurify";
-import { getResolvedPDFJS, extractText, getDocumentProxy } from 'unpdf';
+import { getResolvedPDFJS, extractText, getDocumentProxy, extractImages } from 'unpdf';
 import type { TextItem, TextContent } from 'pdfjs-dist/types/src/display/api';
 
 
@@ -72,7 +73,9 @@ export default function Page() {
         if (file == null) throw new Error("No file to process");
         const arrayBuffer = await file.arrayBuffer();
 
-        let fullText = "";
+
+
+
         const pdf = await getDocumentProxy(new Uint8Array(arrayBuffer));
         console.log(await pdf.numPages);
         const pdfJS = await getResolvedPDFJS(); //get direct access to the underlying PDF.js library used by unpdf
@@ -86,21 +89,31 @@ export default function Page() {
         
 
         //for each page extract the textContent elements
-        let textContents : TextItem[] = [] ;
+        let textContents : TextItem[][] = [];
+        
         for (let page of pages) {
           const textContent : TextContent = await page.getTextContent({includeMarkedContent: false}); //get the list of TextContent objects without any TextMarkedContentObjects
           let textContentItems = textContent.items as TextItem[];
-          textContents.push(...textContentItems); //ignore the styles and lang properties of each TextContent object
+          textContents.push(textContentItems); //store each page's text items in its own array
         }
 
-        //build a list containing all the pdf from the pdf with the relative text sizes
-        let docText: { text: string; headingLevel: number }[] = [];
+        //collect page heights from PDF.js page viewports (scale 1)
+        const pageHeights: number[] = pages.map((page) => page.getViewport({ scale: 1 }).height);
+
+        //build a list containing all the text and images from the pdf with the relative text sizes
+        type DocText = { type: 'text'; text: string; headingLevel: number; yPos: number };
+        type DocImage = { type: 'image'; src: string; yPos: number };
+        type DocElement = DocText | DocImage;
+
+        let docElements: DocElement[] = [];
 
         //create a list of all the text heights in the document to sort by
         let heights : number[] = [];
-        for (let item of textContents) {
-          if (!heights.includes(item.height)) {
-            heights.push(item.height);
+        for (let pageItems of textContents) {
+          for (let item of pageItems) {
+            if (!heights.includes(item.height)) {
+              heights.push(item.height);
+            }
           }
         }
         heights.sort((a,b) => b-a); //sort heights from largest to smallest
@@ -119,88 +132,146 @@ export default function Page() {
             heightToHeading[heights[i]] = level;
           }
         }
-        console.log("textContent: ");
-        console.log(textContents);
         
 
         let lastXIndent = -999;
-        //populate docText as a simplified version of textContents (only the text and height properties)
-        for (let i = 0; i < textContents.length; i++) {
-          const item = textContents[i] as TextItem;
-          let lineText = item.str;
-
-          //if the text is empty or only whitespace, skip it
-          if (lineText.trim() === "") continue;
-
-          //check whether this is a new page
-          let newPage = false;
-          if (i == 0) {
-            newPage = true;
-          }
-          else if (item.transform[5] > textContents[i-1].transform[5]) { //if the y position has increased, it's a new page
-            newPage = true;
-          }
-
-          //check the heading level
-          const headingLevel = heightToHeading[item.height] || 6; //default to 6 if height not recognized
+        //populate docElements with text items (with position tracking)
+        let tempDocText: { text: string; headingLevel: number; yPos: number }[] = [];
+        let pageStartYPos = 0; //track the yPos of the start of each page
+        
+        for (let pageNum = 0; pageNum < textContents.length; pageNum++) {
+          const pageItems = textContents[pageNum];
+          const pageHeight = pageHeights[pageNum];
           
+          //update pageStartYPos for the current page
+          if (pageNum > 0) {
+            pageStartYPos += pageHeights[pageNum - 1];
+          }
+          
+          for (let i = 0; i < pageItems.length; i++) {
+            const item = pageItems[i] as TextItem;
+            let lineText = item.str;
 
-          //if it's a new page then check whether this line or the last line is likely a page number and reformat it
-          if (newPage) {
-            //check whether the lineText is a arabic or roman numeral
-            let pageNum = Number(lineText.trim());
-            if (isNaN(pageNum)) {
-              //try parsing as a roman numeral
-              pageNum = parseRomanNumeral(lineText.trim());
-              if (isNaN(pageNum)) {
-                //probably not a page num
+            //if the text is empty or only whitespace, skip it
+            if (lineText.trim() === "") continue;
+            
+
+            //check whether this is a new page (first item of this page)
+            let newPage = (i == 0);
+
+            //check the heading level
+            const headingLevel = heightToHeading[item.height] || 6; //default to 6 if height not recognized
+            
+
+            //if it's a new page then check whether this line or the last line is likely a page number and reformat it
+            if (newPage) {
+              
+              //check whether the lineText is a arabic or roman numeral
+              let pageNumberInDocument = Number(lineText.trim());
+              if (isNaN(pageNumberInDocument)) {
+                //try parsing as a roman numeral
+                pageNumberInDocument = parseRomanNumeral(lineText.trim());
+                if (isNaN(pageNumberInDocument)) {
+                  //probably not a page num
+                }
+              }
+
+              //if the lineText is likely a page number, reformat it to "Page X"
+              if (!isNaN(pageNumberInDocument)) {
+                lineText = "Page " + pageNumberInDocument;
+
+                if (displayPageNumbers) {
+
+                  const adjustedYPos = calculateAdjustedYPos(pageHeight, item.transform[5], pageStartYPos) 
+                  tempDocText.push({"text": lineText, "headingLevel": headingLevel, "yPos": adjustedYPos});
+                  
+                }
+                continue; //skip the other parsing logic for this line
               }
             }
 
-            //if the lineText is likely a page number, reformat it to "Page X"
-            if (!isNaN(pageNum)) {
-              lineText = "Page " + pageNum;
-
-              if (displayPageNumbers) {
-                docText.push({"text": lineText, "headingLevel": headingLevel});
-              }
-              continue; //skip the other parsing logic for this line
-            }
-          }
-
-          //check whether this is the start of a new paragraph
-          let isNewParagraph = false;
-          if ((item.transform[4]-lastXIndent)/lastXIndent > .05) { //if the x position has increased significantly, assume it's a new paragraph
-            isNewParagraph = true;
-          }
-          else {
-            lastXIndent = item.transform[4]; //only update lastXIndent if we are not starting a new paragraph, to allow for multiple lines of the same paragraph to have slightly different indents without breaking the paragraph
-          }
-
-          
-
-          //if this is not a new paragraph and the height is the same as the previous item, assume it's a continuation of the same line and concatenate the text
-          if (!isNewParagraph && i > 0 && headingLevel == docText[docText.length-1].headingLevel) {
-
-            //if the last character of the last line is a "-" then remove it before combining (since a word was likely broken across two lines)
-            let lastLine = docText[docText.length - 1].text;
-            if (lastLine[lastLine.length-1] === "-") {
-              lastLine = lastLine.slice(0, -1);
-              docText[docText.length - 1].text = lastLine + lineText; //also combine the lines wihtout adding a space (in the middle of a word)
+            //check whether this is the start of a new paragraph
+            let isNewParagraph = false;
+            if ((item.transform[4]-lastXIndent)/lastXIndent > .05) { //if the x position has increased significantly, assume it's a new paragraph
+              isNewParagraph = true;
             }
             else {
-              docText[docText.length - 1].text += " " + lineText;
+              lastXIndent = item.transform[4]; //only update lastXIndent if we are not starting a new paragraph, to allow for multiple lines of the same paragraph to have slightly different indents without breaking the paragraph
             }
-            
+
+          
+
+            //if this is not a new paragraph and the height is the same as the previous item, assume it's a continuation of the same line and concatenate the text
+            if (!isNewParagraph && i > 0 && headingLevel == tempDocText[tempDocText.length-1].headingLevel) {
+
+              //if the last character of the last line is a "-" then remove it before combining (since a word was likely broken across two lines)
+              let lastLine = tempDocText[tempDocText.length - 1].text;
+              if (lastLine[lastLine.length-1] === "-") {
+                lastLine = lastLine.slice(0, -1);
+                tempDocText[tempDocText.length - 1].text = lastLine + lineText; //also combine the lines wihtout adding a space (in the middle of a word)
+              }
+              else {
+                tempDocText[tempDocText.length - 1].text += " " + lineText;
+              }
+              
+            }
+            else {
+              //otherwise add the text and the corresponding heading level to tempDocText with yPos
+              const adjustedYPos = calculateAdjustedYPos(pageHeight, item.transform[5], pageStartYPos);
+              tempDocText.push({"text": lineText, "headingLevel": headingLevel, "yPos": adjustedYPos});
+              
+            }
           }
-          else {
-            //otherwise add the text and the corresponding heading level to docText
-            docText.push({"text": lineText, "headingLevel": headingLevel});
+
+          //now try to extract images from this page
+          try {
+            const extractedImages = await extractImages(pdf, pageNum+1); //unPDF page numbers are 1-indexed
+            console.log("Found " + extractedImages.length + " images on page " + (pageNum+1));
+
+            for (const imgObj of extractedImages) {
+              const canvas = document.createElement('canvas');
+              const context = canvas.getContext('2d');
+              
+              if (!context) continue;
+
+              canvas.width = imgObj.width;
+              canvas.height = imgObj.height;
+
+              //create ImageData from the extracted image data
+              const imageData = context.createImageData(imgObj.width, imgObj.height);
+              imageData.data.set(imgObj.data);
+              
+              //put the image data on the canvas
+              context.putImageData(imageData, 0, 0);
+
+              //convert canvas to data URL
+              const imageDataUrl = canvas.toDataURL('image/png');
+              
+              //add the extracted image to docElements
+              //use a large negative yPos to place it with the text from the same page
+              docElements.push({
+                type: 'image',
+                src: imageDataUrl,
+                yPos: pageStartYPos
+              });
+            }
+          } catch (err) {
+            console.warn(`Failed to extract images from page ${pageNum}:`, err);
           }
+
         }
 
+        //convert tempDocText to docElements
+        for (let textItem of tempDocText) {
+          docElements.push({
+            type: 'text',
+            text: textItem.text,
+            headingLevel: textItem.headingLevel,
+            yPos: textItem.yPos
+          });
+        }
 
-        console.log(docText)
+        console.log(docElements);
 
         //const { totalPages, text } = await extractText(pdf, {mergePages: true});
 
@@ -209,10 +280,30 @@ export default function Page() {
 
         if (cancelled) return;
 
-        
-        const elements = docText.map((line, idx) => (
-          <PdfReadableLine key={idx} headingLevel={line.headingLevel} content={line.text} />
-        ));
+        //sort docElements by yPos (in accending order, then by type to keep images together)
+        docElements.sort((a, b) => {
+          if (a.yPos !== b.yPos) return a.yPos - b.yPos;
+          return a.type === 'image' ? 1 : -1;
+        });
+
+        const elements = docElements.map((element, idx) => {
+          if (element.type === 'text') {
+            return (
+              <PdfReadableLine 
+                key={idx} 
+                headingLevel={element.headingLevel} 
+                content={element.text} 
+              />
+            );
+          } else {
+            return (
+              <PdfImageLine 
+                key={idx} 
+                src={element.src}
+              />
+            );
+          }
+        });
 
         if (!cancelled && mounted.current) setReadableHtml(elements);
       } catch (err: any) {
@@ -246,11 +337,11 @@ export default function Page() {
           {fileName && <p className="mt-2 text-sm text-gray-500">Selected: {fileName}</p>}
         </div>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-1 gap-6">
           <div>
               <div>
                 <h2 className="text-lg font-medium mb-2">Output</h2>
-                <div className="border rounded p-4 h-[600px] overflow-auto bg-white">
+                <div className="border rounded p-4 bg-white h-fit-content w-full">
                   {loading && <p className="text-sm text-gray-500">Processing PDF...</p>}
                   {error && <p className="text-sm text-red-500">Error: {error}</p>}
                   {!loading && !error && readableHtml && (
@@ -314,3 +405,10 @@ export function parseRomanNumeral(input: string): number {
   }
   return total;
 }
+
+//when repeatedly caled with the y information extracted from a pdf about the location of text elements this function will adjust the y values so they are always increasing when an element is lower in a document.
+function calculateAdjustedYPos(pageHeight: number, originalYTransform: number, pageStartYPos: number) {
+  
+  return (pageHeight - originalYTransform) + pageStartYPos;
+}
+
