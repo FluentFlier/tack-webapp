@@ -8,6 +8,9 @@ import type { UserPreferences } from "@/types";
 // ── Default preferences (used when not signed in or before data loads) ──
 const DEFAULT_PREFERENCES: Omit<UserPreferences, "user_id"> = {
     high_contrast: false,
+    color_profile: "default",
+    custom_fg: "#f1f5f9",
+    custom_bg: "#0f172a",
     font_size: "medium",
     screen_reader_verbosity: "normal",
     reduced_motion: false,
@@ -57,12 +60,20 @@ function applySettingsToRoot(prefs: Omit<UserPreferences, "user_id">) {
     const root = document.documentElement;
 
     // ── Color profile via data attribute ──
-    // When high_contrast is true, use the high-contrast palette.
-    // When false, remove the attribute so the default palette applies.
-    if (prefs.high_contrast) {
-        root.setAttribute("data-color-profile", "high-contrast");
+    const profile = prefs.color_profile || (prefs.high_contrast ? "high-contrast" : "default");
+    if (profile && profile !== "default") {
+        root.setAttribute("data-color-profile", profile);
     } else {
         root.removeAttribute("data-color-profile");
+    }
+
+    // Custom palette: set CSS variables for foreground/background
+    if (profile === "custom" && prefs.custom_fg && prefs.custom_bg) {
+        root.style.setProperty("--custom-fg", prefs.custom_fg);
+        root.style.setProperty("--custom-bg", prefs.custom_bg);
+    } else {
+        root.style.removeProperty("--custom-fg");
+        root.style.removeProperty("--custom-bg");
     }
 
     // ── Font size via CSS variable ──
@@ -129,6 +140,9 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
                 if (data) {
                     const prefs = {
                         high_contrast: data.high_contrast ?? false,
+                        color_profile: data.color_profile ?? "default",
+                        custom_fg: data.custom_fg ?? "#f1f5f9",
+                        custom_bg: data.custom_bg ?? "#0f172a",
                         font_size: data.font_size ?? "medium",
                         screen_reader_verbosity: data.screen_reader_verbosity ?? "normal",
                         reduced_motion: data.reduced_motion ?? false,

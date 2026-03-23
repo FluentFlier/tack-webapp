@@ -2,3 +2,4 @@ export { ChatMessage } from "./ChatMessage";
 export { ChatInput } from "./ChatInput";
 export { ChatHistory } from "./ChatHistory";
 export { CommandPalette } from "./CommandPalette";
+export { SlashCommandButtons } from "./SlashCommandButtons";

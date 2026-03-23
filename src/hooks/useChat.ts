@@ -59,6 +59,9 @@ export function useChat(initialConversationId?: string) {
         } else if (result.startsWith("__COMMAND__:read:")) {
           const url = result.replace("__COMMAND__:read:", "");
           input = `Please read and simplify the content at this URL: ${url}`;
+        } else if (result.startsWith("__COMMAND__:search:")) {
+          const query = result.replace("__COMMAND__:search:", "");
+          input = `Please search the web for: ${query}`;
         }
       }
 

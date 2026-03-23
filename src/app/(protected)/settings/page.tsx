@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { LiveRegion } from "@/components/a11y";
 import { insforge } from "@/lib/insforge";
 import { useUser } from "@insforge/nextjs";
-import type { UserPreferences } from "@/types";
+import type { UserPreferences, ColorProfile } from "@/types";
 
 // ── Font-size enum → pixel mapping ──
 const FONT_SIZE_MAP: Record<string, number> = {
@@ -21,7 +21,7 @@ const FONT_SIZE_MAP: Record<string, number> = {
 /**
  * Apply the current preference values directly to the <html> element.
  * This activates the CSS rules already defined in globals.css:
- *   - data-color-profile="high-contrast"  → high contrast palette
+ *   - data-color-profile attribute        → color-blindness palette
  *   - --base-font-size                    → scales all rem-based text
  *   - .reduced-motion class               → disables animations/transitions
  * Also persists to localStorage so the blocking <Script> in layout.tsx
@@ -30,11 +30,21 @@ const FONT_SIZE_MAP: Record<string, number> = {
 function applySettingsToDOM(prefs: Omit<UserPreferences, "user_id">) {
   const root = document.documentElement;
 
-  // High contrast
-  if (prefs.high_contrast) {
-    root.setAttribute("data-color-profile", "high-contrast");
+  // Color profile via data attribute
+  const profile = prefs.color_profile || (prefs.high_contrast ? "high-contrast" : "default");
+  if (profile && profile !== "default") {
+    root.setAttribute("data-color-profile", profile);
   } else {
     root.removeAttribute("data-color-profile");
+  }
+
+  // Custom palette: set CSS variables for foreground/background
+  if (profile === "custom" && prefs.custom_fg && prefs.custom_bg) {
+    root.style.setProperty("--custom-fg", prefs.custom_fg);
+    root.style.setProperty("--custom-bg", prefs.custom_bg);
+  } else {
+    root.style.removeProperty("--custom-fg");
+    root.style.removeProperty("--custom-bg");
   }
 
   // Font size
@@ -75,6 +85,9 @@ export default function SettingsPage() {
         setPreferences({
           user_id: user!.id,
           high_contrast: false,
+          color_profile: "default",
+          custom_fg: "#f1f5f9",
+          custom_bg: "#0f172a",
           font_size: "medium",
           screen_reader_verbosity: "normal",
           reduced_motion: false,
@@ -154,22 +167,106 @@ export default function SettingsPage() {
             Adjust visual settings for your comfort
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="high-contrast">High contrast mode</Label>
-            <input
-              id="high-contrast"
-              type="checkbox"
-              checked={preferences.high_contrast}
-              onChange={(e) =>
-                setPreferences({
-                  ...preferences,
-                  high_contrast: e.target.checked,
-                })
-              }
-              className="h-5 w-5 rounded border-gray-300 focus:ring-2 focus:ring-ring"
-            />
-          </div>
+        <CardContent className="space-y-6">
+          {/* ── Color-Blindness Profile ── */}
+          <fieldset className="space-y-3 rounded-lg border border-border p-4">
+            <legend className="px-2 text-sm font-semibold">Color-Blindness Profile</legend>
+            <p className="text-xs text-muted-foreground">
+              Select a color palette optimized for your vision. Changes apply on save.
+            </p>
+            <div className="space-y-2" role="radiogroup" aria-label="Color-blindness profile">
+              {([
+                { value: "default", label: "Default" },
+                { value: "protanopia", label: "Protanopia (red-blind)" },
+                { value: "deuteranopia", label: "Deuteranopia (green-blind)" },
+                { value: "tritanopia", label: "Tritanopia (blue-blind)" },
+                { value: "protanomaly", label: "Protanomaly (red-weak)" },
+                { value: "deuteranomaly", label: "Deuteranomaly (green-weak)" },
+                { value: "achromatopsia", label: "Achromatopsia (Monochrome)" },
+                { value: "high-contrast", label: "High Contrast" },
+                { value: "custom", label: "Custom palette" },
+              ] as { value: ColorProfile; label: string }[]).map((opt) => (
+                <label
+                  key={opt.value}
+                  className="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm hover:bg-muted/50 cursor-pointer"
+                >
+                  <input
+                    type="radio"
+                    name="colorProfile"
+                    value={opt.value}
+                    checked={preferences.color_profile === opt.value}
+                    onChange={() =>
+                      setPreferences({
+                        ...preferences,
+                        color_profile: opt.value,
+                        // Keep high_contrast in sync for backward compat
+                        high_contrast: opt.value === "high-contrast",
+                      })
+                    }
+                    className="h-4 w-4 accent-primary"
+                  />
+                  {opt.label}
+                </label>
+              ))}
+            </div>
+
+            {/* Custom palette color pickers — only visible when "custom" is selected */}
+            {preferences.color_profile === "custom" && (
+              <div className="mt-3 space-y-3 rounded-md border border-border bg-muted/30 p-4">
+                <p className="text-xs font-medium text-muted-foreground">Pick a foreground/background color pair:</p>
+                <div className="flex items-center gap-3">
+                  <Label htmlFor="custom-fg" className="min-w-[6rem] text-sm">Foreground</Label>
+                  <input
+                    id="custom-fg-picker"
+                    type="color"
+                    value={preferences.custom_fg}
+                    onChange={(e) =>
+                      setPreferences({ ...preferences, custom_fg: e.target.value })
+                    }
+                    className="h-9 w-12 cursor-pointer rounded border border-border p-0.5"
+                    aria-label="Foreground color picker"
+                  />
+                  <input
+                    id="custom-fg"
+                    type="text"
+                    value={preferences.custom_fg}
+                    onChange={(e) =>
+                      setPreferences({ ...preferences, custom_fg: e.target.value })
+                    }
+                    pattern="^#[0-9a-fA-F]{6}$"
+                    maxLength={7}
+                    className="w-24 rounded-md border bg-background px-2 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring"
+                    aria-label="Foreground hex color"
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <Label htmlFor="custom-bg" className="min-w-[6rem] text-sm">Background</Label>
+                  <input
+                    id="custom-bg-picker"
+                    type="color"
+                    value={preferences.custom_bg}
+                    onChange={(e) =>
+                      setPreferences({ ...preferences, custom_bg: e.target.value })
+                    }
+                    className="h-9 w-12 cursor-pointer rounded border border-border p-0.5"
+                    aria-label="Background color picker"
+                  />
+                  <input
+                    id="custom-bg"
+                    type="text"
+                    value={preferences.custom_bg}
+                    onChange={(e) =>
+                      setPreferences({ ...preferences, custom_bg: e.target.value })
+                    }
+                    pattern="^#[0-9a-fA-F]{6}$"
+                    maxLength={7}
+                    className="w-24 rounded-md border bg-background px-2 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring"
+                    aria-label="Background hex color"
+                  />
+                </div>
+              </div>
+            )}
+          </fieldset>
 
           <div className="space-y-2">
             <Label htmlFor="font-size">Font size</Label>

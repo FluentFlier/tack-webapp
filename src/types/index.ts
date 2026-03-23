@@ -21,9 +21,23 @@ export interface MessageMetadata {
   processing_time_ms?: number;
 }
 
+export type ColorProfile =
+  | "default"
+  | "protanopia"
+  | "deuteranopia"
+  | "tritanopia"
+  | "protanomaly"
+  | "deuteranomaly"
+  | "achromatopsia"
+  | "high-contrast"
+  | "custom";
+
 export interface UserPreferences {
   user_id: string;
   high_contrast: boolean;
+  color_profile: ColorProfile;
+  custom_fg: string;
+  custom_bg: string;
   font_size: "small" | "medium" | "large" | "x-large";
   screen_reader_verbosity: "concise" | "normal" | "verbose";
   reduced_motion: boolean;

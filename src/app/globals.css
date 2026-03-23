@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 20 5% 94%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
@@ -86,7 +86,8 @@ html {
 
 /* ── Color-Blindness Palettes ─────────────────────────────────────
    Applied via data-color-profile attribute on <html>.
-   Each palette overrides the shadcn/ui HSL design tokens.
+   Each palette overrides the FULL set of shadcn/ui HSL design tokens
+   so the entire UI transforms — background, cards, borders, text, etc.
 
    APPROACH: CSS custom properties (preferred over CSS filters)
    - Pros: precise control over every UI color, guarantees text contrast
@@ -94,85 +95,179 @@ html {
    For image simulation, apply SVG filters to image containers.
    ─────────────────────────────────────────────────────────────────── */
 
-/* Protanopia (red-blind) — blues/yellows replace red/green signals */
+/* ── Protanopia (red-blind) ──────────────────────────────────────
+   Blues and yellows replace red/green signals.
+   Deep navy background with bright blue accents and amber warnings. */
 [data-color-profile="protanopia"] {
-  --primary: 200 80% 55%;
-  --primary-foreground: 0 0% 100%;
-  --accent: 200 80% 55%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 40 90% 50%;
+  --background: 215 40% 7%;
+  --foreground: 210 20% 92%;
+  --card: 215 35% 10%;
+  --card-foreground: 210 20% 92%;
+  --popover: 215 35% 10%;
+  --popover-foreground: 210 20% 92%;
+  --primary: 205 85% 55%;
+  --primary-foreground: 215 40% 7%;
+  --secondary: 215 30% 16%;
+  --secondary-foreground: 210 20% 92%;
+  --muted: 215 25% 14%;
+  --muted-foreground: 210 15% 60%;
+  --accent: 45 90% 55%;
+  --accent-foreground: 215 40% 7%;
+  --destructive: 40 95% 50%;
   --destructive-foreground: 0 0% 0%;
-  --ring: 200 80% 55%;
-  --chart-1: 200 70% 50%;
-  --chart-2: 50 80% 50%;
-  --chart-3: 200 40% 35%;
-  --chart-4: 45 85% 60%;
-  --chart-5: 30 90% 55%;
+  --border: 215 25% 22%;
+  --input: 215 25% 22%;
+  --ring: 205 85% 55%;
+  --chart-1: 205 75% 55%;
+  --chart-2: 50 85% 55%;
+  --chart-3: 200 45% 40%;
+  --chart-4: 45 90% 65%;
+  --chart-5: 195 70% 45%;
 }
 
-/* Deuteranopia (green-blind) — blues/yellows, similar to protanopia */
+/* ── Deuteranopia (green-blind) ──────────────────────────────────
+   Blues and golden-yellows, slightly warmer than protanopia.
+   Slate-blue background with cobalt accents and golden warnings. */
 [data-color-profile="deuteranopia"] {
-  --primary: 205 75% 55%;
-  --primary-foreground: 0 0% 100%;
-  --accent: 205 75% 55%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 42 90% 50%;
+  --background: 220 35% 8%;
+  --foreground: 215 18% 90%;
+  --card: 220 30% 11%;
+  --card-foreground: 215 18% 90%;
+  --popover: 220 30% 11%;
+  --popover-foreground: 215 18% 90%;
+  --primary: 210 80% 58%;
+  --primary-foreground: 220 35% 8%;
+  --secondary: 220 25% 17%;
+  --secondary-foreground: 215 18% 90%;
+  --muted: 220 22% 15%;
+  --muted-foreground: 215 12% 58%;
+  --accent: 42 92% 55%;
+  --accent-foreground: 220 35% 8%;
+  --destructive: 42 95% 52%;
   --destructive-foreground: 0 0% 0%;
-  --ring: 205 75% 55%;
-  --chart-1: 205 70% 50%;
-  --chart-2: 48 80% 50%;
-  --chart-3: 205 40% 35%;
-  --chart-4: 42 85% 60%;
-  --chart-5: 28 90% 55%;
+  --border: 220 22% 23%;
+  --input: 220 22% 23%;
+  --ring: 210 80% 58%;
+  --chart-1: 210 75% 55%;
+  --chart-2: 48 88% 55%;
+  --chart-3: 208 42% 38%;
+  --chart-4: 42 90% 62%;
+  --chart-5: 200 65% 48%;
 }
 
-/* Tritanopia (blue-blind) — reds/cyans replace blue/yellow signals */
+/* ── Tritanopia (blue-blind) ─────────────────────────────────────
+   Reds and cyans replace blue/yellow signals.
+   Warm dark background with coral accents and teal highlights. */
 [data-color-profile="tritanopia"] {
-  --primary: 15 85% 55%;
+  --background: 10 30% 7%;
+  --foreground: 15 15% 90%;
+  --card: 10 25% 10%;
+  --card-foreground: 15 15% 90%;
+  --popover: 10 25% 10%;
+  --popover-foreground: 15 15% 90%;
+  --primary: 8 80% 58%;
   --primary-foreground: 0 0% 100%;
-  --accent: 15 85% 55%;
+  --secondary: 10 20% 16%;
+  --secondary-foreground: 15 15% 90%;
+  --muted: 10 18% 14%;
+  --muted-foreground: 15 10% 58%;
+  --accent: 178 60% 42%;
   --accent-foreground: 0 0% 100%;
-  --destructive: 15 90% 45%;
+  --destructive: 15 90% 48%;
   --destructive-foreground: 0 0% 100%;
-  --ring: 15 85% 55%;
-  --chart-1: 15 80% 50%;
-  --chart-2: 175 60% 40%;
-  --chart-3: 15 40% 35%;
-  --chart-4: 170 65% 55%;
-  --chart-5: 10 85% 55%;
+  --border: 10 18% 22%;
+  --input: 10 18% 22%;
+  --ring: 8 80% 58%;
+  --chart-1: 8 75% 55%;
+  --chart-2: 178 55% 42%;
+  --chart-3: 12 40% 38%;
+  --chart-4: 175 50% 50%;
+  --chart-5: 5 70% 50%;
 }
 
-/* Protanomaly (red-weak) — subtle blue/yellow shift */
+/* ── Protanomaly (red-weak) ──────────────────────────────────────
+   Subtle blue/yellow shift — less aggressive than protanopia.
+   Slightly cool-toned dark background. */
 [data-color-profile="protanomaly"] {
-  --primary: 210 65% 55%;
+  --background: 218 28% 8%;
+  --foreground: 215 15% 90%;
+  --card: 218 24% 11%;
+  --card-foreground: 215 15% 90%;
+  --popover: 218 24% 11%;
+  --popover-foreground: 215 15% 90%;
+  --primary: 212 72% 55%;
   --primary-foreground: 0 0% 100%;
-  --accent: 210 65% 55%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 38 80% 50%;
+  --secondary: 218 20% 16%;
+  --secondary-foreground: 215 15% 90%;
+  --muted: 218 18% 14%;
+  --muted-foreground: 215 10% 58%;
+  --accent: 48 75% 52%;
+  --accent-foreground: 218 28% 8%;
+  --destructive: 38 85% 52%;
   --destructive-foreground: 0 0% 0%;
-  --ring: 210 65% 55%;
+  --border: 218 18% 22%;
+  --input: 218 18% 22%;
+  --ring: 212 72% 55%;
+  --chart-1: 212 68% 52%;
+  --chart-2: 48 80% 55%;
+  --chart-3: 210 38% 38%;
+  --chart-4: 45 75% 60%;
+  --chart-5: 205 60% 45%;
 }
 
-/* Deuteranomaly (green-weak) — subtle blue/yellow shift */
+/* ── Deuteranomaly (green-weak) ──────────────────────────────────
+   Subtle blue/yellow shift — less aggressive than deuteranopia.
+   Slightly warm-blue dark background. */
 [data-color-profile="deuteranomaly"] {
-  --primary: 215 60% 55%;
+  --background: 222 26% 8%;
+  --foreground: 218 14% 90%;
+  --card: 222 22% 11%;
+  --card-foreground: 218 14% 90%;
+  --popover: 222 22% 11%;
+  --popover-foreground: 218 14% 90%;
+  --primary: 215 68% 56%;
   --primary-foreground: 0 0% 100%;
-  --accent: 215 60% 55%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 40 80% 50%;
+  --secondary: 222 18% 16%;
+  --secondary-foreground: 218 14% 90%;
+  --muted: 222 16% 14%;
+  --muted-foreground: 218 10% 58%;
+  --accent: 45 78% 54%;
+  --accent-foreground: 222 26% 8%;
+  --destructive: 40 85% 52%;
   --destructive-foreground: 0 0% 0%;
-  --ring: 215 60% 55%;
+  --border: 222 16% 22%;
+  --input: 222 16% 22%;
+  --ring: 215 68% 56%;
+  --chart-1: 215 65% 52%;
+  --chart-2: 44 82% 55%;
+  --chart-3: 212 38% 38%;
+  --chart-4: 42 75% 60%;
+  --chart-5: 208 58% 45%;
 }
 
-/* Achromatopsia (monochrome) — grayscale palette */
+/* ── Achromatopsia (Monochrome) ──────────────────────────────────
+   Full grayscale — no color at all.
+   Pure luminance-based contrast for complete color blindness. */
 [data-color-profile="achromatopsia"] {
-  --primary: 0 0% 65%;
-  --primary-foreground: 0 0% 0%;
-  --accent: 0 0% 65%;
-  --accent-foreground: 0 0% 0%;
+  --background: 0 0% 6%;
+  --foreground: 0 0% 92%;
+  --card: 0 0% 9%;
+  --card-foreground: 0 0% 92%;
+  --popover: 0 0% 9%;
+  --popover-foreground: 0 0% 92%;
+  --primary: 0 0% 75%;
+  --primary-foreground: 0 0% 6%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 92%;
+  --muted: 0 0% 14%;
+  --muted-foreground: 0 0% 58%;
+  --accent: 0 0% 75%;
+  --accent-foreground: 0 0% 6%;
   --destructive: 0 0% 45%;
   --destructive-foreground: 0 0% 100%;
-  --ring: 0 0% 65%;
+  --border: 0 0% 22%;
+  --input: 0 0% 22%;
+  --ring: 0 0% 75%;
   --chart-1: 0 0% 80%;
   --chart-2: 0 0% 60%;
   --chart-3: 0 0% 40%;
@@ -180,7 +275,9 @@ html {
   --chart-5: 0 0% 50%;
 }
 
-/* High Contrast — maximum contrast palette (activated by high_contrast toggle) */
+/* ── High Contrast ───────────────────────────────────────────────
+   Maximum contrast palette — pure black bg, bright white fg,
+   with vivid blue primary for maximum visibility. */
 [data-color-profile="high-contrast"] {
   --background: 0 0% 0%;
   --foreground: 0 0% 100%;
@@ -219,6 +316,19 @@ html {
 [data-color-profile="high-contrast"] :focus-visible {
   outline: 3px solid hsl(var(--ring));
   outline-offset: 2px;
+}
+
+/* ── Custom palette ──────────────────────────────────────────────
+   Foreground/background set via JS CSS variables. */
+[data-color-profile="custom"] {
+  --background: var(--custom-bg, 0 0% 3.9%);
+  --foreground: var(--custom-fg, 0 0% 98%);
+}
+
+/* Override text and background colors directly for custom palette */
+[data-color-profile="custom"] body {
+  background-color: var(--custom-bg, inherit);
+  color: var(--custom-fg, inherit);
 }
 
 /* ── Reduced Motion ───────────────────────────────────────────────

@@ -39,8 +39,13 @@ export default function RootLayout({
                   if (p.font_size && fsMap[p.font_size]) {
                     r.style.setProperty('--base-font-size', fsMap[p.font_size] + 'px');
                   }
-                  if (p.high_contrast) {
-                    r.setAttribute('data-color-profile', 'high-contrast');
+                  var profile = p.color_profile || (p.high_contrast ? 'high-contrast' : 'default');
+                  if (profile && profile !== 'default') {
+                    r.setAttribute('data-color-profile', profile);
+                  }
+                  if (profile === 'custom' && p.custom_fg && p.custom_bg) {
+                    r.style.setProperty('--custom-fg', p.custom_fg);
+                    r.style.setProperty('--custom-bg', p.custom_bg);
                   }
                   if (p.reduced_motion) {
                     r.classList.add('reduced-motion');

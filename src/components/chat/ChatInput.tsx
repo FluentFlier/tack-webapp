@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SendHorizontal } from "lucide-react";
 import { CommandPalette } from "./CommandPalette";
+import { SlashCommandButtons } from "./SlashCommandButtons";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -52,13 +53,20 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   };
 
   return (
-    <div className="border-t p-4">
+    <div className="border-t">
+      {/* Quick-access slash command buttons */}
+      {!showCommands && (
+        <SlashCommandButtons
+          onSelect={handleCommandSelect}
+          disabled={disabled}
+        />
+      )}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
-        className="relative flex items-end gap-2 max-w-3xl mx-auto"
+        className="relative flex items-end gap-2 max-w-3xl mx-auto px-4 pb-4"
       >
         <CommandPalette
           filter={commandFilter}
