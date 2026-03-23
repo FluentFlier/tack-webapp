@@ -4,7 +4,12 @@ import Script from "next/script";
 import "./globals.css";
 import { InsforgeProvider } from "./providers";
 
-const inter = Inter({ subsets: ["latin"] });
+const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  style: ["normal", "italic"],
+});
 
 export const metadata: Metadata = {
   title: "Tack - Accessible AI Assistant",

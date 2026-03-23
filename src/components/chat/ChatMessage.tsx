@@ -134,24 +134,31 @@ function renderInlineContent(
 
 export function ChatMessage({ message }: ChatMessageProps) {
   const isAssistant = message.role === "assistant";
+  const sources = message.metadata?.sources;
 
   return (
     <div
       className={cn(
-        "flex gap-3 px-4 py-4",
-        isAssistant && "bg-muted/50"
+        "flex gap-3 px-6 py-5 transition-colors",
+        isAssistant && "bg-card/30"
       )}
       role="article"
       aria-label={`${isAssistant ? "Tack" : "You"}: ${message.content.slice(0, 50)}${message.content.length > 50 ? "..." : ""}`}
     >
       <div
         className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border",
-          isAssistant ? "bg-primary text-primary-foreground" : "bg-background"
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border",
+          isAssistant
+            ? "bg-primary/10 border-primary/20"
+            : "bg-muted border-border"
         )}
         aria-hidden="true"
       >
-        {isAssistant ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
+        {isAssistant ? (
+          <Sparkles className="h-4 w-4 text-primary" />
+        ) : (
+          <User className="h-4 w-4 text-muted-foreground" />
+        )}
       </div>
       <div className="flex-1 space-y-1 overflow-hidden">
         <p className="text-sm font-medium">
@@ -167,10 +174,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
           <p className="text-xs text-muted-foreground mt-2">
             Source:{" "}
             <a
-              href={message.metadata.source_url}
+              href={`/reader?url=${encodeURIComponent(message.metadata.source_url)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="underline focus:outline-none focus:ring-2 focus:ring-ring"
+              className="text-primary underline underline-offset-2 decoration-primary/30 hover:decoration-primary/60 focus:outline-none focus:ring-2 focus:ring-ring rounded"
             >
               {message.metadata.source_url}
             </a>

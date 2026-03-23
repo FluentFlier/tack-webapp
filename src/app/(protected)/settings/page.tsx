@@ -152,7 +152,7 @@ export default function SettingsPage() {
       <LiveRegion message={statusMessage} politeness="assertive" />
 
       <div>
-        <h1 className="text-2xl font-bold">Settings</h1>
+        <h1 className="text-2xl font-bold font-serif italic">Settings</h1>
         <p className="text-muted-foreground mt-1">
           Customize your accessibility preferences
         </p>
@@ -162,7 +162,7 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Display</CardTitle>
+          <CardTitle className="font-serif italic">Display</CardTitle>
           <CardDescription>
             Adjust visual settings for your comfort
           </CardDescription>
@@ -279,7 +279,7 @@ export default function SettingsPage() {
                   font_size: e.target.value as UserPreferences["font_size"],
                 })
               }
-              className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full rounded-lg border border-border/60 bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/40 transition-colors"
             >
               <option value="small">Small</option>
               <option value="medium">Medium (default)</option>
@@ -300,7 +300,7 @@ export default function SettingsPage() {
                   reduced_motion: e.target.checked,
                 })
               }
-              className="h-5 w-5 rounded border-gray-300 focus:ring-2 focus:ring-ring"
+              className="h-5 w-5 rounded border-border accent-primary focus:ring-2 focus:ring-ring"
             />
           </div>
         </CardContent>
@@ -308,7 +308,7 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Screen Reader</CardTitle>
+          <CardTitle className="font-serif italic">Screen Reader</CardTitle>
           <CardDescription>
             Adjust how much detail Tack provides in responses
           </CardDescription>
@@ -326,7 +326,7 @@ export default function SettingsPage() {
                     .value as UserPreferences["screen_reader_verbosity"],
                 })
               }
-              className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full rounded-lg border border-border/60 bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/40 transition-colors"
             >
               <option value="concise">
                 Concise — Brief, to-the-point responses

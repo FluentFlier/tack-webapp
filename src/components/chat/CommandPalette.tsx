@@ -23,9 +23,9 @@ export function CommandPalette({
 
   return (
     <div
+      className="absolute bottom-full left-0 right-0 mb-2 rounded-xl border border-border/60 bg-card shadow-xl shadow-black/10 overflow-hidden backdrop-blur-sm"
       role="listbox"
       aria-label="Available commands"
-      className="absolute bottom-full left-0 right-0 mb-1 rounded-md border bg-popover p-1 shadow-md"
     >
       {filtered.map((cmd) => (
         <button
@@ -33,13 +33,12 @@ export function CommandPalette({
           role="option"
           aria-selected={false}
           onClick={() => onSelect(`/${cmd.name} `)}
-          className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent focus:bg-accent focus:outline-none"
+          className="w-full text-left px-4 py-3 hover:bg-accent transition-colors focus:outline-none focus:bg-accent border-b border-border/30 last:border-0"
         >
-          <span className="font-mono text-xs text-muted-foreground">
+          <span className="text-primary font-mono text-sm font-medium">
             /{cmd.name}
           </span>
-          <span className="text-muted-foreground">—</span>
-          <span>{cmd.description}</span>
+          <p className="text-muted-foreground text-xs mt-0.5">{cmd.description}</p>
         </button>
       ))}
     </div>
