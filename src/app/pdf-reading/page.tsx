@@ -30,7 +30,7 @@ export default function Page() {
     "AIDefaultShortening": false,
     "AIFullDocumentSummary": false,
     "displayPageNumbers": true,
-    "backgroundColor": "#FFFFFF",
+    "backgroundColor": "#ffffff",
     "textColor": "#000000",
   } //fix this once the pdf-reading-settings page saves settings to backend
   
@@ -332,13 +332,13 @@ export default function Page() {
   }, [file]);
 
 
-  const mainStyleDict = {
+  const styleDict = {
     backgroundColor: settings.backgroundColor
   }
   return (
     <>
       <Header />
-      <main className="min-h-screen p-8" style={mainStyleDict}>
+      <main className="min-h-screen p-8" style={styleDict}>
         <h1 className="text-3xl text-gray-600">PDF Reading</h1>
         <a href="pdf-reading-settings">PDF Reader Settings</a>
         <div className="mt-6">
@@ -360,7 +360,7 @@ export default function Page() {
                   {loading && <p className="text-sm text-gray-500">Processing PDF...</p>}
                   {error && <p className="text-sm text-red-500">Error: {error}</p>}
                   {!loading && !error && readableHtml && (
-                    <div className="border rounded p-4 bg-white h-fit-content w-full">
+                    <div className="border rounded p-4 bg-white h-fit-content w-full" style={styleDict}>
                       <p>Below is the content of the document. When you select a button labeled summarize line? you can press the button to toggle an AI shortend version of the following line or paragraph. Pressing the button again will return the original version.</p>
                       <div>{readableHtml}</div>
                     </div>
