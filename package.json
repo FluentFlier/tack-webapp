@@ -25,6 +25,12 @@
   },
   "homepage": "https://github.com/FluentFlier/tack-webapp#readme",
   "dependencies": {
+    "@embedpdf/core": "^2.9.1",
+    "@embedpdf/engines": "^2.9.1",
+    "@embedpdf/plugin-document-manager": "^2.9.1",
+    "@embedpdf/plugin-render": "^2.9.1",
+    "@embedpdf/plugin-scroll": "^2.9.1",
+    "@embedpdf/plugin-viewport": "^2.9.1",
     "@insforge/nextjs": "^1.1.7",
     "@insforge/sdk": "^1.1.5",
     "@mozilla/readability": "^0.6.0",
@@ -43,6 +49,7 @@
     "jsdom": "^28.1.0",
     "lucide-react": "^0.564.0",
     "next": "^14.2.35",
+    "pdfjs-dist": "^5.5.207",
     "postcss": "^8.5.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -50,6 +57,7 @@
     "tailwindcss": "3.4",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.9.3",
+    "unpdf": "^1.4.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
