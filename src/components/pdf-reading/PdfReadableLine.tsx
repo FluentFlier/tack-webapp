@@ -49,7 +49,7 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
     }
 
     const doToggle = async () => {
-        alert("Toggling sumary for: " + content);
+        //alert("Toggling sumary for: " + content);
         if (isSummary) {
             // animate back to original
             setFading(true);
@@ -77,18 +77,19 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
         }, 180);
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key && e.key.toLowerCase() === "o") {
-            doToggle();
-        }
-    };
+    
 
     const display = isSummary && summaryText ? summaryText : content;
     const summaryStyle = isSummary ? "italic font-semibold" : "";
     const fadeClass = fading ? "opacity-30 scale-95" : "opacity-100 scale-100";
 
+    const minSummaryLength = 1000; //only show a button to summarize a line that is longer than x characters
+    const longEnoughToSummarize = content.length > minSummaryLength;
+
+    let summarizeButton = <button onClick={doToggle}>summarize line? {`${isSummary ? "enabled" : "disabled"}`}</button>;
     return (
-    <div tabIndex={0} onKeyDown={handleKeyDown} className="focus:outline-none">
+    <div tabIndex={0}  className="focus:outline-none">
+        {longEnoughToSummarize ? summarizeButton : ''}
         <p className={`${baseClass} transition-transform transition-opacity duration-200 ${summaryStyle} ${fadeClass}`}>
         {loading ? `${display}…` : display}
         </p>
