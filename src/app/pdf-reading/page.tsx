@@ -30,11 +30,10 @@ export default function Page() {
     "AIDefaultShortening": false,
     "AIFullDocumentSummary": false,
     "displayPageNumbers": true,
-    "backgroundColor": "#ffffff",
-    "textColor": "#000000",
+    "backgroundColor": "#c73b3bff",
+    "textColor": "#17c24aff",
   } //fix this once the pdf-reading-settings page saves settings to backend
   
-  let displayPageNumbers = settings.displayPageNumbers;
 
 
 
@@ -157,9 +156,11 @@ export default function Page() {
             pageStartYPos += pageHeights[pageNum - 1];
           }
           
+          let lastLineWasPageNumber = false;
           for (let i = 0; i < pageItems.length; i++) {
             const item = pageItems[i] as TextItem;
             let lineText = item.str;
+
 
             //if the text is empty or only whitespace, skip it
             if (lineText.trim() === "") continue;
@@ -188,9 +189,10 @@ export default function Page() {
               //if the lineText is likely a page number, reformat it to "Page X"
               if (!isNaN(pageNumberInDocument)) {
                 lineText = "Page " + pageNumberInDocument;
-
-                if (displayPageNumbers) {
-
+                
+                
+                if (settings.displayPageNumbers) {
+                  lastLineWasPageNumber = true //so that the next line gets set as a new paragraph
                   const adjustedYPos = calculateAdjustedYPos(pageHeight, item.transform[5], pageStartYPos) 
                   tempDocText.push({"text": lineText, "headingLevel": headingLevel, "yPos": adjustedYPos});
                   
@@ -209,7 +211,11 @@ export default function Page() {
             }
 
           
-
+            //if the last line was displayed as a page number then treat this line as a new paragraph, and reset the state keeping track of whether the last line was a page number
+            if (lastLineWasPageNumber) {
+              isNewParagraph = true
+              lastLineWasPageNumber = false
+            }
             //if this is not a new paragraph and the height is the same as the previous item, assume it's a continuation of the same line and concatenate the text
             if (!isNewParagraph && i > 0 && headingLevel == tempDocText[tempDocText.length-1].headingLevel) {
 
@@ -332,41 +338,45 @@ export default function Page() {
   }, [file]);
 
 
-  const styleDict = {
+  const styleDictBackground = {
     backgroundColor: settings.backgroundColor
+  }
+  const styleDictTextColor = {
+    color: settings.textColor
   }
   return (
     <>
       <Header />
-      <main className="min-h-screen p-8" style={styleDict}>
-        <h1 className="text-3xl text-gray-600">PDF Reading</h1>
-        <a href="pdf-reading-settings">PDF Reader Settings</a>
+      <main className="min-h-screen p-8" style={styleDictBackground}>
+        <h1 className="text-3xl text-gray-600" style={styleDictTextColor}>PDF Reading</h1>
+        <a href="pdf-reading-settings" style={styleDictTextColor}>PDF Reader Settings</a>
         <div className="mt-6">
-          <label className="block text-sm font-medium text-gray-700">Upload a PDF using the browse button below then the text content will appear below</label>
+          <label className="block text-sm font-medium text-gray-700" style={styleDictTextColor}>Upload a PDF using the browse button below then the text content will appear below</label>
           <input
             type="file"
             accept="application/pdf,.pdf"
             onChange={handleFileChange}
             className="mt-2"
+            style={styleDictTextColor}
           />
-          {fileName && <p className="mt-2 text-sm text-gray-500">Selected: {fileName}</p>}
+          {fileName && <p className="mt-2 text-sm text-gray-500" style={styleDictTextColor}>Selected: {fileName}</p>}
         </div>
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-1 gap-6">
           <div>
               <div>
-                <h2 className="text-lg font-medium mb-2">Output</h2>
+                <h2 className="text-lg font-medium mb-2" style={styleDictTextColor}>Output</h2>
                 
-                  {loading && <p className="text-sm text-gray-500">Processing PDF...</p>}
-                  {error && <p className="text-sm text-red-500">Error: {error}</p>}
+                  {loading && <p className="text-sm text-gray-500" style={styleDictTextColor}>Processing PDF...</p>}
+                  {error && <p className="text-sm text-red-500" style={styleDictTextColor}>Error: {error}</p>}
                   {!loading && !error && readableHtml && (
-                    <div className="border rounded p-4 bg-white h-fit-content w-full" style={styleDict}>
-                      <p>Below is the content of the document. When you select a button labeled summarize line? you can press the button to toggle an AI shortend version of the following line or paragraph. Pressing the button again will return the original version.</p>
+                    <div className="border rounded p-4 bg-white h-fit-content w-full" style={styleDictBackground}>
+                      <p style={styleDictTextColor}>Below is the content of the document. When you select a button labeled summarize line? you can press the button to toggle an AI shortend version of the following line or paragraph. Pressing the button again will return the original version.</p>
                       <div>{readableHtml}</div>
                     </div>
                   )}
                   {!loading && !error && !readableHtml && (
-                    <p className="text-sm text-gray-500">Once you upload a PDF using the browse button above, the text content of the document will appear here</p>
+                    <p className="text-sm text-gray-500" style={styleDictTextColor}>Once you upload a PDF using the browse button above, the text content of the document will appear here</p>
                   )}
                 
               </div>
