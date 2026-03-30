@@ -8,7 +8,6 @@ import { Header } from "@/components/layout";
 import PdfReadableLine from "@/components/pdf-reading/PdfReadableLine";
 import PdfImageLine from "@/components/pdf-reading/PdfImageLine";
 import { Readability } from "@mozilla/readability";
-import DOMPurify from "dompurify";
 import { getResolvedPDFJS, extractText, getDocumentProxy, extractImages } from 'unpdf';
 import type { TextItem, TextContent } from 'pdfjs-dist/types/src/display/api';
 
@@ -26,7 +25,17 @@ export default function Page() {
 
 
   //USER SETTINGS
-  let displayPageNumbers = false;
+
+  let settings = {
+    "AIDefaultShortening": false,
+    "AIFullDocumentSummary": false,
+    "displayPageNumbers": true,
+    "backgroundColor": "#FFFFFF",
+    "textColor": "#000000",
+  } //fix this once the pdf-reading-settings page saves settings to backend
+  
+  let displayPageNumbers = settings.displayPageNumbers;
+
 
 
 
@@ -293,6 +302,8 @@ export default function Page() {
                 key={idx} 
                 headingLevel={element.headingLevel} 
                 content={element.text} 
+                defaultToSummary={settings.AIDefaultShortening}
+                textColor={settings.textColor}
               />
             );
           } else {
@@ -320,12 +331,16 @@ export default function Page() {
     };
   }, [file]);
 
+
+  const mainStyleDict = {
+    backgroundColor: settings.backgroundColor
+  }
   return (
     <>
       <Header />
-      <main className="min-h-screen p-8">
+      <main className="min-h-screen p-8" style={mainStyleDict}>
         <h1 className="text-3xl text-gray-600">PDF Reading</h1>
-
+        <a href="pdf-reading-settings">PDF Reader Settings</a>
         <div className="mt-6">
           <label className="block text-sm font-medium text-gray-700">Upload a PDF using the browse button below then the text content will appear below</label>
           <input
