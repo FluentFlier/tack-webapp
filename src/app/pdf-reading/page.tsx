@@ -30,8 +30,8 @@ export default function Page() {
     "AIDefaultShortening": false,
     "AIFullDocumentSummary": false,
     "displayPageNumbers": true,
-    "backgroundColor": "#c73b3bff",
-    "textColor": "#17c24aff",
+    "backgroundColor": "#ffffffff",
+    "textColor": "#000000ff",
   } //fix this once the pdf-reading-settings page saves settings to backend
   
 
