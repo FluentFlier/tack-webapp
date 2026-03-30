@@ -327,7 +327,7 @@ export default function Page() {
         <h1 className="text-3xl text-gray-600">PDF Reading</h1>
 
         <div className="mt-6">
-          <label className="block text-sm font-medium text-gray-700">Upload PDF</label>
+          <label className="block text-sm font-medium text-gray-700">Upload a PDF using the browse button below then the text content will appear below</label>
           <input
             type="file"
             accept="application/pdf,.pdf"
@@ -341,16 +341,19 @@ export default function Page() {
           <div>
               <div>
                 <h2 className="text-lg font-medium mb-2">Output</h2>
-                <div className="border rounded p-4 bg-white h-fit-content w-full">
+                
                   {loading && <p className="text-sm text-gray-500">Processing PDF...</p>}
                   {error && <p className="text-sm text-red-500">Error: {error}</p>}
                   {!loading && !error && readableHtml && (
-                    <div>{readableHtml}</div>
+                    <div className="border rounded p-4 bg-white h-fit-content w-full">
+                      <p>Below is the content of the document. When you select a button labeled summarize line? you can press the button to toggle an AI shortend version of the following line or paragraph. Pressing the button again will return the original version.</p>
+                      <div>{readableHtml}</div>
+                    </div>
                   )}
                   {!loading && !error && !readableHtml && (
-                    <p className="text-sm text-gray-500">Upload a PDF to extract readable content.</p>
+                    <p className="text-sm text-gray-500">Once you upload a PDF using the browse button above, the text content of the document will appear here</p>
                   )}
-                </div>
+                
               </div>
             </div>
           </div>
