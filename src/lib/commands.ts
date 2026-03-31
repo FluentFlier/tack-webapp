@@ -32,6 +32,16 @@ export const COMMANDS: SlashCommand[] = [
     },
   },
   {
+    name: "search",
+    description: "Search the web via Google",
+    usage: "/search <query>",
+    execute: (args: string) => {
+      const query = args.trim();
+      if (!query) return "Please provide a search query. Usage: /search <query>";
+      return `__COMMAND__:search:${query}`;
+    },
+  },
+  {
     name: "clear",
     description: "Start a new conversation",
     usage: "/clear",
