@@ -25,16 +25,34 @@ export default function Page() {
 
 
   //USER SETTINGS
-
-  let settings = {
+  const defaultSettings = {
     "AIDefaultShortening": false,
     "AIFullDocumentSummary": false,
     "displayPageNumbers": true,
-    "backgroundColor": "#ffffffff",
-    "textColor": "#000000ff",
-  } //fix this once the pdf-reading-settings page saves settings to backend
-  
+    "backgroundColor": "#FFFFFF",
+    "textColor": "#000000",
+  };
 
+  const [settings, setSettings] = useState(defaultSettings);
+
+  useEffect(() => {
+    const savedSettings = localStorage.getItem("pdfReaderSettings");
+    if (savedSettings) {
+      setSettings(JSON.parse(savedSettings));
+    } else {
+      setSettings(defaultSettings);
+    }
+  }, []);
+
+
+  function saveSettings() {
+    saveSettingsLocalStorage(settings);
+    //eventually save settings to Insforge backend, at the moment this is just a stub
+  }
+
+  function saveSettingsLocalStorage(updatedSettings: typeof settings) {
+    localStorage.setItem("pdfReaderSettings", JSON.stringify(updatedSettings));
+  }
 
 
 
