@@ -9,9 +9,10 @@ type Props = {
     summarizePercent?: number; // percent to shorten by when summarizing
     defaultToSummary: boolean;
     textColor: string;
+    minLengthToSummarize: number;
 };
 
-export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen, summarizePercent = 50, defaultToSummary = false, textColor = "#000000"}) => {
+export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen, summarizePercent = 50, defaultToSummary = false, textColor = "#000000", minLengthToSummarize = 1000}) => {
     const classMap: Record<number, string> = {
     1: "text-2xl font-bold mt-4 mb-2",
     2: "text-xl font-bold mt-3 mb-1.5",
@@ -85,15 +86,16 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
     const summaryStyle = isSummary ? "italic font-semibold" : "";
     const fadeClass = fading ? "opacity-30 scale-95" : "opacity-100 scale-100";
 
-    const minSummaryLength = 1000; //only show a button to summarize a line that is longer than x characters
-    const longEnoughToSummarize = content.length > minSummaryLength;
+    const longEnoughToSummarize = content.length > minLengthToSummarize;
 
-    let summarizeButton = <button onClick={doToggle}>summarize line? {`${isSummary ? "enabled" : "disabled"}`}</button>;
-    
+   
     
     const pstyleDict = {
         "color": textColor
     }
+
+     let summarizeButton = <button style={pstyleDict} onClick={doToggle}>summarize line? {`${isSummary ? "enabled" : "disabled"}`}</button>;
+    
     return (
     <div tabIndex={0}  className="focus:outline-none">
         {longEnoughToSummarize ? summarizeButton : ''}
