@@ -31,6 +31,8 @@ export default function Page() {
     "displayPageNumbers": true,
     "backgroundColor": "#FFFFFF",
     "textColor": "#000000",
+    "minLengthToSummarize": 200,
+    "targetSummaryLength": 60, //percentage
   };
 
   const [settings, setSettings] = useState(defaultSettings);
@@ -328,6 +330,8 @@ export default function Page() {
                 content={element.text} 
                 defaultToSummary={settings.AIDefaultShortening}
                 textColor={settings.textColor}
+                minLengthToSummarize={settings.minLengthToSummarize}
+                summarizePercent={settings.targetSummaryLength}
               />
             );
           } else {
@@ -389,7 +393,7 @@ export default function Page() {
                   {error && <p className="text-sm text-red-500" style={styleDictTextColor}>Error: {error}</p>}
                   {!loading && !error && readableHtml && (
                     <div className="border rounded p-4 bg-white h-fit-content w-full" style={styleDictBackground}>
-                      <p style={styleDictTextColor}>Below is the content of the document. When you select a button labeled summarize line? you can press the button to toggle an AI shortend version of the following line or paragraph. Pressing the button again will return the original version.</p>
+                      <p style={styleDictTextColor}>Below is the content of the document. When you select a button labeled summarize line? you can press the button to toggle an AI shortened version of the following line or paragraph. Pressing the button again will return the original version.</p>
                       <div>{readableHtml}</div>
                     </div>
                   )}
