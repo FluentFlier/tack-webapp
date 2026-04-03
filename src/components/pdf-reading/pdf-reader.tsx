@@ -25,41 +25,25 @@ export default function Page() {
 
 
   //USER SETTINGS
-  const defaultSettings = {
-    "AIDefaultShortening": false,
-    "AIFullDocumentSummary": false,
-    "displayPageNumbers": true,
-    "backgroundColor": "#FFFFFF",
-    "textColor": "#000000",
-    "minLengthToSummarize": 200,
-    "targetSummaryLength": 60, //percentage
-  };
-
-  const [settings, setSettings] = useState(defaultSettings);
-
-  useEffect(() => {
-    const savedSettings = localStorage.getItem("pdfReaderSettings");
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
-    } else {
-      setSettings(defaultSettings);
+  //this function written using Copilot inline suggestions then edited
+  function getsettings() {
+    
+    try {
+      const localStorageSettings = localStorage.getItem("pdfReaderSettings");
+      if (localStorageSettings) {
+        return JSON.parse(localStorageSettings) as PDFReaderSettings;
+      }
+      else {
+        throw new Error("no settings in local storage")
+      }
     }
-  }, []);
-
-
-  function saveSettings() {
-    saveSettingsLocalStorage(settings);
-    //eventually save settings to Insforge backend, at the moment this is just a stub
+    catch {
+      return defaultSettings;
+    }
   }
 
-  function saveSettingsLocalStorage(updatedSettings: typeof settings) {
-    localStorage.setItem("pdfReaderSettings", JSON.stringify(updatedSettings));
-  }
-
-
-
-
-
+  let settings = getsettings()
+ 
 
 
   useEffect(() => {
