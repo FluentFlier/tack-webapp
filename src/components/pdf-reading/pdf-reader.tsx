@@ -25,6 +25,19 @@ export default function Page() {
 
 
   //USER SETTINGS
+
+  const defaultSettings = {
+    "AIDefaultShortening": false,
+    "AIFullDocumentSummary": false,
+    "displayPageNumbers": true,
+    "backgroundColor": "#FFFFFF",
+    "textColor": "#000000",
+    "minLengthToSummarize": 200,
+    "targetSummaryLength": 60, //percentage
+  };
+
+  type PDFReaderSettings = typeof defaultSettings;
+  
   //this function written using Copilot inline suggestions then edited
   function getsettings() {
     
