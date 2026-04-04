@@ -31,6 +31,12 @@ export function Header() {
                 Chat
               </Button>
             </Link>
+            <Link href="/pdf-reading" aria-label="Go to chat">
+              <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+                <MessageSquare className="h-4 w-4" aria-hidden="true" />
+                PDF Reader
+              </Button>
+            </Link>
             <Link href="/settings" aria-label="Settings">
               <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
                 <Settings className="h-4 w-4" aria-hidden="true" />
