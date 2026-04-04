@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+//this file written almost entirely by GitHub Copilot with some fixes after Copilot tried guessing the API methods
+
 type ReqBody = {
   text: string;
   percent: number; // percent to shorten (e.g., 30 means reduce length by 30%)
