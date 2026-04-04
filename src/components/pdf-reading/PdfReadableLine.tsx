@@ -24,7 +24,7 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
 
     const baseClass = classMap[headingLevel] ?? classMap[6];
 
-    const [isSummary, setIsSummary] = useState(defaultToSummary);
+    const [isSummary, setIsSummary] = useState(false);
     const [summaryText, setSummaryText] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [fading, setFading] = useState(false);
@@ -80,6 +80,10 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
         }, 180);
     };
 
+    //if the line is supposed to be summarized by default, then do that now
+    if (defaultToSummary) {
+        doToggle();
+    }
     
 
     const display = isSummary && summaryText ? summaryText : content;
