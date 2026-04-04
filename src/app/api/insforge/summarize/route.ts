@@ -1,23 +1,23 @@
 import { NextResponse } from "next/server";
 
-//this file written almost entirely by GitHub Copilot with some fixes after Copilot tried guessing the API methods
+//this file copied from src/app/insforge/shorten/route.ts (which was mostly written using GitHub Copilot) and then the prompt was modified manually
 
 type ReqBody = {
   text: string;
-  percent: number; // percent to shorten (e.g., 30 means reduce length by 30%)
+  targetLength: number; 
 };
 
 export async function POST(request: Request) {
   try {
-    const { text, percent } = (await request.json()) as ReqBody;
-    if (typeof text !== "string" || typeof percent !== "number") {
+    const { text, targetLength } = (await request.json()) as ReqBody;
+    if (typeof text !== "string" || typeof targetLength !== "number") {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
     const base = process.env.NEXT_PUBLIC_INSFORGE_BASE_URL;
     const apiKey = process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY;
 
-    const targetLen = Math.max(20, Math.round(text.length * (1 - percent / 100)));
+    const targetLen = targetLength
 
     // Best-effort: try calling InsForge model gateway if env is configured.
     if (base && apiKey) {
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
         const host = base.replace(/\/?$/g, "");
         const endpoint = `${host}/api/ai/chat/completion`;
 
-        const prompt = `Shorten the following paragraph to approximately ${targetLen} characters (preserve meaning and key points). Any quotes should be left intact even if it means not shortening the paragraph. \n\nParagraph:\n${text}`;
+        const prompt = `Summarize the following text to approximately ${targetLen} characters (give a general overview of the text). \n\nText to summarize:\n${text}`;
 
         const body = {
           model: "openai/gpt-4o-mini",
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
         // InsForge documented response shape: { success: true, text: "..." }
         if (r.ok && json && typeof json.text === "string") {
-          return NextResponse.json({ shortened: json.text });
+          return NextResponse.json({ summary: json.text });
         }
         else if (!r.ok) {
           return NextResponse.json({ error: "!r.ok" }, { status: 500 });
