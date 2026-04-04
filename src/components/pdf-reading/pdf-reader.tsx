@@ -496,14 +496,6 @@ export default function Page() {
   );
 }
 
-function escapeHtml(str: string) {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
 
 // Client helper: shorten a paragraph by a given percent using the InsForge model gateway
 // `percent` is the percentage to shorten by (e.g. 30 means reduce length by 30%)
