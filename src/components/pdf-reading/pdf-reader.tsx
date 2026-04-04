@@ -3,20 +3,30 @@
 //notes about this file
 //This file was written mostly by GPT-5 mini with some parts written by Daniel Briggs
 
+//the full document summary function was implemented starting on 2026-4-3 using Github Copilot. Basically it takes the extracted lines of text, concatenates them together to get a list of all the text, truncates it if the text is too long, then runs that through the existing shorten function that shortens by a percentage using a calculated percentage to get to a roughly fixed length summary then outputs to html
 import React, { useEffect, useRef, useState } from "react";
 import { Header } from "@/components/layout";
 import PdfReadableLine from "@/components/pdf-reading/PdfReadableLine";
 import PdfImageLine from "@/components/pdf-reading/PdfImageLine";
-import { Readability } from "@mozilla/readability";
-import { getResolvedPDFJS, extractText, getDocumentProxy, extractImages } from 'unpdf';
+import { Button } from "@/components/ui/button";
+import { getDocumentProxy, extractImages } from 'unpdf';
 import type { TextItem, TextContent } from 'pdfjs-dist/types/src/display/api';
 
 
 
 export default function Page() {
+  const FULL_DOCUMENT_SUMMARY_MAX_CHARS = 8000;
+  const FULL_DOCUMENT_SUMMARY_IDEAL_LENGTH = 300;
+
+
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [readableHtml, setReadableHtml] = useState<React.ReactNode | null>(null);
+  const [documentText, setDocumentText] = useState("");
+  const [documentSummary, setDocumentSummary] = useState<string | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+  const [summaryUsedTruncation, setSummaryUsedTruncation] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(true);
@@ -66,6 +76,41 @@ export default function Page() {
     };
   }, []);
 
+  async function generateDocumentSummary(rawText: string, isCancelled: () => boolean = () => false) {
+    if (!rawText.trim()) {
+      setDocumentSummary(null);
+      setSummaryError("No extracted document text available to summarize.");
+      setSummaryLoading(false);
+      setSummaryUsedTruncation(false);
+      return;
+    }
+
+    const textForSummary = rawText.slice(0, FULL_DOCUMENT_SUMMARY_MAX_CHARS);
+    const usedTruncation = rawText.length > FULL_DOCUMENT_SUMMARY_MAX_CHARS;
+
+    if (!isCancelled() && mounted.current) {
+      setSummaryLoading(true);
+      setSummaryError(null);
+      setSummaryUsedTruncation(usedTruncation);
+    }
+
+    try {
+      const summary = await shortenWithInsforge(textForSummary, (FULL_DOCUMENT_SUMMARY_IDEAL_LENGTH / textForSummary.length) * 100);
+      if (!isCancelled() && mounted.current) {
+        setDocumentSummary(summary);
+      }
+    } catch (err: any) {
+      if (!isCancelled() && mounted.current) {
+        setDocumentSummary(null);
+        setSummaryError(String(err.message ?? err));
+      }
+    } finally {
+      if (!isCancelled() && mounted.current) {
+        setSummaryLoading(false);
+      }
+    }
+  }
+
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0] ?? null;
     if (!f) return;
@@ -80,6 +125,11 @@ export default function Page() {
     setFile(f);
     setFileName(f.name);
     setReadableHtml(null);
+    setDocumentText("");
+    setDocumentSummary(null);
+    setSummaryLoading(false);
+    setSummaryError(null);
+    setSummaryUsedTruncation(false);
     setError(null);
   }
 
@@ -103,7 +153,6 @@ export default function Page() {
 
         const pdf = await getDocumentProxy(new Uint8Array(arrayBuffer));
         console.log(await pdf.numPages);
-        const pdfJS = await getResolvedPDFJS(); //get direct access to the underlying PDF.js library used by unpdf
         
         //load list of all pages
         let listOfPagePromises = [];
@@ -305,7 +354,7 @@ export default function Page() {
 
         console.log(docElements);
 
-        //const { totalPages, text } = await extractText(pdf, {mergePages: true});
+  const fullDocumentText = tempDocText.map((item) => item.text).join("\n\n");
 
 
 
@@ -341,7 +390,14 @@ export default function Page() {
           }
         });
 
-        if (!cancelled && mounted.current) setReadableHtml(elements);
+        if (!cancelled && mounted.current) {
+          setReadableHtml(elements);
+          setDocumentText(fullDocumentText);
+
+          if (settings.AIFullDocumentSummary) {
+            void generateDocumentSummary(fullDocumentText, () => cancelled);
+          }
+        }
       } catch (err: any) {
         if (!cancelled && mounted.current) setError(String(err.message ?? err));
       } finally {
@@ -363,6 +419,9 @@ export default function Page() {
   const styleDictTextColor = {
     color: settings.textColor
   }
+
+
+  
   return (
     <>
       <Header />
@@ -390,6 +449,37 @@ export default function Page() {
                   {error && <p className="text-sm text-red-500" style={styleDictTextColor}>Error: {error}</p>}
                   {!loading && !error && readableHtml && (
                     <div className="border rounded p-4 bg-white h-fit-content w-full" style={styleDictBackground}>
+                      {settings.AIFullDocumentSummary && (
+                        <div className="mb-4 rounded border p-3 bg-gray-50">
+                          <h3 className="text-md font-medium mb-1" style={styleDictTextColor}>Full document summary</h3>
+                          {summaryLoading && <p className="text-sm text-gray-500" style={styleDictTextColor}>Generating summary...</p>}
+                          {summaryError && (
+                            <div className="flex flex-col gap-2">
+                              <p className="text-sm text-red-500">Error: {summaryError}</p>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="w-fit"
+                                onClick={() => void generateDocumentSummary(documentText)}
+                                disabled={!documentText || summaryLoading}
+                              >
+                                Retry summary
+                              </Button>
+                            </div>
+                          )}
+                          {!summaryLoading && !summaryError && documentSummary && (
+                            <p className="text-sm" style={styleDictTextColor}>{documentSummary}</p>
+                          )}
+                          {!summaryLoading && !summaryError && !documentSummary && (
+                            <p className="text-sm text-gray-500" style={styleDictTextColor}>A summary will appear here after processing.</p>
+                          )}
+                          {summaryUsedTruncation && (
+                            <p className="text-xs text-gray-500 mt-2" style={styleDictTextColor}>
+                              Summary generated from the first {FULL_DOCUMENT_SUMMARY_MAX_CHARS.toLocaleString()} characters because this PDF is very long.
+                            </p>
+                          )}
+                        </div>
+                      )}
                       <p style={styleDictTextColor}>Below is the content of the document. When you select a button labeled summarize line? you can press the button to toggle an AI shortened version of the following line or paragraph. Pressing the button again will return the original version.</p>
                       <div>{readableHtml}</div>
                     </div>
