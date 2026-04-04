@@ -28,6 +28,12 @@ export default function Home() {
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </Link>
+              <Link href="/pdf-reading">
+                <Button className="gap-2">
+                  PDF Reader
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </Link>
             </SignedIn>
             <SignedOut>
               <SignInButton>
@@ -70,6 +76,12 @@ export default function Home() {
               <Link href="/chat">
                 <Button size="lg" className="gap-2 text-base px-8 h-12">
                   Open Chat
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </Link>
+              <Link href="/pdf-reading">
+                <Button size="lg" className="gap-2 text-base px-8 h-12">
+                  Open PDF Reader
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </Link>
