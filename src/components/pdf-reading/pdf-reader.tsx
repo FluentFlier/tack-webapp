@@ -15,7 +15,7 @@ import type { TextItem, TextContent } from 'pdfjs-dist/types/src/display/api';
 
 
 export default function Page() {
-  const FULL_DOCUMENT_SUMMARY_MAX_CHARS = 8000;
+  const FULL_DOCUMENT_SUMMARY_MAX_CHARS = 1000;
   const FULL_DOCUMENT_SUMMARY_IDEAL_LENGTH = 300;
 
 
@@ -95,7 +95,7 @@ export default function Page() {
     }
 
     try {
-      const summary = await shortenWithInsforge(textForSummary, (FULL_DOCUMENT_SUMMARY_IDEAL_LENGTH / textForSummary.length) * 100);
+      const summary = await summarizeWithInsforge(textForSummary, FULL_DOCUMENT_SUMMARY_IDEAL_LENGTH);
       if (!isCancelled() && mounted.current) {
         setDocumentSummary(summary);
       }
@@ -450,12 +450,12 @@ export default function Page() {
                   {!loading && !error && readableHtml && (
                     <div className="border rounded p-4 bg-white h-fit-content w-full" style={styleDictBackground}>
                       {settings.AIFullDocumentSummary && (
-                        <div className="mb-4 rounded border p-3 bg-gray-50">
+                        <div className="mb-4 rounded border p-3 bg-gray-50" style={styleDictBackground}>
                           <h3 className="text-md font-medium mb-1" style={styleDictTextColor}>Full document summary</h3>
                           {summaryLoading && <p className="text-sm text-gray-500" style={styleDictTextColor}>Generating summary...</p>}
                           {summaryError && (
-                            <div className="flex flex-col gap-2">
-                              <p className="text-sm text-red-500">Error: {summaryError}</p>
+                            <div className="flex flex-col gap-2" style={styleDictBackground}>
+                              <p className="text-sm text-red-500" style={styleDictTextColor}>Error: {summaryError}</p>
                               <Button
                                 type="button"
                                 variant="outline"
@@ -497,6 +497,7 @@ export default function Page() {
 }
 
 
+//this function written with Copilot to utilize the shorten api route
 // Client helper: shorten a paragraph by a given percent using the InsForge model gateway
 // `percent` is the percentage to shorten by (e.g. 30 means reduce length by 30%)
 export async function shortenWithInsforge(text: string, percent: number) {
@@ -511,6 +512,23 @@ export async function shortenWithInsforge(text: string, percent: number) {
   }
   const json = await res.json();
   return json.shortened as string;
+}
+
+//this function copied from shortenWithInsforge then modified for the full document summaries
+// Client helper: shorten a paragraph by a given percent using the InsForge model gateway
+// `percent` is the percentage to shorten by (e.g. 30 means reduce length by 30%)
+export async function summarizeWithInsforge(text: string, targetLength: number) {
+  const res = await fetch("/api/insforge/summarize", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text, targetLength }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(body || "Request failed");
+  }
+  const json = await res.json();
+  return json.summary as string;
 }
 
 //This function was written by GPT-5 mini
