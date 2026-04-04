@@ -85,6 +85,17 @@ export default function Home() {
                   Open Chat
                 </button>
               </Link>
+              <Link href="/pdf-reading">
+                <Button className="gap-2">
+                  PDF Reader
+                </Button>
+              </Link>
+              <Link href="/pdf-reading">
+                <Button className="gap-2">
+                  PDF Reader
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </Link>
             </SignedIn>
           </div>
         </div>
@@ -118,6 +129,11 @@ export default function Home() {
               <Link href="/chat">
                 <Button size="lg" className="landing-cta-btn">
                   Open Chat
+                </Button>
+              </Link>
+              <Link href="/pdf-reading">
+                <Button size="lg" className="gap-2 text-base px-8 h-12">
+                  Open PDF Reader
                 </Button>
               </Link>
             </SignedIn>

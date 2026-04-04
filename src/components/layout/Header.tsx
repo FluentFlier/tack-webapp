@@ -43,9 +43,8 @@ export function Header() {
                 Chat
               </Button>
             </Link>
-            <Link href="/pdf" aria-label="PDF Reader">
-              <Button variant="ghost" size="sm">
-                <FileText className="h-4 w-4 mr-2" aria-hidden="true" />
+            <Link href="/pdf-reading" aria-label="Go to PDF reader">
+              <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
                 PDF Reader
               </Button>
             </Link>
