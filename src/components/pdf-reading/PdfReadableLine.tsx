@@ -1,6 +1,7 @@
-"use client"
+//this file written almost entirely by Copilot to display a line/paragraph of text. Settings were added to modify the colors of the text and summarization settigngs.
 
-import React, { useState } from "react";
+
+import React, { useEffect, useRef, useState } from "react";
 
 type Props = {
     headingLevel: number;
@@ -28,27 +29,28 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
     const [summaryText, setSummaryText] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [fading, setFading] = useState(false);
+    const didInitDefaultSummary = useRef(false);
 
     async function fetchSummary() {
-    setLoading(true);
-    try {
-        const res = await fetch("/api/insforge/shorten", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: content, percent: summarizePercent }),
-        });
-        if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(txt || "Summarize request failed");
+        setLoading(true);
+        try {
+            const res = await fetch("/api/insforge/shorten", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: content, percent: summarizePercent }),
+            });
+            if (!res.ok) {
+            const txt = await res.text();
+            throw new Error(txt || "Summarize request failed");
+            }
+            const json = await res.json();
+            const s = json.shortened ?? null;
+            if (s) setSummaryText(s);
+        } catch (err) {
+            console.error("Failed to fetch summary:", err);
+        } finally {
+            setLoading(false);
         }
-        const json = await res.json();
-        const s = json.shortened ?? null;
-        if (s) setSummaryText(s);
-    } catch (err) {
-        console.error("Failed to fetch summary:", err);
-    } finally {
-        setLoading(false);
-    }
     }
 
     const doToggle = async () => {
@@ -72,6 +74,7 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
             return;
         }
 
+        //if a summary hasn't been generated yet, then this code will fetch and display one
         await fetchSummary();
         setFading(true);
         setTimeout(() => {
@@ -80,10 +83,21 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
         }, 180);
     };
 
-    //if the line is supposed to be summarized by default, then do that now
-    if (defaultToSummary) {
+    //this useEffect written by Copilot to generate an AI shortened version if defaultToSummary is true and only run this once not multiple times per line
+    // Initialize default summary once per line instance when enabled.
+    useEffect(() => {
+        if (!defaultToSummary) return;
+        if (didInitDefaultSummary.current) return;
+        if (content.length <= minLengthToSummarize) return;
+
+        didInitDefaultSummary.current = true;
+        //console.log("toggling summary");
+
+        
+        
         doToggle();
-    }
+
+    }, [defaultToSummary, content, minLengthToSummarize, summaryText]);
     
 
     const display = isSummary && summaryText ? summaryText : content;
