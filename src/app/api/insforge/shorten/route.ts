@@ -1,14 +1,30 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@insforge/nextjs/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 //this file written almost entirely by GitHub Copilot with some fixes after Copilot tried guessing the API methods
+//Copilot used to add authorization checks following design from chat api
 
 type ReqBody = {
   text: string;
   percent: number; // percent to shorten (e.g., 30 means reduce length by 30%)
 };
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const { token, userId } = await auth();
+    if (!token || !userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    //this rate limiting copied from chat route
+    const { allowed } = checkRateLimit(userId, 20, 60000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please wait a moment." },
+        { status: 429 }
+      );
+    }
+
     const { text, percent } = (await request.json()) as ReqBody;
     if (typeof text !== "string" || typeof percent !== "number") {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });

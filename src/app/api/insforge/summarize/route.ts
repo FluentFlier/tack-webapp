@@ -1,14 +1,31 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@insforge/nextjs/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 //this file copied from src/app/insforge/shorten/route.ts (which was mostly written using GitHub Copilot) and then the prompt was modified manually
+//Copilot used to add authorization checks following design from chat api
 
 type ReqBody = {
   text: string;
   targetLength: number; 
 };
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const { token, userId } = await auth();
+    if (!token || !userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    //this rate limiting copied from chat route
+    const { allowed } = checkRateLimit(userId, 20, 60000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please wait a moment." },
+        { status: 429 }
+      );
+    }
+        
     const { text, targetLength } = (await request.json()) as ReqBody;
     if (typeof text !== "string" || typeof targetLength !== "number") {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
