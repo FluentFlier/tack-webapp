@@ -2,8 +2,10 @@
 
 //notes about this file
 //This file was written mostly by GPT-5 mini with some parts written by Daniel Briggs
-
 //the full document summary function was implemented starting on 2026-4-3 using Github Copilot. Basically it takes the extracted lines of text, concatenates them together to get a list of all the text, truncates it if the text is too long, then runs that through the existing shorten function that shortens by a percentage using a calculated percentage to get to a roughly fixed length summary then outputs to html
+//rate limiting and account needing to be signed in notifications were added using Copilot, basically when a rate limit error is encountered a function is the pdf-reader component is called (this makes sure an alert about the error is only shown once per page load, instead of once per error)
+
+
 import React, { useEffect, useRef, useState } from "react";
 import { Header } from "@/components/layout";
 import PdfReadableLine from "@/components/pdf-reading/PdfReadableLine";
@@ -30,6 +32,20 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(true);
+  const didShowRateLimitAlert = useRef(false);
+  const didShowUnauthorizedAlert = useRef(false);
+
+  function showRateLimitAlertOnce() {
+    if (didShowRateLimitAlert.current) return;
+    didShowRateLimitAlert.current = true;
+    alert("Rate limit exceeded for AI features, please adjust your settings to increase the minimum size of a line/paragraph that is allowed to be summarized in order to reduce your AI usage and therefore avoid this error.");
+  }
+
+  function showUnauthorizedAlertOnce() {
+    if (didShowUnauthorizedAlert.current) return;
+    didShowUnauthorizedAlert.current = true;
+    alert("You must be signed in to use AI summarization features.");
+  }
 
 
 
@@ -76,6 +92,7 @@ export default function Page() {
     };
   }, []);
 
+  //this function written by Copilot to generate document summaries using the first part of a document
   async function generateDocumentSummary(rawText: string, isCancelled: () => boolean = () => false) {
     if (!rawText.trim()) {
       setDocumentSummary(null);
@@ -95,7 +112,12 @@ export default function Page() {
     }
 
     try {
-      const summary = await summarizeWithInsforge(textForSummary, FULL_DOCUMENT_SUMMARY_IDEAL_LENGTH);
+      const summary = await summarizeWithInsforge(
+        textForSummary,
+        FULL_DOCUMENT_SUMMARY_IDEAL_LENGTH,
+        showRateLimitAlertOnce,
+        showUnauthorizedAlertOnce
+      );
       if (!isCancelled() && mounted.current) {
         setDocumentSummary(summary);
       }
@@ -131,6 +153,8 @@ export default function Page() {
     setSummaryError(null);
     setSummaryUsedTruncation(false);
     setError(null);
+    didShowRateLimitAlert.current = false;
+    didShowUnauthorizedAlert.current = false;
   }
 
   useEffect(() => {
@@ -378,6 +402,8 @@ export default function Page() {
                 textColor={settings.textColor}
                 minLengthToSummarize={settings.minLengthToSummarize}
                 summarizePercent={settings.targetSummaryLength}
+                onRateLimit={showRateLimitAlertOnce}
+                onUnauthorized={showUnauthorizedAlertOnce}
               />
             );
           } else {
@@ -515,14 +541,23 @@ export async function shortenWithInsforge(text: string, percent: number) {
 }
 
 //this function copied from shortenWithInsforge then modified for the full document summaries
-// Client helper: shorten a paragraph by a given percent using the InsForge model gateway
-// `percent` is the percentage to shorten by (e.g. 30 means reduce length by 30%)
-export async function summarizeWithInsforge(text: string, targetLength: number) {
+export async function summarizeWithInsforge(
+  text: string,
+  targetLength: number,
+  onRateLimit?: () => void,
+  onUnauthorized?: () => void
+) {
   const res = await fetch("/api/insforge/summarize", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text, targetLength }),
   });
+  if (res.status === 429) {
+    onRateLimit?.();
+  }
+  if (res.status === 401) {
+    onUnauthorized?.();
+  }
   if (!res.ok) {
     const body = await res.text();
     throw new Error(body || "Request failed");
