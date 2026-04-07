@@ -1,18 +1,21 @@
-"use client"
+//this file written almost entirely by Copilot to display a line/paragraph of text. Settings were added to modify the colors of the text and summarization settigngs.
+//rate limiting and account needing to be signed in notifications were added using Copilot, basically when a rate limit error is encountered a function is the pdf-reader component is called (this makes sure an alert about the error is only shown once per page load, instead of once per error)
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type Props = {
     headingLevel: number;
     content: string;
     onOpen?: (content: string) => void;
+    onRateLimit?: () => void;
+    onUnauthorized?: () => void;
     summarizePercent?: number; // percent to shorten by when summarizing
     defaultToSummary: boolean;
     textColor: string;
     minLengthToSummarize: number;
 };
 
-export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen, summarizePercent = 50, defaultToSummary = false, textColor = "#000000", minLengthToSummarize = 1000}) => {
+export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen, onRateLimit, onUnauthorized, summarizePercent = 50, defaultToSummary = false, textColor = "#000000", minLengthToSummarize = 1000}) => {
     const classMap: Record<number, string> = {
     1: "text-2xl font-bold mt-4 mb-2",
     2: "text-xl font-bold mt-3 mb-1.5",
@@ -28,27 +31,35 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
     const [summaryText, setSummaryText] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [fading, setFading] = useState(false);
+    const didInitDefaultSummary = useRef(false);
 
     async function fetchSummary() {
-    setLoading(true);
-    try {
-        const res = await fetch("/api/insforge/shorten", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: content, percent: summarizePercent }),
-        });
-        if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(txt || "Summarize request failed");
+        setLoading(true);
+        try {
+            const res = await fetch("/api/insforge/shorten", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: content, percent: summarizePercent }),
+            });
+            if (res.status === 429) {
+                onRateLimit?.();
+            }
+            if (res.status === 401) {
+                onUnauthorized?.();
+            }
+            
+            if (!res.ok) {
+            const txt = await res.text();
+            throw new Error(txt || "Summarize request failed");
+            }
+            const json = await res.json();
+            const s = json.shortened ?? null;
+            if (s) setSummaryText(s);
+        } catch (err) {
+            console.error("Failed to fetch summary:", err);
+        } finally {
+            setLoading(false);
         }
-        const json = await res.json();
-        const s = json.shortened ?? null;
-        if (s) setSummaryText(s);
-    } catch (err) {
-        console.error("Failed to fetch summary:", err);
-    } finally {
-        setLoading(false);
-    }
     }
 
     const doToggle = async () => {
@@ -72,6 +83,7 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
             return;
         }
 
+        //if a summary hasn't been generated yet, then this code will fetch and display one
         await fetchSummary();
         setFading(true);
         setTimeout(() => {
@@ -80,10 +92,21 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
         }, 180);
     };
 
-    //if the line is supposed to be summarized by default, then do that now
-    if (defaultToSummary) {
+    //this useEffect written by Copilot to generate an AI shortened version if defaultToSummary is true and only run this once not multiple times per line
+    // Initialize default summary once per line instance when enabled.
+    useEffect(() => {
+        if (!defaultToSummary) return;
+        if (didInitDefaultSummary.current) return;
+        if (content.length <= minLengthToSummarize) return;
+
+        didInitDefaultSummary.current = true;
+        //console.log("toggling summary");
+
+        
+        
         doToggle();
-    }
+
+    }, [defaultToSummary, content, minLengthToSummarize, summaryText]);
     
 
     const display = isSummary && summaryText ? summaryText : content;
