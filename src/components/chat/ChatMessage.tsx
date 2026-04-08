@@ -32,7 +32,7 @@ function formatContent(content: string): React.ReactNode[] {
     if (headingMatch) {
       const headingText = stripInlineMarkdown(headingMatch[2]);
       elements.push(
-        <p key={i} className="font-bold text-base mt-3 mb-1">
+        <p key={i} className="font-bold text-base mt-3 mb-1 text-[rgba(240,237,237,0.92)]">
           {renderInlineContent(headingText, `h-${i}`)}
         </p>
       );
@@ -40,7 +40,6 @@ function formatContent(content: string): React.ReactNode[] {
     }
 
     // Detect standalone heading lines (ALL CAPS or Title Case lines with no punctuation ending)
-    // Only if the line is short and the next line is blank or end of content
     const isStandaloneHeading =
       line.trim().length > 0 &&
       line.trim().length < 80 &&
@@ -50,7 +49,7 @@ function formatContent(content: string): React.ReactNode[] {
 
     if (isStandaloneHeading && !line.trim().match(/^\d+\.\s/)) {
       elements.push(
-        <p key={i} className="font-bold text-base mt-3 mb-1">
+        <p key={i} className="font-bold text-base mt-3 mb-1 text-[rgba(240,237,237,0.92)]">
           {renderInlineContent(line.trim(), `sh-${i}`)}
         </p>
       );
@@ -66,7 +65,7 @@ function formatContent(content: string): React.ReactNode[] {
     // Regular text line
     const processedLine = stripInlineMarkdown(line);
     elements.push(
-      <p key={i} className="text-sm leading-relaxed">
+      <p key={i} className="text-sm leading-relaxed text-[rgba(240,237,237,0.72)]">
         {renderInlineContent(processedLine, `p-${i}`)}
       </p>
     );
@@ -119,7 +118,7 @@ function renderInlineContent(
           href={part}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-primary underline underline-offset-2 hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-ring break-all"
+          className="text-[hsl(255,60%,70%)] underline underline-offset-2 hover:text-[hsl(255,60%,80%)] focus:outline-none focus:ring-2 focus:ring-ring break-all transition-colors"
         >
           {part}
         </a>
@@ -139,28 +138,28 @@ export function ChatMessage({ message }: ChatMessageProps) {
     <div
       className={cn(
         "flex gap-3 px-4 py-4",
-        isAssistant && "bg-muted/50"
+        isAssistant && "app-msg--assistant"
       )}
       role="article"
       aria-label={`${isAssistant ? "Tack" : "You"}: ${message.content.slice(0, 50)}${message.content.length > 50 ? "..." : ""}`}
     >
       <div
         className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border",
-          isAssistant ? "bg-primary text-primary-foreground" : "bg-background"
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+          isAssistant ? "app-msg__avatar--bot" : "app-msg__avatar--user"
         )}
         aria-hidden="true"
       >
-        {isAssistant ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
+        {isAssistant ? <Bot className="h-4 w-4 text-white" /> : <User className="h-4 w-4 text-[rgba(240,237,237,0.6)]" />}
       </div>
       <div className="flex-1 space-y-1 overflow-hidden">
-        <p className="text-sm font-medium">
+        <p className="text-sm font-medium text-[rgba(240,237,237,0.85)]">
           {isAssistant ? "Tack" : "You"}
         </p>
         <div className="max-w-none">
           {isAssistant
             ? formatContent(message.content)
-            : <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+            : <p className="text-sm whitespace-pre-wrap text-[rgba(240,237,237,0.72)]">{message.content}</p>
           }
         </div>
         {message.metadata?.source_url && (
@@ -170,7 +169,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
               href={message.metadata.source_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="underline focus:outline-none focus:ring-2 focus:ring-ring"
+              className="text-[hsl(255,60%,70%)] underline focus:outline-none focus:ring-2 focus:ring-ring"
             >
               {message.metadata.source_url}
             </a>

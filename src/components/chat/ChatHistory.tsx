@@ -20,10 +20,10 @@ export function ChatHistory({ messages, loading = false }: ChatHistoryProps) {
     return (
       <div className="flex flex-1 items-center justify-center p-8">
         <div className="text-center max-w-md">
-          <h2 className="text-xl font-semibold mb-2">Welcome to Tack</h2>
-          <p className="text-muted-foreground">
+          <h2 className="app-chat-welcome text-2xl mb-3">Welcome to Tack</h2>
+          <p className="text-muted-foreground text-sm leading-relaxed">
             Start a conversation or try a command like{" "}
-            <kbd className="rounded border px-1.5 py-0.5 text-xs font-mono">
+            <kbd className="app-kbd rounded px-1.5 py-0.5 text-xs font-mono">
               /help
             </kbd>{" "}
             to see what I can do.
@@ -44,10 +44,10 @@ export function ChatHistory({ messages, loading = false }: ChatHistoryProps) {
         <ChatMessage key={msg.id} message={msg} />
       ))}
       {loading && (
-        <div className="flex gap-3 px-4 py-4 bg-muted/50" role="status">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-primary text-primary-foreground">
-            <span className="animate-pulse text-xs" aria-hidden="true">
-              ...
+        <div className="app-chat-thinking flex gap-3 px-4 py-4" role="status">
+          <div className="app-msg__avatar--bot flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+            <span className="app-chat-thinking__dot animate-pulse text-xs" aria-hidden="true">
+              •••
             </span>
           </div>
           <div className="flex items-center">
