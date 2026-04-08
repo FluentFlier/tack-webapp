@@ -23,7 +23,6 @@ export function CommandPalette({
 
   return (
     <div
-      className="absolute bottom-full left-0 right-0 mb-2 rounded-xl border border-border/60 bg-card shadow-xl shadow-black/10 overflow-hidden backdrop-blur-sm"
       role="listbox"
       aria-label="Available commands"
       className="app-command-palette absolute bottom-full left-0 right-0 mb-1 rounded-lg p-1"

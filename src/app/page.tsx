@@ -134,7 +134,6 @@ export default function Home() {
               <SignInButton>
                 <Button size="lg" className="gap-2 text-base px-8 h-12">
                   Get Started Free
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </SignInButton>
             </SignedOut>
