@@ -34,28 +34,30 @@ export function ChatHistory({ messages, loading = false }: ChatHistoryProps) {
   }
 
   return (
-    <div
-      className="flex-1 overflow-y-auto"
-      role="log"
-      aria-label="Chat messages"
-      aria-live="polite"
-    >
-      {messages.map((msg) => (
-        <ChatMessage key={msg.id} message={msg} />
-      ))}
-      {loading && (
-        <div className="app-chat-thinking flex gap-3 px-4 py-4" role="status">
-          <div className="app-msg__avatar--bot flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
-            <span className="app-chat-thinking__dot animate-pulse text-xs" aria-hidden="true">
-              •••
-            </span>
+    <>
+      <div
+        className="flex-1 overflow-y-auto"
+        role="log"
+        aria-label="Chat messages"
+        aria-live="polite"
+      >
+        {messages.map((msg) => (
+          <ChatMessage key={msg.id} message={msg} />
+        ))}
+        {loading && (
+          <div className="app-chat-thinking flex gap-3 px-4 py-4" role="status">
+            <div className="app-msg__avatar--bot flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+              <span className="app-chat-thinking__dot animate-pulse text-xs" aria-hidden="true">
+                •••
+              </span>
+            </div>
+            <div className="flex items-center">
+              <p className="text-sm text-muted-foreground">Tack is thinking...</p>
+            </div>
           </div>
-          <div className="flex items-center">
-            <p className="text-sm text-muted-foreground">Tack is thinking...</p>
-          </div>
-        </div>
-      )}
-      <div ref={bottomRef} />
-    </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+    </>
   );
 }
