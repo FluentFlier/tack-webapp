@@ -8,12 +8,12 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col h-screen">
+    <div className="app-shell flex flex-col h-screen">
       <Header />
       <FocusManager />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto" role="main">
+        <main className="app-main flex-1 overflow-y-auto" role="main">
           {children}
         </main>
       </div>

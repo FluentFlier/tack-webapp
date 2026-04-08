@@ -4,58 +4,59 @@
 
 @layer base {
   :root {
-    --background: 20 5% 94%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 25 15% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 25 15% 10%;
-    --primary: 34 76% 52%;
+    /* ─── Dark Cinematic Palette ─── */
+    --background: 240 15% 4.5%;         /* #0a0a0f */
+    --foreground: 220 10% 92%;          /* soft white */
+    --card: 240 12% 8%;                 /* slightly lighter dark */
+    --card-foreground: 220 10% 92%;
+    --popover: 240 12% 8%;
+    --popover-foreground: 220 10% 92%;
+    --primary: 255 60% 62%;             /* purple accent */
     --primary-foreground: 0 0% 100%;
-    --secondary: 30 15% 93%;
-    --secondary-foreground: 25 15% 15%;
-    --muted: 30 12% 92%;
-    --muted-foreground: 25 10% 44%;
-    --accent: 30 15% 93%;
-    --accent-foreground: 25 15% 15%;
-    --destructive: 6 65% 48%;
+    --secondary: 240 10% 14%;
+    --secondary-foreground: 220 10% 88%;
+    --muted: 240 10% 12%;
+    --muted-foreground: 220 8% 55%;
+    --accent: 255 50% 58%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 30 15% 88%;
-    --input: 30 15% 88%;
-    --ring: 34 76% 52%;
-    --radius: 0.625rem;
-    --chart-1: 34 76% 52%;
-    --chart-2: 160 40% 45%;
-    --chart-3: 25 15% 30%;
-    --chart-4: 34 50% 70%;
-    --chart-5: 160 30% 60%;
+    --border: 240 10% 16%;
+    --input: 240 10% 16%;
+    --ring: 255 55% 60%;
+    --chart-1: 255 65% 60%;
+    --chart-2: 200 60% 50%;
+    --chart-3: 340 55% 55%;
+    --chart-4: 45 70% 55%;
+    --chart-5: 180 50% 45%;
+    --radius: 0.5rem
   }
 
   .dark {
-    --background: 25 14% 9%;
-    --foreground: 30 25% 95%;
-    --card: 25 12% 12%;
-    --card-foreground: 30 25% 95%;
-    --popover: 25 12% 12%;
-    --popover-foreground: 30 25% 95%;
-    --primary: 34 76% 58%;
-    --primary-foreground: 25 14% 9%;
-    --secondary: 25 10% 16%;
-    --secondary-foreground: 30 20% 90%;
-    --muted: 25 10% 16%;
-    --muted-foreground: 25 15% 60%;
-    --accent: 25 10% 16%;
-    --accent-foreground: 30 20% 90%;
-    --destructive: 6 60% 55%;
+    --background: 240 15% 4.5%;
+    --foreground: 220 10% 92%;
+    --card: 240 12% 8%;
+    --card-foreground: 220 10% 92%;
+    --popover: 240 12% 8%;
+    --popover-foreground: 220 10% 92%;
+    --primary: 255 60% 62%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 10% 14%;
+    --secondary-foreground: 220 10% 88%;
+    --muted: 240 10% 12%;
+    --muted-foreground: 220 8% 55%;
+    --accent: 255 50% 58%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 25 12% 18%;
-    --input: 25 12% 18%;
-    --ring: 34 76% 58%;
-    --chart-1: 34 76% 58%;
-    --chart-2: 160 40% 50%;
-    --chart-3: 30 25% 95%;
-    --chart-4: 34 50% 70%;
-    --chart-5: 160 30% 60%;
+    --border: 240 10% 16%;
+    --input: 240 10% 16%;
+    --ring: 255 55% 60%;
+    --chart-1: 255 65% 60%;
+    --chart-2: 200 60% 50%;
+    --chart-3: 340 55% 55%;
+    --chart-4: 45 70% 55%;
+    --chart-5: 180 50% 45%
   }
 
   * {
@@ -396,4 +397,991 @@ html {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LANDING PAGE — Dark Cinematic Hero
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Root Container ────────────────────────────────────────────── */
+.landing-root {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: #050508;
+  color: #f0eded;
+}
+
+/* ── Background Image ──────────────────────────────────────────── */
+.landing-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.18;
+  filter: blur(2px) saturate(0.6);
+}
+
+/* ── Dark Overlay + Gradient ───────────────────────────────────── */
+.landing-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 5, 8, 0.85) 0%,
+      rgba(5, 5, 8, 0.5) 40%,
+      rgba(5, 5, 8, 0.7) 100%
+    );
+}
+
+/* ── Ambient Gradient Orbs ─────────────────────────────────────── */
+.landing-orb {
+  position: absolute;
+  z-index: 2;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+}
+
+.landing-orb--purple {
+  width: 700px;
+  height: 400px;
+  bottom: -5%;
+  left: 10%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(140, 60, 200, 0.35) 0%,
+    rgba(100, 30, 160, 0.15) 50%,
+    transparent 80%
+  );
+  animation: orbFloat 12s ease-in-out infinite alternate;
+}
+
+.landing-orb--blue {
+  width: 500px;
+  height: 350px;
+  bottom: 5%;
+  right: 5%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(60, 80, 220, 0.3) 0%,
+    rgba(40, 60, 180, 0.1) 50%,
+    transparent 80%
+  );
+  animation: orbFloat 10s ease-in-out 2s infinite alternate-reverse;
+}
+
+@keyframes orbFloat {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    transform: translateY(-30px) scale(1.05);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Navigation Bar
+   ═══════════════════════════════════════════════════════════════════ */
+.landing-nav {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+.landing-nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 72px;
+}
+
+/* Logo */
+.landing-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #f0eded;
+  text-decoration: none;
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  transition: opacity 0.3s ease;
+}
+
+.landing-logo:hover {
+  opacity: 0.75;
+}
+
+.landing-logo svg {
+  opacity: 0.85;
+}
+
+/* Nav links */
+.landing-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 2.2rem;
+}
+
+.landing-nav__link {
+  position: relative;
+  color: rgba(240, 237, 237, 0.6);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+  padding-bottom: 2px;
+}
+
+.landing-nav__link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: rgba(240, 237, 237, 0.5);
+  transition: width 0.3s ease;
+}
+
+.landing-nav__link:hover {
+  color: rgba(240, 237, 237, 0.95);
+}
+
+.landing-nav__link:hover::after {
+  width: 100%;
+}
+
+.landing-nav__link--active {
+  color: rgba(240, 237, 237, 0.95);
+}
+
+/* Right actions */
+.landing-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.landing-nav__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: rgba(240, 237, 237, 0.6);
+  cursor: pointer;
+  transition: color 0.25s ease, background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.landing-nav__icon-btn:hover {
+  color: #f0eded;
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(1.12);
+  box-shadow: 0 0 12px rgba(140, 120, 255, 0.2);
+}
+
+.landing-nav__icon-btn:active {
+  transform: scale(0.95);
+}
+
+.landing-signin-btn {
+  padding: 0.45rem 1.4rem;
+  border-radius: 100px;
+  border: 1px solid rgba(240, 237, 237, 0.25);
+  background: transparent;
+  color: rgba(240, 237, 237, 0.85);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.landing-signin-btn:hover {
+  border-color: rgba(180, 160, 255, 0.55);
+  background: rgba(120, 90, 255, 0.1);
+  color: #f0eded;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(100, 70, 220, 0.2), 0 0 0 1px rgba(140, 120, 255, 0.1);
+}
+
+.landing-signin-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Hero Section
+   ═══════════════════════════════════════════════════════════════════ */
+.landing-hero {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 72px);
+  padding: 2rem;
+}
+
+.landing-hero__content {
+  text-align: center;
+  max-width: 720px;
+}
+
+/* Heading — Harmony serif with gradient fade */
+.landing-hero__heading {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.8rem;
+}
+
+.landing-hero__heading-line {
+  display: block;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.65) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.landing-hero__heading-line--accent {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(200, 180, 240, 0.5) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Subtext */
+.landing-hero__subtext {
+  max-width: 500px;
+  margin: 0 auto 2.5rem;
+  font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+  line-height: 1.75;
+  color: rgba(240, 237, 237, 0.55);
+  font-weight: 300;
+  letter-spacing: 0.01em;
+}
+
+/* CTA Group */
+.landing-hero__cta-group {
+  display: flex;
+  justify-content: center;
+}
+
+/* CTA Button */
+.landing-cta-btn {
+  padding: 0.75rem 2.4rem !important;
+  border-radius: 6px !important;
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  background: linear-gradient(
+    135deg,
+    rgba(90, 60, 200, 0.85) 0%,
+    rgba(60, 80, 220, 0.85) 100%
+  ) !important;
+  border: 1px solid rgba(140, 120, 255, 0.25) !important;
+  color: #f0eded !important;
+  cursor: pointer;
+  transition: all 0.35s ease !important;
+  box-shadow:
+    0 0 20px rgba(100, 70, 220, 0.2),
+    0 4px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+.landing-cta-btn:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(110, 80, 220, 0.98) 0%,
+    rgba(80, 100, 240, 0.98) 100%
+  ) !important;
+  box-shadow:
+    0 0 40px rgba(100, 70, 220, 0.45),
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(160, 140, 255, 0.2) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+  border-color: rgba(160, 140, 255, 0.4) !important;
+}
+
+.landing-cta-btn:active {
+  transform: translateY(0) scale(0.98) !important;
+  box-shadow:
+    0 0 20px rgba(100, 70, 220, 0.25),
+    0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .landing-nav__links {
+    display: none;
+  }
+
+  .landing-nav__inner {
+    padding: 0 0.5rem;
+  }
+
+  .landing-hero__heading-line {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+  }
+
+  .landing-hero__subtext {
+    font-size: 0.9rem;
+    padding: 0 1rem;
+  }
+
+  .landing-orb--purple {
+    width: 400px;
+    height: 250px;
+  }
+
+  .landing-orb--blue {
+    width: 300px;
+    height: 200px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   About Page
+   ═══════════════════════════════════════════════════════════════════ */
+.about-root {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  background: #050508;
+  color: #f0eded;
+}
+
+/* ── Shared section layout ─────────────────────────────────────── */
+.about-main {
+  position: relative;
+  z-index: 5;
+  padding-top: 72px; /* nav height */
+}
+
+.about-section {
+  padding: 6rem 2rem;
+}
+
+.about-section__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.about-section__eyebrow {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(180, 160, 255, 0.7);
+  margin: 0 0 1rem;
+}
+
+/* ── Headings ──────────────────────────────────────────────────── */
+.about-heading {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.8rem;
+  color: rgba(240, 237, 237, 0.95);
+}
+
+.about-heading--sm {
+  font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+}
+
+.about-heading--accent {
+  background: linear-gradient(
+    135deg,
+    rgba(200, 180, 255, 0.9) 0%,
+    rgba(140, 100, 255, 0.7) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.about-body {
+  font-size: clamp(0.9rem, 1.6vw, 1.02rem);
+  line-height: 1.8;
+  color: rgba(240, 237, 237, 0.55);
+  font-weight: 300;
+  max-width: 600px;
+  margin: 0 0 1.2rem;
+}
+
+/* ── Mission ───────────────────────────────────────────────────── */
+.about-mission {
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.about-mission .about-body {
+  margin: 0 auto 1.2rem;
+}
+
+/* ── Story ─────────────────────────────────────────────────────── */
+.about-story {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.about-story__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.about-story__image-wrap {
+  order: -1;
+}
+
+/* ── Placeholder images ────────────────────────────────────────── */
+.about-placeholder-img {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.about-placeholder-img--wide {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.about-placeholder-img--sm {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+}
+
+.about-placeholder-img__icon {
+  opacity: 0.5;
+}
+
+.about-placeholder-img__label {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.4;
+}
+
+/* ── Team grid ─────────────────────────────────────────────────── */
+.about-team {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.about-team__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+  list-style: none;
+  padding: 0;
+}
+
+.about-team__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.2rem;
+}
+
+/* ── Avatar placeholder ────────────────────────────────────────── */
+.about-avatar {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.about-avatar__bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+.about-avatar__bg--rivera {
+  background: linear-gradient(135deg, rgba(120, 60, 220, 0.8) 0%, rgba(60, 80, 220, 0.8) 100%);
+}
+
+.about-avatar__bg--chen {
+  background: linear-gradient(135deg, rgba(40, 100, 220, 0.8) 0%, rgba(30, 170, 200, 0.8) 100%);
+}
+
+.about-avatar__bg--kim {
+  background: linear-gradient(135deg, rgba(110, 50, 200, 0.8) 0%, rgba(90, 60, 220, 0.8) 100%);
+}
+
+.about-avatar__bg--brooks {
+  background: linear-gradient(135deg, rgba(60, 80, 200, 0.8) 0%, rgba(40, 100, 220, 0.8) 100%);
+}
+
+.about-avatar__initials {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.05em;
+}
+
+.about-team__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.about-team__name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(240, 237, 237, 0.9);
+  margin: 0;
+}
+
+.about-team__role {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(180, 160, 255, 0.65);
+  margin: 0;
+}
+
+.about-team__bio {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: rgba(240, 237, 237, 0.45);
+  font-weight: 300;
+  margin: 0.4rem 0 0;
+}
+
+/* ── Values ────────────────────────────────────────────────────── */
+.about-values__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+  list-style: none;
+  padding: 0;
+}
+
+.about-values__card {
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.about-values__card-icon {
+  margin-bottom: 0.4rem;
+}
+
+.about-values__title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(240, 237, 237, 0.9);
+  margin: 0;
+}
+
+.about-values__body {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: rgba(240, 237, 237, 0.45);
+  font-weight: 300;
+  margin: 0;
+}
+
+/* ── About Responsive ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .about-team__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .about-values__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-story__grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .about-story__image-wrap {
+    order: unset;
+  }
+}
+
+@media (max-width: 600px) {
+  .about-team__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .about-section {
+    padding: 4rem 1.2rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   APP-WIDE DARK CINEMATIC THEME
+   These styles extend the design tokens above to give every page
+   the same elegant, dark, futuristic look as the landing page.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Scrollbar Styling ─────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(140, 120, 200, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(140, 120, 200, 0.35);
+}
+
+/* ── Selection Highlight ───────────────────────────────────────── */
+::selection {
+  background: rgba(140, 100, 220, 0.3);
+  color: inherit;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Header — Translucent Dark Glass
+   ═══════════════════════════════════════════════════════════════════ */
+.app-header {
+  background: rgba(10, 10, 15, 0.85) !important;
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border-bottom: 1px solid rgba(140, 120, 200, 0.1) !important;
+}
+
+.app-header__logo {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  letter-spacing: 0.15em;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: rgba(240, 237, 237, 0.92);
+}
+
+.app-header__logo-icon {
+  color: hsl(255 60% 62%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Sidebar — Dark Panel with Purple Accents
+   ═══════════════════════════════════════════════════════════════════ */
+.app-sidebar {
+  background: rgba(10, 10, 18, 0.95) !important;
+  border-right: 1px solid rgba(140, 120, 200, 0.08) !important;
+}
+
+.app-sidebar__new-chat {
+  background: rgba(140, 100, 220, 0.12) !important;
+  border: 1px solid rgba(140, 120, 200, 0.2) !important;
+  color: rgba(240, 237, 237, 0.85) !important;
+  transition: all 0.3s ease !important;
+}
+
+.app-sidebar__new-chat:hover {
+  background: rgba(140, 100, 220, 0.2) !important;
+  border-color: rgba(140, 120, 200, 0.35) !important;
+}
+
+.app-sidebar__item {
+  color: rgba(240, 237, 237, 0.5);
+  transition: all 0.25s ease;
+  border-radius: 8px;
+}
+
+.app-sidebar__item:hover {
+  background: rgba(140, 100, 220, 0.08);
+  color: rgba(240, 237, 237, 0.85);
+}
+
+.app-sidebar__item--active {
+  background: rgba(140, 100, 220, 0.14) !important;
+  color: rgba(240, 237, 237, 0.95) !important;
+  border-left: 2px solid hsl(255 60% 62%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Chat Area
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Welcome state */
+.app-chat-welcome {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  background: linear-gradient(
+    180deg,
+    rgba(240, 237, 237, 0.95) 0%,
+    rgba(240, 237, 237, 0.5) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Assistant message row */
+.app-msg--assistant {
+  background: rgba(140, 100, 220, 0.04);
+  border-bottom: 1px solid rgba(140, 120, 200, 0.06);
+}
+
+/* Assistant avatar */
+.app-msg__avatar--bot {
+  background: linear-gradient(
+    135deg,
+    rgba(90, 60, 200, 0.8),
+    rgba(60, 80, 220, 0.8)
+  ) !important;
+  border: 1px solid rgba(140, 120, 200, 0.3) !important;
+  box-shadow: 0 0 12px rgba(100, 70, 220, 0.15);
+}
+
+/* User avatar */
+.app-msg__avatar--user {
+  background: rgba(240, 237, 237, 0.08) !important;
+  border: 1px solid rgba(240, 237, 237, 0.12) !important;
+}
+
+/* Thinking indicator */
+.app-chat-thinking {
+  background: rgba(140, 100, 220, 0.06);
+}
+
+.app-chat-thinking__dot {
+  color: hsl(255 60% 62%);
+}
+
+/* Chat input area */
+.app-chat-input-area {
+  border-top: 1px solid rgba(140, 120, 200, 0.1) !important;
+  background: rgba(10, 10, 15, 0.6);
+  backdrop-filter: blur(12px);
+}
+
+.app-chat-textarea {
+  background: rgba(20, 20, 30, 0.8) !important;
+  border: 1px solid rgba(140, 120, 200, 0.12) !important;
+  color: rgba(240, 237, 237, 0.9) !important;
+  transition: border-color 0.3s ease !important;
+}
+
+.app-chat-textarea:focus {
+  border-color: rgba(140, 120, 200, 0.3) !important;
+  box-shadow: 0 0 0 2px rgba(140, 100, 220, 0.1) !important;
+}
+
+.app-chat-textarea::placeholder {
+  color: rgba(240, 237, 237, 0.3) !important;
+}
+
+/* Send button */
+.app-send-btn {
+  background: linear-gradient(
+    135deg,
+    rgba(90, 60, 200, 0.8),
+    rgba(60, 80, 220, 0.8)
+  ) !important;
+  border: 1px solid rgba(140, 120, 200, 0.25) !important;
+  color: white !important;
+  transition: all 0.3s ease !important;
+}
+
+.app-send-btn:hover:not(:disabled) {
+  box-shadow: 0 0 20px rgba(100, 70, 220, 0.25) !important;
+}
+
+.app-send-btn:disabled {
+  opacity: 0.3 !important;
+}
+
+/* Slash command pills */
+.app-slash-pill {
+  background: rgba(140, 100, 220, 0.08) !important;
+  border: 1px solid rgba(140, 120, 200, 0.15) !important;
+  color: rgba(240, 237, 237, 0.6) !important;
+  transition: all 0.25s ease !important;
+}
+
+.app-slash-pill:hover {
+  background: rgba(140, 100, 220, 0.15) !important;
+  border-color: rgba(140, 120, 200, 0.3) !important;
+  color: rgba(240, 237, 237, 0.85) !important;
+}
+
+/* Command palette */
+.app-command-palette {
+  background: rgba(16, 16, 24, 0.97) !important;
+  border: 1px solid rgba(140, 120, 200, 0.15) !important;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4) !important;
+}
+
+.app-command-palette__item:hover {
+  background: rgba(140, 100, 220, 0.1) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Settings Page — Dark Cards with Subtle Borders
+   ═══════════════════════════════════════════════════════════════════ */
+.app-settings-title {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  background: linear-gradient(
+    180deg,
+    rgba(240, 237, 237, 0.95) 0%,
+    rgba(240, 237, 237, 0.6) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.app-settings-card {
+  background: rgba(14, 14, 22, 0.9) !important;
+  border: 1px solid rgba(140, 120, 200, 0.1) !important;
+  backdrop-filter: blur(8px);
+}
+
+.app-settings-card__title {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.app-settings-save-btn {
+  background: linear-gradient(
+    135deg,
+    rgba(90, 60, 200, 0.85) 0%,
+    rgba(60, 80, 220, 0.85) 100%
+  ) !important;
+  border: 1px solid rgba(140, 120, 200, 0.25) !important;
+  color: #f0eded !important;
+  transition: all 0.35s ease !important;
+  box-shadow: 0 0 20px rgba(100, 70, 220, 0.15) !important;
+}
+
+.app-settings-save-btn:hover {
+  box-shadow: 0 0 30px rgba(100, 70, 220, 0.3) !important;
+}
+
+/* Select dropdowns */
+.app-select {
+  background: rgba(20, 20, 30, 0.8) !important;
+  border: 1px solid rgba(140, 120, 200, 0.12) !important;
+  color: rgba(240, 237, 237, 0.85) !important;
+}
+
+.app-select:focus {
+  border-color: rgba(140, 120, 200, 0.3) !important;
+}
+
+.app-select option {
+  background: rgb(16, 16, 24);
+  color: rgba(240, 237, 237, 0.85);
+}
+
+/* Details/accordion */
+.app-details {
+  border-color: rgba(140, 120, 200, 0.1) !important;
+}
+
+.app-details summary:hover {
+  background: rgba(140, 100, 220, 0.06) !important;
+}
+
+/* Kbd styling */
+.app-kbd {
+  background: rgba(140, 100, 220, 0.1) !important;
+  border: 1px solid rgba(140, 120, 200, 0.15) !important;
+  color: rgba(240, 237, 237, 0.8) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Protected Layout Shell
+   ═══════════════════════════════════════════════════════════════════ */
+.app-shell {
+  background: hsl(240 15% 4.5%);
+  min-height: 100vh;
+}
+
+/* Subtle ambient gradient behind chat */
+.app-main {
+  position: relative;
+}
+
+.app-main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(100, 70, 220, 0.04) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-main > * {
+  position: relative;
+  z-index: 1;
 }

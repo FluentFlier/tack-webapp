@@ -142,7 +142,7 @@ export default function SettingsPage() {
   if (!isLoaded || !preferences) {
     return (
       <div className="p-8" role="status">
-        <p>Loading settings...</p>
+        <p className="text-muted-foreground">Loading settings...</p>
       </div>
     );
   }
@@ -152,24 +152,24 @@ export default function SettingsPage() {
       <LiveRegion message={statusMessage} politeness="assertive" />
 
       <div>
-        <h1 className="text-2xl font-bold font-serif italic">Settings</h1>
-        <p className="text-muted-foreground mt-1">
+        <h1 className="app-settings-title text-3xl">Settings</h1>
+        <p className="text-muted-foreground mt-2 text-sm">
           Customize your accessibility preferences
         </p>
       </div>
 
       <Separator />
 
-      <Card>
+      <Card className="app-settings-card">
         <CardHeader>
-          <CardTitle className="font-serif italic">Display</CardTitle>
+          <CardTitle className="app-settings-card__title">Display</CardTitle>
           <CardDescription>
             Adjust visual settings for your comfort
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* ── Color-Blindness Profile ── */}
-          <fieldset className="space-y-3 rounded-lg border border-border p-4">
+          <fieldset className="space-y-3 rounded-lg border border-[rgba(140,120,200,0.1)] p-4">
             <legend className="px-2 text-sm font-semibold">Color-Blindness Profile</legend>
             <p className="text-xs text-muted-foreground">
               Select a color palette optimized for your vision. Changes apply on save.
@@ -279,7 +279,7 @@ export default function SettingsPage() {
                   font_size: e.target.value as UserPreferences["font_size"],
                 })
               }
-              className="w-full rounded-lg border border-border/60 bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/40 transition-colors"
+              className="app-select w-full rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="small">Small</option>
               <option value="medium">Medium (default)</option>
@@ -306,9 +306,9 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="app-settings-card">
         <CardHeader>
-          <CardTitle className="font-serif italic">Screen Reader</CardTitle>
+          <CardTitle className="app-settings-card__title">Screen Reader</CardTitle>
           <CardDescription>
             Adjust how much detail Tack provides in responses
           </CardDescription>
@@ -326,7 +326,7 @@ export default function SettingsPage() {
                     .value as UserPreferences["screen_reader_verbosity"],
                 })
               }
-              className="w-full rounded-lg border border-border/60 bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/40 transition-colors"
+              className="app-select w-full rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="concise">
                 Concise — Brief, to-the-point responses
@@ -343,9 +343,9 @@ export default function SettingsPage() {
       </Card>
 
       {/* ── Braille Display Setup Instructions ── */}
-      <Card>
+      <Card className="app-settings-card">
         <CardHeader>
-          <CardTitle>Braille Display Setup</CardTitle>
+          <CardTitle className="app-settings-card__title">Braille Display Setup</CardTitle>
           <CardDescription>
             Step-by-step instructions to connect and configure a braille display with your screen reader
           </CardDescription>
@@ -353,7 +353,7 @@ export default function SettingsPage() {
         <CardContent className="space-y-4">
 
           {/* VoiceOver + Orbit Reader 20 (macOS) */}
-          <details className="group rounded-lg border border-border">
+          <details className="app-details group rounded-lg border">
             <summary
               className="flex cursor-pointer items-center justify-between px-4 py-3 font-semibold text-sm hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-ring rounded-lg"
               aria-label="VoiceOver and Orbit Reader 20 setup instructions for macOS"
@@ -366,9 +366,9 @@ export default function SettingsPage() {
               <div>
                 <h4 className="font-semibold text-foreground mb-1">1. Enable VoiceOver</h4>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">⌘ Cmd + F5</kbd> to toggle VoiceOver on or off.</li>
-                  <li>A Quick Start tutorial will appear on first launch — complete it or press <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">V</kbd> to skip.</li>
-                  <li>The VoiceOver modifier keys (VO) are <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">Ctrl + Option</kbd> by default.</li>
+                  <li>Press <kbd className="app-kbd px-1.5 py-0.5 rounded text-xs font-mono">⌘ Cmd + F5</kbd> to toggle VoiceOver on or off.</li>
+                  <li>A Quick Start tutorial will appear on first launch — complete it or press <kbd className="app-kbd px-1.5 py-0.5 rounded text-xs font-mono">V</kbd> to skip.</li>
+                  <li>The VoiceOver modifier keys (VO) are <kbd className="app-kbd px-1.5 py-0.5 rounded text-xs font-mono">Ctrl + Option</kbd> by default.</li>
                 </ul>
               </div>
 
@@ -383,7 +383,7 @@ export default function SettingsPage() {
               <div>
                 <h4 className="font-semibold text-foreground mb-1">3. Open VoiceOver Utility</h4>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">VO + F8</kbd> (Ctrl + Option + F8).</li>
+                  <li>Press <kbd className="app-kbd px-1.5 py-0.5 rounded text-xs font-mono">VO + F8</kbd> (Ctrl + Option + F8).</li>
                   <li>Or: System Settings → Accessibility → VoiceOver → Open VoiceOver Utility.</li>
                 </ul>
               </div>
@@ -413,7 +413,7 @@ export default function SettingsPage() {
               <div>
                 <h4 className="font-semibold text-foreground mb-1">6. Test It</h4>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Navigate this page with <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">VO + Right</kbd>. Labels should appear on the braille display.</li>
+                  <li>Navigate this page with <kbd className="app-kbd px-1.5 py-0.5 rounded text-xs font-mono">VO + Right</kbd>. Labels should appear on the braille display.</li>
                   <li>Focus a text input and type on the Orbit Reader&apos;s braille keyboard — characters should appear in the field.</li>
                 </ul>
               </div>
@@ -422,7 +422,7 @@ export default function SettingsPage() {
           </details>
 
           {/* NVDA + Orbit Reader 20 (Windows) */}
-          <details className="group rounded-lg border border-border">
+          <details className="app-details group rounded-lg border">
             <summary
               className="flex cursor-pointer items-center justify-between px-4 py-3 font-semibold text-sm hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-ring rounded-lg"
               aria-label="NVDA and Orbit Reader 20 setup instructions for Windows"
@@ -436,7 +436,7 @@ export default function SettingsPage() {
                 <h4 className="font-semibold text-foreground mb-1">1. Install &amp; Launch NVDA</h4>
                 <ul className="list-disc pl-5 space-y-1">
                   <li>Download NVDA free from <strong>nvaccess.org</strong>.</li>
-                  <li>The NVDA modifier key is <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">Insert</kbd> (or <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">Caps Lock</kbd> in laptop layout).</li>
+                  <li>The NVDA modifier key is <kbd className="app-kbd px-1.5 py-0.5 rounded text-xs font-mono">Insert</kbd> (or <kbd className="app-kbd px-1.5 py-0.5 rounded text-xs font-mono">Caps Lock</kbd> in laptop layout).</li>
                 </ul>
               </div>
 
@@ -451,7 +451,7 @@ export default function SettingsPage() {
               <div>
                 <h4 className="font-semibold text-foreground mb-1">3. Open NVDA Braille Settings</h4>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">Insert + N</kbd> to open the NVDA menu.</li>
+                  <li>Press <kbd className="app-kbd px-1.5 py-0.5 rounded text-xs font-mono">Insert + N</kbd> to open the NVDA menu.</li>
                   <li>Navigate to: <strong>Preferences → Settings → Braille</strong>.</li>
                 </ul>
               </div>
@@ -480,7 +480,7 @@ export default function SettingsPage() {
                 <h4 className="font-semibold text-foreground mb-1">6. Test It</h4>
                 <ul className="list-disc pl-5 space-y-1">
                   <li>Open Tack in Chrome or Edge.</li>
-                  <li>Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs font-mono">Tab</kbd> through the page. Each focused element&apos;s label should appear on the braille display.</li>
+                  <li>Press <kbd className="app-kbd px-1.5 py-0.5 rounded text-xs font-mono">Tab</kbd> through the page. Each focused element&apos;s label should appear on the braille display.</li>
                   <li>If the display doesn&apos;t update, check that <strong>Tether Braille</strong> is set to &quot;Automatically&quot;.</li>
                 </ul>
               </div>
@@ -491,7 +491,7 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Button onClick={savePreferences} disabled={saving}>
+      <Button onClick={savePreferences} disabled={saving} className="app-settings-save-btn">
         {saving ? "Saving..." : "Save Settings"}
       </Button>
     </div>

@@ -436,7 +436,7 @@ export default function Page() {
     return () => {
       cancelled = true;
     };
-  }, [file]);
+  }, [file, settings]);
 
 
   const styleDictBackground = {

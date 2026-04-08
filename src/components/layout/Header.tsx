@@ -3,43 +3,54 @@
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@insforge/nextjs";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Settings, Sparkles } from "lucide-react";
+import { Settings } from "lucide-react";
 
 export function Header() {
   return (
     <header
       role="banner"
-      className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl"
+      className="app-header sticky top-0 z-40"
     >
-      <div className="flex h-14 items-center justify-between px-4">
+      <div className="flex h-16 items-center justify-between px-5">
         <Link
           href="/"
-          className="flex items-center gap-2.5 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background rounded-sm"
+          className="app-header__logo flex items-center gap-2.5 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm"
           aria-label="Tack - Home"
         >
-          <div className="flex items-center justify-center h-7 w-7 rounded-md bg-primary/10 border border-primary/20">
-            <Sparkles className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-          </div>
-          <span className="font-serif text-lg font-medium italic">Tack</span>
+          <svg
+            width="26"
+            height="26"
+            viewBox="0 0 28 28"
+            fill="none"
+            aria-hidden="true"
+            className="app-header__logo-icon"
+          >
+            <circle cx="14" cy="14" r="13" stroke="currentColor" strokeWidth="1.5" />
+            <path
+              d="M9 14.5C9 11.5 11.5 9 14 9C16.5 9 19 11.5 19 14.5C19 17.5 16.5 19 14 19"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </svg>
+          <span>TACK</span>
         </Link>
 
-        <nav aria-label="Main navigation" className="flex items-center gap-1">
+        <nav aria-label="Main navigation" className="flex items-center gap-3">
           <SignedIn>
             <Link href="/chat" aria-label="Go to chat">
-              <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
-                <MessageSquare className="h-4 w-4" aria-hidden="true" />
+              <Button variant="ghost" size="sm" className="text-[rgba(240,237,237,0.6)] hover:text-[rgba(240,237,237,0.9)] hover:bg-[rgba(140,100,220,0.08)]">
                 Chat
               </Button>
             </Link>
-            <Link href="/pdf-reading" aria-label="Go to chat">
+            <Link href="/pdf-reading" aria-label="Go to PDF reader">
               <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
-                <MessageSquare className="h-4 w-4" aria-hidden="true" />
                 PDF Reader
               </Button>
             </Link>
             <Link href="/settings" aria-label="Settings">
-              <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
-                <Settings className="h-4 w-4" aria-hidden="true" />
+              <Button variant="ghost" size="sm" className="text-[rgba(240,237,237,0.6)] hover:text-[rgba(240,237,237,0.9)] hover:bg-[rgba(140,100,220,0.08)]">
+                <Settings className="h-4 w-4 mr-1.5" aria-hidden="true" />
                 Settings
               </Button>
             </Link>
@@ -49,7 +60,7 @@ export function Header() {
           </SignedIn>
           <SignedOut>
             <SignInButton>
-              <Button size="sm">Sign In</Button>
+              <button className="landing-signin-btn" type="button">Sign In</button>
             </SignInButton>
           </SignedOut>
         </nav>

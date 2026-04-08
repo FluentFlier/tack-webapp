@@ -65,12 +65,12 @@ export function Sidebar() {
     <aside
       role="complementary"
       aria-label="Conversation history"
-      className="w-64 border-r border-border/50 bg-card/30 flex flex-col h-full"
+      className="app-sidebar w-64 flex flex-col h-full"
     >
       <div className="p-3">
         <Link href="/chat">
           <Button
-            className="w-full justify-start gap-2"
+            className="app-sidebar__new-chat w-full justify-start"
             variant="outline"
             aria-label="Start a new chat"
           >
@@ -101,14 +101,14 @@ export function Sidebar() {
                   <Link
                     href={`/chat/${conv.id}`}
                     className={cn(
-                      "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all pr-8",
-                      "hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring",
-                      isActive && "bg-primary/10 border border-primary/20 text-primary font-medium"
+                      "app-sidebar__item flex items-center gap-2 px-3 py-2 text-sm transition-colors",
+                      "focus:outline-none focus:ring-2 focus:ring-ring",
+                      isActive && "app-sidebar__item--active font-medium"
                     )}
                     aria-current={isActive ? "page" : undefined}
                   >
                     <MessageSquare
-                      className="h-3.5 w-3.5 shrink-0"
+                      className="h-3.5 w-3.5 shrink-0 opacity-50"
                       aria-hidden="true"
                     />
                     <span className="truncate">{conv.title}</span>
