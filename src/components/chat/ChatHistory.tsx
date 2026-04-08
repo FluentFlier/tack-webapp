@@ -3,23 +3,22 @@
 import { useEffect, useRef } from "react";
 import { ChatMessage } from "./ChatMessage";
 import type { Message } from "@/types";
-import { Sparkles } from "lucide-react";
 
 interface ChatHistoryProps {
   messages: Message[];
   loading?: boolean;
 }
 
-export function ChatHistory({ messages, loading }: ChatHistoryProps) {
+export function ChatHistory({ messages, loading = false }: ChatHistoryProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length]);
+  }, [messages]);
 
   if (messages.length === 0 && !loading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex flex-1 items-center justify-center p-8">
         <div className="text-center max-w-md">
           <h2 className="app-chat-welcome text-2xl mb-3">Welcome to Tack</h2>
           <p className="text-muted-foreground text-sm leading-relaxed">
@@ -27,7 +26,7 @@ export function ChatHistory({ messages, loading }: ChatHistoryProps) {
             <kbd className="app-kbd rounded px-1.5 py-0.5 text-xs font-mono">
               /help
             </kbd>{" "}
-            for available commands
+            to see what I can do.
           </p>
         </div>
       </div>
@@ -38,8 +37,8 @@ export function ChatHistory({ messages, loading }: ChatHistoryProps) {
     <div
       className="flex-1 overflow-y-auto"
       role="log"
-      aria-live="polite"
       aria-label="Chat messages"
+      aria-live="polite"
     >
       {messages.map((msg) => (
         <ChatMessage key={msg.id} message={msg} />

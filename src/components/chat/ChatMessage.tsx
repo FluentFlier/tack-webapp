@@ -133,7 +133,6 @@ function renderInlineContent(
 
 export function ChatMessage({ message }: ChatMessageProps) {
   const isAssistant = message.role === "assistant";
-  const sources = message.metadata?.sources;
 
   return (
     <div
@@ -167,7 +166,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
           <p className="text-xs text-muted-foreground mt-2">
             Source:{" "}
             <a
-              href={`/reader?url=${encodeURIComponent(message.metadata.source_url)}`}
+              href={message.metadata.source_url}
               target="_blank"
               rel="noopener noreferrer"
               className="text-[hsl(255,60%,70%)] underline focus:outline-none focus:ring-2 focus:ring-ring"

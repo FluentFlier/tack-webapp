@@ -5,6 +5,7 @@ import {
   serperScrapeContext,
   serperSearchContext,
 } from "@/lib/serper";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,46 +37,34 @@ export async function POST(request: NextRequest) {
       edgeFunctionToken: token,
     });
 
+    
+    // Create or use existing conversation
     let convId = conversation_id;
     if (!convId) {
       const { data: conv, error: convError } = await insforge.database
         .from("conversations")
-        .insert({ user_id: userId, title: sanitizedMessage.slice(0, 100) })
+        .insert({ user_id: userId, title: message.slice(0, 100) })
         .select()
         .single();
 
       if (convError || !conv) {
-        return NextResponse.json({ error: "Failed to create conversation" }, { status: 500 });
+        return NextResponse.json(
+          { error: "Failed to create conversation" },
+          { status: 500 }
+        );
       }
       convId = conv.id;
     }
 
+    // Save user message
     await insforge.database.from("messages").insert({
       conversation_id: convId,
       role: "user",
-      content: sanitizedMessage,
+      content: message,
       metadata: {},
     });
 
-    const urls = extractUrls(sanitizedMessage);
-    const extractions = await Promise.all(urls.map(extractContent));
-    const validExtractions = extractions.filter(Boolean) as {
-      title: string;
-      content: string;
-      url: string;
-    }[];
-
-    let contextBlock = "";
-    const sources: { title: string; url: string }[] = [];
-    if (validExtractions.length > 0) {
-      contextBlock = "\n\n--- EXTRACTED WEB CONTENT ---\n";
-      for (const ext of validExtractions) {
-        contextBlock += `\nSource: ${ext.title} (${ext.url})\n${ext.content}\n---\n`;
-        sources.push({ title: ext.title, url: ext.url });
-      }
-      contextBlock += "\n--- END EXTRACTED CONTENT ---\n";
-    }
-
+    // Build system prompt for accessibility focus
     const systemPrompt = `You are Tack, an AI assistant designed to help blind and visually impaired users access the internet.
 
 FORMATTING RULES (follow these strictly):
