@@ -107,8 +107,7 @@ export default function Home() {
 
           <p className="landing-hero__subtext">
             Tack is an AI assistant that helps blind and visually impaired users
-            navigate the web. Summarize pages, extract content, and browse — all
-            through a simple chat interface optimized for screen readers.
+            navigate, read, and understand web content through natural conversation.
           </p>
 
           <div className="landing-hero__cta-group">
@@ -131,6 +130,14 @@ export default function Home() {
                 </Button>
               </Link>
             </SignedIn>
+            <SignedOut>
+              <SignInButton>
+                <Button size="lg" className="gap-2 text-base px-8 h-12">
+                  Get Started Free
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </SignInButton>
+            </SignedOut>
           </div>
         </section>
       </main>
