@@ -106,7 +106,7 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
         
         doToggle();
 
-    }, [defaultToSummary, content, minLengthToSummarize, summaryText, doToggle]);
+    }, [defaultToSummary, content, minLengthToSummarize, summaryText]);
     
 
     const display = isSummary && summaryText ? summaryText : content;
