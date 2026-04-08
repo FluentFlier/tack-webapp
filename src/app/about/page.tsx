@@ -117,7 +117,7 @@ export default function AboutPage() {
               Tack was built on a simple belief: the internet should be navigable
               by everyone, regardless of ability. We combine AI with thoughtful
               design to give blind and visually impaired users a voice-first
-              browsing experience that doesn't compromise on capability.
+              browsing experience that doesn$apost compromise on capability.
             </p>
           </div>
         </section>
@@ -146,7 +146,7 @@ export default function AboutPage() {
               </h2>
               <p className="about-body">
                 Our founders watched a family member struggle with screen readers
-                that couldn't keep up with modern, dynamic web pages. The gap
+                that couldn$apost keep up with modern, dynamic web pages. The gap
                 between what the web promised and what was actually accessible
                 was enormous.
               </p>
