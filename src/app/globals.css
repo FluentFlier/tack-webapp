@@ -718,6 +718,305 @@ html {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   About Page
+   ═══════════════════════════════════════════════════════════════════ */
+.about-root {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  background: #050508;
+  color: #f0eded;
+}
+
+/* ── Shared section layout ─────────────────────────────────────── */
+.about-main {
+  position: relative;
+  z-index: 5;
+  padding-top: 72px; /* nav height */
+}
+
+.about-section {
+  padding: 6rem 2rem;
+}
+
+.about-section__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.about-section__eyebrow {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(180, 160, 255, 0.7);
+  margin: 0 0 1rem;
+}
+
+/* ── Headings ──────────────────────────────────────────────────── */
+.about-heading {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.8rem;
+  color: rgba(240, 237, 237, 0.95);
+}
+
+.about-heading--sm {
+  font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+}
+
+.about-heading--accent {
+  background: linear-gradient(
+    135deg,
+    rgba(200, 180, 255, 0.9) 0%,
+    rgba(140, 100, 255, 0.7) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.about-body {
+  font-size: clamp(0.9rem, 1.6vw, 1.02rem);
+  line-height: 1.8;
+  color: rgba(240, 237, 237, 0.55);
+  font-weight: 300;
+  max-width: 600px;
+  margin: 0 0 1.2rem;
+}
+
+/* ── Mission ───────────────────────────────────────────────────── */
+.about-mission {
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.about-mission .about-body {
+  margin: 0 auto 1.2rem;
+}
+
+/* ── Story ─────────────────────────────────────────────────────── */
+.about-story {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.about-story__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.about-story__image-wrap {
+  order: -1;
+}
+
+/* ── Placeholder images ────────────────────────────────────────── */
+.about-placeholder-img {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.about-placeholder-img--wide {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.about-placeholder-img--sm {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+}
+
+.about-placeholder-img__icon {
+  opacity: 0.5;
+}
+
+.about-placeholder-img__label {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.4;
+}
+
+/* ── Team grid ─────────────────────────────────────────────────── */
+.about-team {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.about-team__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+  list-style: none;
+  padding: 0;
+}
+
+.about-team__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.2rem;
+}
+
+/* ── Avatar placeholder ────────────────────────────────────────── */
+.about-avatar {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.about-avatar__bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+.about-avatar__bg--rivera {
+  background: linear-gradient(135deg, rgba(120, 60, 220, 0.8) 0%, rgba(60, 80, 220, 0.8) 100%);
+}
+
+.about-avatar__bg--chen {
+  background: linear-gradient(135deg, rgba(40, 100, 220, 0.8) 0%, rgba(30, 170, 200, 0.8) 100%);
+}
+
+.about-avatar__bg--kim {
+  background: linear-gradient(135deg, rgba(110, 50, 200, 0.8) 0%, rgba(90, 60, 220, 0.8) 100%);
+}
+
+.about-avatar__bg--brooks {
+  background: linear-gradient(135deg, rgba(60, 80, 200, 0.8) 0%, rgba(40, 100, 220, 0.8) 100%);
+}
+
+.about-avatar__initials {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.05em;
+}
+
+.about-team__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.about-team__name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(240, 237, 237, 0.9);
+  margin: 0;
+}
+
+.about-team__role {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(180, 160, 255, 0.65);
+  margin: 0;
+}
+
+.about-team__bio {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: rgba(240, 237, 237, 0.45);
+  font-weight: 300;
+  margin: 0.4rem 0 0;
+}
+
+/* ── Values ────────────────────────────────────────────────────── */
+.about-values__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+  list-style: none;
+  padding: 0;
+}
+
+.about-values__card {
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.about-values__card-icon {
+  margin-bottom: 0.4rem;
+}
+
+.about-values__title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(240, 237, 237, 0.9);
+  margin: 0;
+}
+
+.about-values__body {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: rgba(240, 237, 237, 0.45);
+  font-weight: 300;
+  margin: 0;
+}
+
+/* ── About Responsive ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .about-team__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .about-values__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-story__grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .about-story__image-wrap {
+    order: unset;
+  }
+}
+
+@media (max-width: 600px) {
+  .about-team__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .about-section {
+    padding: 4rem 1.2rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    APP-WIDE DARK CINEMATIC THEME
    These styles extend the design tokens above to give every page
    the same elegant, dark, futuristic look as the landing page.
