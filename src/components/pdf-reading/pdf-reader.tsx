@@ -443,72 +443,91 @@ export default function Page() {
   return (
     <>
       <Header />
-      <main className="min-h-screen p-8" style={styleDictBackground}>
-        <h1 className="text-3xl text-gray-600" style={styleDictTextColor}>PDF Reading</h1>
-        <a href="pdf-reading-settings" style={styleDictTextColor}>PDF Reader Settings</a>
-        <div className="mt-6">
-          <label className="block text-sm font-medium text-gray-700" style={styleDictTextColor}>Upload a PDF using the browse button below then the text content will appear below</label>
-          <input
-            type="file"
-            accept="application/pdf,.pdf"
-            onChange={handleFileChange}
-            className="mt-2"
-            style={styleDictTextColor}
-          />
-          {fileName && <p className="mt-2 text-sm text-gray-500" style={styleDictTextColor}>Selected: {fileName}</p>}
-        </div>
+      <main className="min-h-screen bg-background">
+        <div className="max-w-3xl mx-auto p-6 space-y-6">
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-1 gap-6">
           <div>
-              <div>
-                <h2 className="text-lg font-medium mb-2" style={styleDictTextColor}>Output</h2>
-                
-                  {loading && <p className="text-sm text-gray-500" style={styleDictTextColor}>Processing PDF...</p>}
-                  {error && <p className="text-sm text-red-500" style={styleDictTextColor}>Error: {error}</p>}
-                  {!loading && !error && readableHtml && (
-                    <div className="border rounded p-4 bg-white h-fit-content w-full" style={styleDictBackground}>
-                      {settings.AIFullDocumentSummary && (
-                        <div className="mb-4 rounded border p-3 bg-gray-50" style={styleDictBackground}>
-                          <h3 className="text-md font-medium mb-1" style={styleDictTextColor}>Full document summary</h3>
-                          {summaryLoading && <p className="text-sm text-gray-500" style={styleDictTextColor}>Generating summary...</p>}
-                          {summaryError && (
-                            <div className="flex flex-col gap-2" style={styleDictBackground}>
-                              <p className="text-sm text-red-500" style={styleDictTextColor}>Error: {summaryError}</p>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                className="w-fit"
-                                onClick={() => void generateDocumentSummary(documentText)}
-                                disabled={!documentText || summaryLoading}
-                              >
-                                Retry summary
-                              </Button>
-                            </div>
-                          )}
-                          {!summaryLoading && !summaryError && documentSummary && (
-                            <p className="text-sm" style={styleDictTextColor}>{documentSummary}</p>
-                          )}
-                          {!summaryLoading && !summaryError && !documentSummary && (
-                            <p className="text-sm text-gray-500" style={styleDictTextColor}>A summary will appear here after processing.</p>
-                          )}
-                          {summaryUsedTruncation && (
-                            <p className="text-xs text-gray-500 mt-2" style={styleDictTextColor}>
-                              Summary generated from the first {FULL_DOCUMENT_SUMMARY_MAX_CHARS.toLocaleString()} characters because this PDF is very long.
-                            </p>
-                          )}
-                        </div>
-                      )}
-                      <p style={styleDictTextColor}>Below is the content of the document. When you select a button labeled summarize line? you can press the button to toggle an AI shortened version of the following line or paragraph. Pressing the button again will return the original version.</p>
-                      <div>{readableHtml}</div>
-                    </div>
-                  )}
-                  {!loading && !error && !readableHtml && (
-                    <p className="text-sm text-gray-500" style={styleDictTextColor}>Once you upload a PDF using the browse button above, the text content of the document will appear here</p>
-                  )}
-                
-              </div>
-            </div>
+            <h1 className="text-3xl font-bold">PDF Reading</h1>
+            <Link href="/pdf-reading-settings">
+              <Button variant="ghost" size="sm" className="mt-2 gap-2 text-muted-foreground hover:text-foreground">
+                <Settings className="h-4 w-4" aria-hidden="true" />
+                PDF Reader Settings
+              </Button>
+            </Link>
           </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Upload PDF</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Label htmlFor="pdf-upload">Select a PDF file — the text content will appear below</Label>
+              <input
+                id="pdf-upload"
+                type="file"
+                accept="application/pdf,.pdf"
+                onChange={handleFileChange}
+                className="mt-2 block text-sm text-muted-foreground file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:bg-secondary file:text-secondary-foreground hover:file:bg-secondary/80"
+              />
+              {fileName && (
+                <p className="mt-2 text-sm text-muted-foreground">Selected: {fileName}</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <div>
+            <h2 className="text-lg font-medium mb-3">Output</h2>
+            {loading && <p className="text-sm text-muted-foreground">Processing PDF...</p>}
+            {error && <p className="text-sm text-destructive">Error: {error}</p>}
+            {!loading && !error && readableHtml && (
+              <div className="border border-border rounded-lg p-4 space-y-4">
+                {settings.AIFullDocumentSummary && (
+                  <div className="rounded-lg border border-border bg-muted p-3">
+                    <h3 className="text-md font-medium mb-1">Full document summary</h3>
+                    {summaryLoading && (
+                      <p className="text-sm text-muted-foreground">Generating summary...</p>
+                    )}
+                    {summaryError && (
+                      <div className="flex flex-col gap-2">
+                        <p className="text-sm text-destructive">Error: {summaryError}</p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-fit"
+                          onClick={() => void generateDocumentSummary(documentText)}
+                          disabled={!documentText || summaryLoading}
+                        >
+                          Retry summary
+                        </Button>
+                      </div>
+                    )}
+                    {!summaryLoading && !summaryError && documentSummary && (
+                      <p className="text-sm">{documentSummary}</p>
+                    )}
+                    {!summaryLoading && !summaryError && !documentSummary && (
+                      <p className="text-sm text-muted-foreground">A summary will appear here after processing.</p>
+                    )}
+                    {summaryUsedTruncation && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Summary generated from the first {FULL_DOCUMENT_SUMMARY_MAX_CHARS.toLocaleString()} characters because this PDF is very long.
+                      </p>
+                    )}
+                  </div>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  Below is the content of the document. When you select a button labeled &quot;summarize line?&quot; you can press it to toggle an AI shortened version of the following line or paragraph. Pressing again returns the original.
+                </p>
+                <div>{readableHtml}</div>
+              </div>
+            )}
+            {!loading && !error && !readableHtml && (
+              <p className="text-sm text-muted-foreground">
+                Once you upload a PDF above, the text content of the document will appear here.
+              </p>
+            )}
+          </div>
+
+        </div>
       </main>
     </>
   );
