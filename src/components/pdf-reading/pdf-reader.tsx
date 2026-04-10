@@ -6,7 +6,7 @@
 //rate limiting and account needing to be signed in notifications were added using Copilot, basically when a rate limit error is encountered a function is the pdf-reader component is called (this makes sure an alert about the error is only shown once per page load, instead of once per error)
 
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "@/components/layout";
 import PdfReadableLine from "@/components/pdf-reading/PdfReadableLine";
 import PdfImageLine from "@/components/pdf-reading/PdfImageLine";
@@ -81,8 +81,8 @@ export default function Page() {
     }
   }
 
-  let settings = getsettings()
- 
+  const settings = useMemo(() => getsettings(), []);
+
 
 
   useEffect(() => {
