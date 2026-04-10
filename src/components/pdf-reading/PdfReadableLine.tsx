@@ -11,11 +11,10 @@ type Props = {
     onUnauthorized?: () => void;
     summarizePercent?: number; // percent to shorten by when summarizing
     defaultToSummary: boolean;
-    textColor: string;
     minLengthToSummarize: number;
 };
 
-export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen, onRateLimit, onUnauthorized, summarizePercent = 50, defaultToSummary = false, textColor = "#000000", minLengthToSummarize = 1000}) => {
+export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen, onRateLimit, onUnauthorized, summarizePercent = 50, defaultToSummary = false, minLengthToSummarize = 1000}) => {
     const classMap: Record<number, string> = {
     1: "text-2xl font-bold mt-4 mb-2",
     2: "text-xl font-bold mt-3 mb-1.5",
@@ -117,16 +116,12 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
 
    
     
-    const pstyleDict = {
-        "color": textColor
-    }
-
-     let summarizeButton = <button style={pstyleDict} onClick={doToggle}>summarize line? {`${isSummary ? "enabled" : "disabled"}`}</button>;
+    let summarizeButton = <button className="text-xs text-muted-foreground underline mb-1" onClick={doToggle}>summarize line? {`${isSummary ? "enabled" : "disabled"}`}</button>;
     
     return (
     <div tabIndex={0}  className="focus:outline-none">
         {longEnoughToSummarize ? summarizeButton : ''}
-        <p className={`${baseClass} transition-transform transition-opacity duration-200 ${summaryStyle} ${fadeClass}`} style={pstyleDict}>
+        <p className={`${baseClass} transition-transform transition-opacity duration-200 ${summaryStyle} ${fadeClass}`}>
         {loading ? `${display}…` : display}
         </p>
     </div>
