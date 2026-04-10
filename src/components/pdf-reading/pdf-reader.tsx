@@ -7,10 +7,14 @@
 
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { Header } from "@/components/layout";
 import PdfReadableLine from "@/components/pdf-reading/PdfReadableLine";
 import PdfImageLine from "@/components/pdf-reading/PdfImageLine";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Settings } from "lucide-react";
 import { getDocumentProxy, extractImages } from 'unpdf';
 import type { TextItem, TextContent } from 'pdfjs-dist/types/src/display/api';
 
@@ -56,8 +60,6 @@ export default function Page() {
     "AIDefaultShortening": false,
     "AIFullDocumentSummary": false,
     "displayPageNumbers": true,
-    "backgroundColor": "#FFFFFF",
-    "textColor": "#000000",
     "minLengthToSummarize": 200,
     "targetSummaryLength": 60, //percentage
   };
@@ -394,12 +396,11 @@ export default function Page() {
         const elements = docElements.map((element, idx) => {
           if (element.type === 'text') {
             return (
-              <PdfReadableLine 
-                key={idx} 
-                headingLevel={element.headingLevel} 
-                content={element.text} 
+              <PdfReadableLine
+                key={idx}
+                headingLevel={element.headingLevel}
+                content={element.text}
                 defaultToSummary={settings.AIDefaultShortening}
-                textColor={settings.textColor}
                 minLengthToSummarize={settings.minLengthToSummarize}
                 summarizePercent={settings.targetSummaryLength}
                 onRateLimit={showRateLimitAlertOnce}
@@ -439,15 +440,6 @@ export default function Page() {
   }, [file, settings]);
 
 
-  const styleDictBackground = {
-    backgroundColor: settings.backgroundColor
-  }
-  const styleDictTextColor = {
-    color: settings.textColor
-  }
-
-
-  
   return (
     <>
       <Header />
