@@ -17,8 +17,7 @@ export default function Page() {
     "AIFullDocumentSummary": false,
     "displayPageNumbers": true,
     "backgroundColor": "#08080f",
-    "middlegroundColor": "rgb(121, 121, 121)",
-    "textColor": "#ffffff",
+    "middlegroundColor": "#0e0e15", "textColor": "#ffffff",
     "minLengthToSummarize": 200,
     "targetSummaryLength": 60, //percentage
   };
