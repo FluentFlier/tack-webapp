@@ -14,7 +14,6 @@ type Props = {
     textColor: string;
     minLengthToSummarize: number;
 };
-
 export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen, onRateLimit, onUnauthorized, summarizePercent = 50, defaultToSummary = false, textColor = "#000000", minLengthToSummarize = 1000}) => {
     const classMap: Record<number, string> = {
     1: "text-2xl font-bold mt-4 mb-2",
@@ -116,17 +115,16 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
     const longEnoughToSummarize = content.length > minLengthToSummarize;
 
    
-    
-    const pstyleDict = {
+    const pStyleDict = {
         "color": textColor
     }
 
-     let summarizeButton = <button style={pstyleDict} onClick={doToggle}>summarize line? {`${isSummary ? "enabled" : "disabled"}`}</button>;
+    let summarizeButton = <button style={pStyleDict} className="text-xs text-muted-foreground underline mb-1" onClick={doToggle}>summarize line? {`${isSummary ? "enabled" : "disabled"}`}</button>;
     
     return (
     <div tabIndex={0}  className="focus:outline-none">
         {longEnoughToSummarize ? summarizeButton : ''}
-        <p className={`${baseClass} transition-transform transition-opacity duration-200 ${summaryStyle} ${fadeClass}`} style={pstyleDict}>
+        <p style={pStyleDict} className={`${baseClass} transition-transform transition-opacity duration-200 ${summaryStyle} ${fadeClass}`}>
         {loading ? `${display}…` : display}
         </p>
     </div>

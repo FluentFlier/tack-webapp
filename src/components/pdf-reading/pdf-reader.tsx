@@ -4,13 +4,17 @@
 //This file was written mostly by GPT-5 mini with some parts written by Daniel Briggs
 //the full document summary function was implemented starting on 2026-4-3 using Github Copilot. Basically it takes the extracted lines of text, concatenates them together to get a list of all the text, truncates it if the text is too long, then runs that through the existing shorten function that shortens by a percentage using a calculated percentage to get to a roughly fixed length summary then outputs to html
 //rate limiting and account needing to be signed in notifications were added using Copilot, basically when a rate limit error is encountered a function is the pdf-reader component is called (this makes sure an alert about the error is only shown once per page load, instead of once per error)
-
+//some restyling was done using using AI by Jay to make the styling match the rest of the site
 
 import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Header } from "@/components/layout";
 import PdfReadableLine from "@/components/pdf-reading/PdfReadableLine";
 import PdfImageLine from "@/components/pdf-reading/PdfImageLine";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Settings } from "lucide-react";
 import { getDocumentProxy, extractImages } from 'unpdf';
 import type { TextItem, TextContent } from 'pdfjs-dist/types/src/display/api';
 
@@ -56,8 +60,9 @@ export default function Page() {
     "AIDefaultShortening": false,
     "AIFullDocumentSummary": false,
     "displayPageNumbers": true,
-    "backgroundColor": "#FFFFFF",
-    "textColor": "#000000",
+    "backgroundColor": "#08080f",
+    "middlegroundColor": "rgb(121, 121, 121)",
+    "textColor": "#ffffff",
     "minLengthToSummarize": 200,
     "targetSummaryLength": 60, //percentage
   };
@@ -82,8 +87,6 @@ export default function Page() {
   }
 
   let settings = getsettings()
- 
-
 
   useEffect(() => {
     mounted.current = true;
@@ -394,10 +397,10 @@ export default function Page() {
         const elements = docElements.map((element, idx) => {
           if (element.type === 'text') {
             return (
-              <PdfReadableLine 
-                key={idx} 
-                headingLevel={element.headingLevel} 
-                content={element.text} 
+              <PdfReadableLine
+                key={idx}
+                headingLevel={element.headingLevel}
+                content={element.text}
                 defaultToSummary={settings.AIDefaultShortening}
                 textColor={settings.textColor}
                 minLengthToSummarize={settings.minLengthToSummarize}
@@ -436,87 +439,112 @@ export default function Page() {
     return () => {
       cancelled = true;
     };
-  }, [file, settings]);
+  }, [file]);
 
 
   const styleDictBackground = {
     backgroundColor: settings.backgroundColor
   }
+  const styleDictMiddleground = {
+    backgroundColor: settings.middlegroundColor,
+  }
   const styleDictTextColor = {
     color: settings.textColor
   }
 
-
-  
   return (
     <>
       <Header />
-      <main className="min-h-screen p-8" style={styleDictBackground}>
-        <h1 className="text-3xl text-gray-600" style={styleDictTextColor}>PDF Reading</h1>
-        <a href="pdf-reading-settings" style={styleDictTextColor}>PDF Reader Settings</a>
-        <div className="mt-6">
-          <label className="block text-sm font-medium text-gray-700" style={styleDictTextColor}>Upload a PDF using the browse button below then the text content will appear below</label>
-          <input
-            type="file"
-            accept="application/pdf,.pdf"
-            onChange={handleFileChange}
-            className="mt-2"
-            style={styleDictTextColor}
-          />
-          {fileName && <p className="mt-2 text-sm text-gray-500" style={styleDictTextColor}>Selected: {fileName}</p>}
-        </div>
+      <main style={styleDictBackground} className="min-h-screen bg-background">
+        <div className="max-w-3xl mx-auto p-6 space-y-6">
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-1 gap-6">
           <div>
-              <div>
-                <h2 className="text-lg font-medium mb-2" style={styleDictTextColor}>Output</h2>
-                
-                  {loading && <p className="text-sm text-gray-500" style={styleDictTextColor}>Processing PDF...</p>}
-                  {error && <p className="text-sm text-red-500" style={styleDictTextColor}>Error: {error}</p>}
-                  {!loading && !error && readableHtml && (
-                    <div className="border rounded p-4 bg-white h-fit-content w-full" style={styleDictBackground}>
-                      {settings.AIFullDocumentSummary && (
-                        <div className="mb-4 rounded border p-3 bg-gray-50" style={styleDictBackground}>
-                          <h3 className="text-md font-medium mb-1" style={styleDictTextColor}>Full document summary</h3>
-                          {summaryLoading && <p className="text-sm text-gray-500" style={styleDictTextColor}>Generating summary...</p>}
-                          {summaryError && (
-                            <div className="flex flex-col gap-2" style={styleDictBackground}>
-                              <p className="text-sm text-red-500" style={styleDictTextColor}>Error: {summaryError}</p>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                className="w-fit"
-                                onClick={() => void generateDocumentSummary(documentText)}
-                                disabled={!documentText || summaryLoading}
-                              >
-                                Retry summary
-                              </Button>
-                            </div>
-                          )}
-                          {!summaryLoading && !summaryError && documentSummary && (
-                            <p className="text-sm" style={styleDictTextColor}>{documentSummary}</p>
-                          )}
-                          {!summaryLoading && !summaryError && !documentSummary && (
-                            <p className="text-sm text-gray-500" style={styleDictTextColor}>A summary will appear here after processing.</p>
-                          )}
-                          {summaryUsedTruncation && (
-                            <p className="text-xs text-gray-500 mt-2" style={styleDictTextColor}>
-                              Summary generated from the first {FULL_DOCUMENT_SUMMARY_MAX_CHARS.toLocaleString()} characters because this PDF is very long.
-                            </p>
-                          )}
+            <h1 style={styleDictTextColor} className="text-3xl font-bold">PDF Reading</h1>
+            <Link style={styleDictTextColor} href="/pdf-reading-settings">
+              <Button style={{...styleDictMiddleground, ...styleDictTextColor}} variant="ghost" size="sm" className="mt-2 gap-2 text-muted-foreground hover:text-foreground">
+                <Settings className="h-4 w-4" aria-hidden="true" />
+                PDF Reader Settings
+              </Button>
+            </Link>
+          </div>
+
+          <Card style={styleDictMiddleground}>
+            <CardHeader>
+              <CardTitle style={styleDictTextColor}>Upload PDF</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Label htmlFor="pdf-upload" style={styleDictTextColor}>Select a PDF file — the text content will appear below</Label>
+              <input
+                id="pdf-upload"
+                type="file"
+                accept="application/pdf,.pdf"
+                onChange={handleFileChange}
+                className="mt-2 block text-sm text-muted-foreground file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:bg-secondary file:text-secondary-foreground hover:file:bg-secondary/80"
+                style={{...styleDictTextColor, ...styleDictMiddleground}}
+              />
+              {fileName && (
+                <p className="mt-2 text-sm text-muted-foreground" style={styleDictTextColor}>Selected: {fileName}</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card style={styleDictMiddleground}>
+            <CardHeader>
+              <CardTitle style={styleDictTextColor}>Output</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading && <p className="text-sm text-muted-foreground" style={styleDictTextColor}>Processing PDF...</p>}
+              {error && <p className="text-sm text-destructive">Error: {error}</p>}
+              {!loading && !error && readableHtml && (
+                <div className="border border-border rounded-lg p-4 space-y-4" style={styleDictMiddleground}>
+                  {settings.AIFullDocumentSummary && (
+                    <>
+                      <h3 className="text-md font-medium mb-1" style={styleDictTextColor}>Full document summary</h3>
+                      {summaryLoading && (
+                        <p className="text-sm text-muted-foreground" style={styleDictTextColor}>Generating summary...</p>
+                      )}
+                      {summaryError && (
+                        <div className="flex flex-col gap-2">
+                          <p className="text-sm text-destructive" style={styleDictTextColor}>Error: {summaryError}</p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-fit"
+                            onClick={() => void generateDocumentSummary(documentText)}
+                            disabled={!documentText || summaryLoading}
+                            style={styleDictTextColor}
+                          >
+                            Retry summary
+                          </Button>
                         </div>
                       )}
-                      <p style={styleDictTextColor}>Below is the content of the document. When you select a button labeled summarize line? you can press the button to toggle an AI shortened version of the following line or paragraph. Pressing the button again will return the original version.</p>
-                      <div>{readableHtml}</div>
-                    </div>
+                      {!summaryLoading && !summaryError && documentSummary && (
+                        <p className="text-sm">{documentSummary}</p>
+                      )}
+                      {!summaryLoading && !summaryError && !documentSummary && (
+                        <p className="text-sm text-muted-foreground" style={styleDictTextColor}>A summary will appear here after processing.</p>
+                      )}
+                      {summaryUsedTruncation && (
+                        <p className="text-xs text-muted-foreground mt-2" style={styleDictTextColor}>
+                          Summary generated from the first {FULL_DOCUMENT_SUMMARY_MAX_CHARS.toLocaleString()} characters because this PDF is very long.
+                        </p>
+                      )}
+                    </>
                   )}
-                  {!loading && !error && !readableHtml && (
-                    <p className="text-sm text-gray-500" style={styleDictTextColor}>Once you upload a PDF using the browse button above, the text content of the document will appear here</p>
-                  )}
-                
-              </div>
-            </div>
-          </div>
+                  <p className="text-sm text-muted-foreground" style={styleDictTextColor}>
+                    Below is the content of the document. When you select a button labeled &quot;summarize line?&quot; you can press it to toggle an AI shortened version of the following line or paragraph. Pressing again returns the original.
+                  </p>
+                  <div>{readableHtml}</div>
+                </div>
+              )}
+              {!loading && !error && !readableHtml && (
+                <p className="text-sm text-muted-foreground" style={styleDictTextColor}>
+                  Once you upload a PDF above, the text content of the document will appear here.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </main>
     </>
   );
