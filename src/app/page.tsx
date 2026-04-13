@@ -73,9 +73,9 @@ export default function Home() {
 
             <SignedOut>
               <SignInButton>
-                <button className="landing-signin-btn" type="button">
+                <span className="landing-signin-btn">
                   Sign In
-                </button>
+                </span>
               </SignInButton>
             </SignedOut>
 
@@ -113,8 +113,8 @@ export default function Home() {
           <div className="landing-hero__cta-group">
             <SignedOut>
               <SignInButton>
-                <Button size="lg" className="landing-cta-btn">
-                  Learn More
+                <Button asChild size="lg" className="landing-cta-btn">
+                  <span>Learn More</span>
                 </Button>
               </SignInButton>
             </SignedOut>
@@ -132,8 +132,8 @@ export default function Home() {
             </SignedIn>
             <SignedOut>
               <SignInButton>
-                <Button size="lg" className="gap-2 text-base px-8 h-12">
-                  Get Started Free
+                <Button asChild size="lg" className="gap-2 text-base px-8 h-12">
+                  <span>Get Started Free</span>
                 </Button>
               </SignInButton>
             </SignedOut>
