@@ -110,11 +110,16 @@ export default function Home() {
             navigate, read, and understand web content through natural conversation.
           </p>
 
-          <div className="landing-hero__cta-group">
+          <div className="landing-hero__cta-group flex flex-row gap-3">
             <SignedOut>
+              <Link href="/about">
+                <Button size="lg" className="landing-cta-btn">
+                  Learn More
+                </Button>
+              </Link>
               <SignInButton>
-                <Button asChild size="lg" className="landing-cta-btn">
-                  <span>Learn More</span>
+                <Button size="lg" className="landing-cta-btn">
+                  Get Started Free
                 </Button>
               </SignInButton>
             </SignedOut>
@@ -130,13 +135,6 @@ export default function Home() {
                 </Button>
               </Link>
             </SignedIn>
-            <SignedOut>
-              <SignInButton>
-                <Button asChild size="lg" className="gap-2 text-base px-8 h-12">
-                  <span>Get Started Free</span>
-                </Button>
-              </SignInButton>
-            </SignedOut>
           </div>
         </section>
       </main>
