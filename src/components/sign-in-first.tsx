@@ -9,7 +9,7 @@ export default function Page() {
   
 return <>
   
-    <h1 className="text-3xl font-bold">You must sign in first, click the button below to go to the sign in page</h1>
+    <h1 className="text-3xl font-bold">You may have to sign in first to use this page. If you are already signed in please wait a few seconds and the page should finish loading. Otherwise, click the button below to go to the sign in page</h1>
     <SignInButton>
       <Button size="sm" className="mt-2 gap-2 text-muted-foreground text-foreground">
         Sign In     
