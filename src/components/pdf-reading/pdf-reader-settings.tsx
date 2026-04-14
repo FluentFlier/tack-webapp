@@ -134,6 +134,7 @@ export default function Page() {
                 Back to PDF Reading
               </Button>
             </Link>
+            <h4 className="font-bold" style={styleTextColorDict}>Note: These settings only apply to the PDF reader and will not be saved to your account. For now they are only saved in your browser</h4>
           </div>
 
           <Card style={styleMiddlegroundColorDict}>
