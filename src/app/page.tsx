@@ -70,9 +70,9 @@ export default function Home() {
 
             <SignedOut>
               <SignInButton>
-                <button className="landing-signin-btn" type="button">
+                <span className="landing-signin-btn">
                   Sign In
-                </button>
+                </span>
               </SignInButton>
             </SignedOut>
 

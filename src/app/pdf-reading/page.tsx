@@ -1,3 +1,5 @@
+"use client";
+
 import dynamic from "next/dynamic";
 import { SignedIn, SignedOut } from "@insforge/nextjs";
 import SignInFirst from "@/components/sign-in-first";
