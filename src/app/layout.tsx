@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { InsforgeProvider } from "./providers";
 
@@ -24,15 +23,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} ${playfair.variable}`}>
+      <head>
         {/*
           Blocking script: applies saved accessibility settings before first paint
           to prevent FOUC. Reads tack_preferences from localStorage and sets
           --base-font-size, data-color-profile, and .reduced-motion on <html>.
         */}
-        <Script
-          id="a11y-restore"
-          strategy="beforeInteractive"
+        <script
           dangerouslySetInnerHTML={{
             __html: `
               try {
@@ -61,6 +58,8 @@ export default function RootLayout({
             `,
           }}
         />
+      </head>
+      <body className={`${inter.className} ${playfair.variable}`}>
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
