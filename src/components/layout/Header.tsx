@@ -36,7 +36,7 @@ export function Header() {
           <span>TACK</span>
         </Link>
 
-        <nav aria-label="Main navigation" className="flex items-center gap-3">
+        <div aria-label="" className="flex items-center gap-3">
           <SignedIn>
             <Link href="/chat" aria-label="Go to chat">
               <Button variant="ghost" size="sm" className="text-[rgba(240,237,237,0.6)] hover:text-[rgba(240,237,237,0.9)] hover:bg-[rgba(140,100,220,0.08)]">
@@ -54,7 +54,8 @@ export function Header() {
                 Settings
               </Button>
             </Link>
-            <div className="ml-2 pl-2 border-l border-border/50">
+            <div aria-label="User menu" className="ml-2 pl-2 border-l border-border/50">
+              <span aria-label="User Profile Menu"></span>
               <UserButton />
             </div>
           </SignedIn>
@@ -63,7 +64,7 @@ export function Header() {
               <button className="landing-signin-btn" type="button">Sign In</button>
             </SignInButton>
           </SignedOut>
-        </nav>
+        </div>
       </div>
     </header>
   );

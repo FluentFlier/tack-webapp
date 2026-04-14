@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { SignedIn, SignedOut, SignInButton } from "@insforge/nextjs";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+//import { Search } from "lucide-react";
 
 export default function Home() {
   return (
@@ -27,7 +27,7 @@ export default function Home() {
 
       {/* ─── Top Navigation ─── */}
       <header role="banner" className="landing-nav">
-        <div className="landing-nav__inner">
+        <div aria-label="Main Navigation" className="landing-nav__inner">
           {/* Logo */}
           <Link href="/" className="landing-logo" aria-label="Tack – Home">
             <svg
@@ -49,27 +49,24 @@ export default function Home() {
           </Link>
 
           {/* Navigation links */}
-          <nav aria-label="Main navigation" className="landing-nav__links">
+          <div aria-label="" className="landing-nav__links">
             <Link href="/" className="landing-nav__link landing-nav__link--active">
               Home
             </Link>
-            <Link href="/about" className="landing-nav__link">
+            <Link aria-label="About Us"href="/about" className="landing-nav__link">
               About Us
             </Link>
-            <Link href="/contact" className="landing-nav__link">
-              Contact Us
-            </Link>
-          </nav>
+          </div>
 
           {/* Right side actions */}
           <div className="landing-nav__actions">
-            <button
+            {/*<button
               className="landing-nav__icon-btn"
               aria-label="Search"
               type="button"
             >
               <Search className="h-4 w-4" aria-hidden="true" />
-            </button>
+            </button>*/}
 
             <SignedOut>
               <SignInButton>
