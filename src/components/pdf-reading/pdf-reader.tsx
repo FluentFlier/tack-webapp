@@ -473,7 +473,9 @@ export default function Page() {
               <CardTitle style={styleDictTextColor}>Upload PDF</CardTitle>
             </CardHeader>
             <CardContent>
-              <Label htmlFor="pdf-upload" style={styleDictTextColor}>Select a PDF file — the text content will appear below</Label>
+              <h3 style={styleDictTextColor} className="font-bold">Note: the PDF Reader may upload your document to various online providers in order to provide AI features which may be enabled by default. Only use the PDF Reader if you are comfortable with and agree with that.</h3>
+
+              <Label htmlFor="pdf-upload" style={styleDictTextColor}>Select a PDF file — the text content will appear below.</Label>
               <input
                 id="pdf-upload"
                 type="file"
