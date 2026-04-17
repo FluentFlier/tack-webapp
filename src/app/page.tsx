@@ -69,10 +69,8 @@ export default function Home() {
             </button>*/}
 
             <SignedOut>
-              <SignInButton>
-                <span className="landing-signin-btn">
+              <SignInButton className="landing-signin-btn">
                   Sign In
-                </span>
               </SignInButton>
             </SignedOut>
 
