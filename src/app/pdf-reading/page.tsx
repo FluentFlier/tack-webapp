@@ -10,7 +10,7 @@ const PdfReaderPage = dynamic(() => import("@/components/pdf-reading/pdf-reader"
   ssr: false
 });
 
-export default async function Page() {
+export default function Page() {
  
   return <>
   <SignedIn>
