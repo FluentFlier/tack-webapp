@@ -53,7 +53,7 @@ export default function Home() {
             <Link href="/" className="landing-nav__link landing-nav__link--active">
               Home
             </Link>
-            <Link aria-label="About Us"href="/about" className="landing-nav__link">
+            <Link aria-label="About Us"href="/" aria-disabled={true} className="landing-nav__link">
               About Us
             </Link>
           </div>
@@ -108,7 +108,7 @@ export default function Home() {
           <div className="landing-hero__cta-group flex flex-row gap-3">
             <SignedOut>
               <Link href="/about">
-                <Button size="lg" className="landing-cta-btn">
+                <Button size="lg" disabled={true} className="landing-cta-btn">
                   Learn More
                 </Button>
               </Link>
