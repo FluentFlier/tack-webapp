@@ -331,6 +331,7 @@ export default function Page() {
             }
           }
 
+          /*Disable image handling since it does not seem to work and only makes pdf parsing take longer at the moment
           //now try to extract images from this page
           try {
             const extractedImages = await extractImages(pdf, pageNum+1); //unPDF page numbers are 1-indexed
@@ -366,7 +367,7 @@ export default function Page() {
           } catch (err) {
             console.warn(`Failed to extract images from page ${pageNum}:`, err);
           }
-
+          */
         }
 
         //convert tempDocText to docElements
