@@ -1,4 +1,5 @@
 "use client"
+//This component written by Github Copilot as a basic component to show images in the pdf reader
 
 import React from "react";
 import Image from "next/image";
