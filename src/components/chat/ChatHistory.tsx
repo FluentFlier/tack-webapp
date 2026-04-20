@@ -28,6 +28,9 @@ export function ChatHistory({ messages, loading = false }: ChatHistoryProps) {
             </kbd>{" "}
             to see what I can do.
           </p>
+          <h3 className="text-muted-foreground text-sm leading-relaxed bold">
+            Note: The AI features may make mistakes and provide incorrect information, do not blindly trust these features.
+          </h3>
         </div>
       </div>
     );
