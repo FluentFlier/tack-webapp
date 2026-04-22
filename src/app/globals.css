@@ -506,7 +506,7 @@ html {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  color: #f0eded;
+  color: #ffffff;
   text-decoration: none;
   font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
   font-size: 1.05rem;
@@ -562,7 +562,7 @@ html {
 }
 
 .landing-nav__link--active {
-  color: rgba(240, 237, 237, 0.95);
+  color: #ffffff;
 }
 
 /* Right actions */
@@ -600,11 +600,11 @@ html {
 .landing-signin-btn {
   padding: 0.45rem 1.4rem;
   border-radius: 100px;
-  border: 1px solid rgba(240, 237, 237, 0.25);
-  background: transparent;
-  color: rgba(240, 237, 237, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
   font-size: 0.8rem;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
@@ -657,7 +657,7 @@ html {
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0.65) 100%
+    rgba(255, 255, 255, 0.88) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -667,8 +667,8 @@ html {
 .landing-hero__heading-line--accent {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.8) 0%,
-    rgba(200, 180, 240, 0.5) 100%
+    #e8d5ff 0%,
+    #c8a8ff 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -681,8 +681,8 @@ html {
   margin: 0 auto 2.5rem;
   font-size: clamp(0.9rem, 1.6vw, 1.05rem);
   line-height: 1.75;
-  color: rgba(240, 237, 237, 0.55);
-  font-weight: 300;
+  color: rgba(240, 237, 237, 0.82);
+  font-weight: 400;
   letter-spacing: 0.01em;
 }
 
@@ -697,16 +697,16 @@ html {
   padding: 0.75rem 2.4rem !important;
   border-radius: 6px !important;
   font-size: 0.82rem !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   letter-spacing: 0.14em !important;
   text-transform: uppercase !important;
   background: linear-gradient(
     135deg,
-    rgba(90, 60, 200, 0.85) 0%,
-    rgba(60, 80, 220, 0.85) 100%
+    rgb(105, 75, 215) 0%,
+    rgb(75, 95, 235) 100%
   ) !important;
-  border: 1px solid rgba(140, 120, 255, 0.25) !important;
-  color: #f0eded !important;
+  border: 1px solid rgba(180, 160, 255, 0.4) !important;
+  color: #ffffff !important;
   cursor: pointer;
   transition: all 0.35s ease !important;
   box-shadow:
