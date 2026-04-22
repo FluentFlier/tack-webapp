@@ -41,8 +41,8 @@ export default function AboutPage() {
       <div className="landing-orb landing-orb--blue" aria-hidden="true" />
 
       {/* ─── Top Navigation ─── */}
-      <header role="banner" className="landing-nav">
-        <div className="landing-nav__inner">
+      <header className="landing-nav">
+        <nav className="landing-nav__inner" aria-label="Site header">
           <Link href="/" className="landing-logo" aria-label="Tack – Home">
             <svg
               width="28"
@@ -99,7 +99,7 @@ export default function AboutPage() {
               </Link>
             </SignedIn>
           </div>
-        </div>
+        </nav>
       </header>
 
       {/* ─── Main Content ─── */}

@@ -26,8 +26,8 @@ export default function Home() {
       <div className="landing-orb landing-orb--blue" aria-hidden="true" />
 
       {/* ─── Top Navigation ─── */}
-      <header role="banner" className="landing-nav">
-        <div className="landing-nav__inner">
+      <header className="landing-nav">
+        <nav className="landing-nav__inner" aria-label="Site header">
           {/* Logo */}
           <Link href="/" className="landing-logo" aria-label="Tack – Home">
             <svg
@@ -92,7 +92,7 @@ export default function Home() {
               </Link>
             </SignedIn>
           </div>
-        </div>
+        </nav>
       </header>
 
       {/* ─── Hero Section ─── */}
