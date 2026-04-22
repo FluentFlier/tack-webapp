@@ -768,6 +768,120 @@ html {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   Auth — Login Page
+   ═══════════════════════════════════════════════════════════════════ */
+
+.auth-login-root {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: #050508;
+  color: #f0eded;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-login-main {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.auth-login-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.auth-login-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #ffffff;
+  text-decoration: none;
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  margin-bottom: 0.5rem;
+  transition: opacity 0.25s ease;
+}
+
+.auth-login-logo:hover {
+  opacity: 0.75;
+}
+
+.auth-login-heading {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.auth-login-subtext {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: rgba(240, 237, 237, 0.72);
+  margin: 0;
+  font-weight: 400;
+}
+
+.auth-login-form-section {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 2rem 1.75rem;
+  box-shadow:
+    0 0 40px rgba(100, 70, 220, 0.12),
+    0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.auth-login-footer {
+  text-align: center;
+}
+
+.auth-login-footer__text {
+  font-size: 0.78rem;
+  color: rgba(240, 237, 237, 0.42);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.auth-login-footer__link {
+  color: rgba(200, 168, 255, 0.85);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.auth-login-footer__link:hover {
+  color: #c8a8ff;
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .auth-login-form-section {
+    padding: 1.5rem 1.25rem;
+    border-radius: 12px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    About Page
    ═══════════════════════════════════════════════════════════════════ */
 .about-root {

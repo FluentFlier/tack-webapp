@@ -4,7 +4,7 @@ export default InsforgeMiddleware({
   baseUrl:
     process.env.NEXT_PUBLIC_INSFORGE_BASE_URL ||
     "https://5bycmn95.us-west.insforge.app",
-  publicRoutes: ["/"],
+  publicRoutes: ["/", "/about", "/auth/login", "/auth/sign-up", "/auth/forgot-password"],
 });
 
 export const config = {
