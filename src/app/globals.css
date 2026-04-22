@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════
+   OPENDYSLEXIC FONT (loaded on-demand for dyslexia mode)
+   ═══════════════════════════════════════════════════════════════════ */
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-bold.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     /* ─── Dark Cinematic Palette ─── */
@@ -113,20 +134,252 @@ html {
   font-size: var(--base-font-size, 16px);
 }
 
-/* ── Color-Blindness Palettes ─────────────────────────────────────
-   Applied via data-color-profile attribute on <html>.
-   Each palette overrides the FULL set of shadcn/ui HSL design tokens
-   so the entire UI transforms — background, cards, borders, text, etc.
 
-   APPROACH: CSS custom properties (preferred over CSS filters)
-   - Pros: precise control over every UI color, guarantees text contrast
-   - Cons: does not recolor raster images or videos
-   For image simulation, apply SVG filters to image containers.
-   ─────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════
+   ACCESSIBILITY MODE STYLES
+   Applied via data attributes on <html> by AccessibilityContext.
+   ═══════════════════════════════════════════════════════════════════ */
 
-/* ── Protanopia (red-blind) ──────────────────────────────────────
-   Blues and yellows replace red/green signals.
-   Deep navy background with bright blue accents and amber warnings. */
+/* ── Font scaling (applies globally) ──────────────────────────────
+   Multiplies the base font size by the a11y font scale factor.
+   JS sets --a11y-font-scale on <html>. */
+html {
+  font-size: calc(var(--base-font-size, 16px) * var(--a11y-font-scale, 1));
+  letter-spacing: var(--a11y-letter-spacing, 0em);
+  word-spacing: var(--a11y-word-spacing, 0em);
+  line-height: var(--a11y-line-height, 1.6);
+}
+
+
+/* ═══════════════════════════ DYSLEXIA MODE ═══════════════════════ */
+
+[data-a11y-dyslexia] {
+  --a11y-letter-spacing: 0.12em;
+  --a11y-word-spacing: 0.16em;
+  --a11y-line-height: 1.8;
+}
+
+[data-a11y-dyslexia] body {
+  font-family: "OpenDyslexic", system-ui, sans-serif !important;
+}
+
+[data-a11y-dyslexia] p,
+[data-a11y-dyslexia] li,
+[data-a11y-dyslexia] span,
+[data-a11y-dyslexia] td {
+  max-width: 65ch;
+}
+
+/* Increase paragraph spacing */
+[data-a11y-dyslexia] p + p {
+  margin-top: 1.5em;
+}
+
+
+/* ═══════════════════════════ LOW VISION MODE ═════════════════════ */
+
+[data-a11y-low-vision] {
+  --va-bg: hsl(0, 0%, 0%);
+  --neon-cyan: hsl(210, 100%, 60%);
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 5%;
+  --card-foreground: 0 0% 100%;
+  --border: 0 0% 50%;
+  --muted-foreground: 0 0% 80%;
+  --ring: 210 100% 60%;
+}
+
+/* Enlarge all interactive elements */
+[data-a11y-low-vision] button,
+[data-a11y-low-vision] a,
+[data-a11y-low-vision] input,
+[data-a11y-low-vision] select,
+[data-a11y-low-vision] textarea {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* Larger icons */
+[data-a11y-low-vision] svg {
+  min-width: 20px;
+  min-height: 20px;
+}
+
+/* Boost borders */
+[data-a11y-low-vision] button,
+[data-a11y-low-vision] a,
+[data-a11y-low-vision] select,
+[data-a11y-low-vision] input,
+[data-a11y-low-vision] textarea {
+  border: 1px solid hsl(0 0% 50%);
+}
+
+/* Stronger focus rings */
+[data-a11y-low-vision] :focus-visible {
+  outline: 3px solid hsl(210 100% 60%);
+  outline-offset: 2px;
+}
+
+/* Boost text contrast for muted elements */
+[data-a11y-low-vision] .text-white\/30,
+[data-a11y-low-vision] .text-white\/40,
+[data-a11y-low-vision] .text-white\/50 {
+  color: hsl(0 0% 80%) !important;
+}
+
+[data-a11y-low-vision] .text-white\/60 {
+  color: hsl(0 0% 90%) !important;
+}
+
+
+/* ═══════════════════════════ COLOR BLIND MODE ════════════════════ */
+
+[data-a11y-color-blind] {
+  /* Replace red/green signals with blue/orange */
+  --neon-cyan: hsl(210, 80%, 55%);
+  --neon-green: hsl(45, 90%, 55%);
+  --neon-orange: hsl(210, 70%, 60%);
+
+  --primary: 210 80% 55%;
+  --destructive: 40 95% 50%;
+  --accent: 45 90% 55%;
+  --chart-1: 210 75% 55%;
+  --chart-2: 50 85% 55%;
+  --chart-3: 200 45% 40%;
+  --chart-4: 45 90% 65%;
+  --chart-5: 195 70% 45%;
+}
+
+/* Ensure color-coded elements also have text/icon labels */
+[data-a11y-color-blind] [data-status="success"]::after,
+[data-a11y-color-blind] [data-status="error"]::after,
+[data-a11y-color-blind] [data-status="warning"]::after {
+  display: inline;
+  margin-left: 0.5em;
+  font-size: 0.75em;
+  font-weight: bold;
+}
+
+[data-a11y-color-blind] [data-status="success"]::after {
+  content: "✓ OK";
+}
+[data-a11y-color-blind] [data-status="error"]::after {
+  content: "✗ Error";
+}
+[data-a11y-color-blind] [data-status="warning"]::after {
+  content: "⚠ Warning";
+}
+
+
+/* ═══════════════════════════ ADHD / FOCUS MODE ═══════════════════ */
+
+/* Kill all animations and glows */
+[data-a11y-adhd] *,
+[data-a11y-adhd] *::before,
+[data-a11y-adhd] *::after {
+  animation: none !important;
+  animation-duration: 0ms !important;
+  transition-duration: 0ms !important;
+}
+
+/* Calmer, muted accent colors */
+[data-a11y-adhd] {
+  --neon-cyan: hsl(200, 30%, 50%);
+  --neon-blue: hsl(210, 30%, 50%);
+  --neon-purple: hsl(260, 25%, 50%);
+  --neon-green: hsl(150, 30%, 45%);
+}
+
+/* Remove glow effects */
+[data-a11y-adhd] .va-search-glow,
+[data-a11y-adhd] .va-text-glow,
+[data-a11y-adhd] .va-pulse-mic {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  animation: none !important;
+}
+
+/* Remove tech grid background */
+[data-a11y-adhd] .va-page::before {
+  display: none;
+}
+
+/* No card hover transforms */
+[data-a11y-adhd] .va-card:hover {
+  transform: none;
+}
+
+/* Hide secondary sections in focus mode */
+.a11y-focus-mode .secondary-section {
+  display: none;
+}
+
+/* Focus container — highlight active section */
+.a11y-focus-mode section:focus-within {
+  outline: 2px solid hsl(200 30% 50% / 0.4);
+  outline-offset: 8px;
+  border-radius: 12px;
+}
+
+
+/* ═══════════════════════════ HIGH CONTRAST (shared) ══════════════ */
+
+[data-a11y-high-contrast] {
+  --va-bg: hsl(0, 0%, 0%);
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 5%;
+  --card-foreground: 0 0% 100%;
+  --border: 0 0% 50%;
+  --muted-foreground: 0 0% 80%;
+}
+
+[data-a11y-high-contrast] :focus-visible {
+  outline: 3px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+
+/* ═══════════════════════════ REDUCED MOTION ══════════════════════ */
+
+.a11y-reduced-motion *,
+.a11y-reduced-motion *::before,
+.a11y-reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+.a11y-reduced-motion .va-search-glow,
+.a11y-reduced-motion .va-pulse-mic {
+  animation: none !important;
+}
+
+/* ── Existing reduced-motion class (from PreferencesProvider) ──── */
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+.reduced-motion .parallax,
+.reduced-motion .spin,
+.reduced-motion .scale,
+.reduced-motion .bounce,
+.reduced-motion .pulse-animation {
+  transform: none !important;
+}
+
+
+/* ═══════════════════════════ EXISTING COLOR PROFILES ═════════════
+   (Preserved from original — activated via data-color-profile)
+   ═══════════════════════════════════════════════════════════════════ */
+
 [data-color-profile="protanopia"] {
   --background: 215 40% 7%;
   --foreground: 210 20% 92%;

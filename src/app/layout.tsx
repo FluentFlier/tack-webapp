@@ -11,9 +11,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Tack - Accessible AI Assistant",
+  title: "VisionAccess - Accessible Information Portal",
   description:
-    "AI-powered web assistant designed for blind and visually impaired users",
+    "AI-powered accessible information portal with adaptive accessibility modes for dyslexia, low vision, color blind, and ADHD users",
 };
 
 export default function RootLayout({
@@ -23,16 +23,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
+      <body className={inter.className}>
         {/*
-          Blocking script: applies saved accessibility settings before first paint
-          to prevent FOUC. Reads tack_preferences from localStorage and sets
-          --base-font-size, data-color-profile, and .reduced-motion on <html>.
+          Blocking script: restore BOTH preference settings AND accessibility
+          mode settings before first paint to prevent FOUC.
         */}
-        <script
+        <Script
+          id="a11y-restore"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               try {
+                // ── Restore existing preferences ──
                 var s = localStorage.getItem('tack_preferences');
                 if (s) {
                   var p = JSON.parse(s);
@@ -54,6 +56,27 @@ export default function RootLayout({
                     r.style.setProperty('--motion-duration', '0.001ms');
                   }
                 }
+
+                // ── Restore accessibility modes ──
+                var a = localStorage.getItem('visionaccess_a11y');
+                if (a) {
+                  var state = JSON.parse(a);
+                  var root = document.documentElement;
+                  var modes = state.activeModes || [];
+                  modes.forEach(function(m) { root.setAttribute('data-a11y-' + m, ''); });
+                  if (state.fontScale) root.style.setProperty('--a11y-font-scale', String(state.fontScale));
+                  if (state.contrastMode === 'high') root.setAttribute('data-a11y-high-contrast', '');
+                  if (state.motionReduced) root.classList.add('a11y-reduced-motion');
+                  if (state.focusMode) root.classList.add('a11y-focus-mode');
+                  var spacingMap = { normal: '0em', wide: '0.08em', wider: '0.14em' };
+                  var wordMap = { normal: '0em', wide: '0.12em', wider: '0.2em' };
+                  var lineMap = { normal: '1.6', wide: '1.8', wider: '2.0' };
+                  if (state.textSpacing) {
+                    root.style.setProperty('--a11y-letter-spacing', spacingMap[state.textSpacing] || '0em');
+                    root.style.setProperty('--a11y-word-spacing', wordMap[state.textSpacing] || '0em');
+                    root.style.setProperty('--a11y-line-height', lineMap[state.textSpacing] || '1.6');
+                  }
+                }
               } catch(e) {}
             `,
           }}
@@ -62,7 +85,7 @@ export default function RootLayout({
       <body className={`${inter.className} ${playfair.variable}`}>
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[hsl(180,100%,50%)] focus:text-[hsl(220,25%,6%)] focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:font-semibold"
         >
           Skip to main content
         </a>
