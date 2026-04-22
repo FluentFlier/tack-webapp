@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice Commands — Tack Web App</title>
+  <meta name="description" content="Accessible voice-command controller for Tack. Supports Web Speech API with VoiceOver, NVDA, and Orbit Reader 20." />
+
+  <style>
+    /* ===================================================================
+       1. RESET & BASE
+       =================================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg:          #0f1117;
+      --color-surface:     #1a1d27;
+      --color-surface-alt: #252836;
+      --color-border:      #3a3d4a;
+      --color-text:        #e4e6ef;
+      --color-text-muted:  #9ca0b0;
+      --color-primary:     #6c8cff;
+      --color-primary-hover:#8aa4ff;
+      --color-success:     #4ade80;
+      --color-error:       #f87171;
+      --color-warning:     #fbbf24;
+      --focus-ring:        0 0 0 3px var(--color-primary);
+      --radius:            8px;
+      --font-sans:         'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono:         'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ===================================================================
+       2. SKIP LINK (visible on focus for keyboard / SR users)
+       =================================================================== */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 16px;
+      background: var(--color-primary);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      z-index: 1000;
+      text-decoration: none;
+    }
+    .skip-link:focus {
+      top: 16px;
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    /* ===================================================================
+       3. FOCUS RINGS — visible for keyboard, hidden for mouse
+       =================================================================== */
+    :focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+    :focus:not(:focus-visible) {
+      outline: none;
+      box-shadow: none;
+    }
+
+    /* ===================================================================
+       4. HIGH-CONTRAST & FORCED-COLORS
+       =================================================================== */
+    @media (forced-colors: active) {
+      :root {
+        --color-bg:      Canvas;
+        --color-surface:  Canvas;
+        --color-text:     CanvasText;
+        --color-primary:  Highlight;
+        --color-border:   CanvasText;
+      }
+      .vc-toggle { border: 2px solid CanvasText; }
+      .vc-toggle[aria-pressed="true"] { border-color: Highlight; }
+    }
+    @media (prefers-contrast: more) {
+      :root {
+        --color-text:       #ffffff;
+        --color-text-muted: #d0d0d0;
+        --color-border:     #808080;
+      }
+    }
+
+    /* ===================================================================
+       5. REDUCED MOTION
+       =================================================================== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ===================================================================
+       6. LAYOUT
+       =================================================================== */
+    .vc-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    .vc-header {
+      margin-bottom: 32px;
+    }
+    .vc-header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .vc-header p {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* ===================================================================
+       7. TOGGLE BUTTON
+       =================================================================== */
+    .vc-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .vc-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius);
+      background: var(--color-surface);
+      color: var(--color-text);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      min-height: 48px; /* WCAG touch-target */
+      min-width: 48px;
+    }
+    .vc-toggle:hover {
+      background: var(--color-surface-alt);
+    }
+    .vc-toggle[aria-pressed="true"] {
+      border-color: var(--color-success);
+      background: rgba(74, 222, 128, 0.1);
+    }
+    .vc-toggle[aria-pressed="true"] .vc-toggle-icon {
+      color: var(--color-success);
+    }
+
+    .vc-toggle-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .vc-shortcut-hint {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      padding: 4px 10px;
+      background: var(--color-surface-alt);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }
+
+    /* ===================================================================
+       8. STATUS / LIVE REGION
+       =================================================================== */
+    .vc-status {
+      padding: 16px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: var(--color-surface);
+      margin-bottom: 24px;
+      min-height: 56px;
+    }
+    .vc-status-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: 6px;
+    }
+    .vc-status-text {
+      font-size: 0.95rem;
+    }
+    .vc-status-text.listening {
+      color: var(--color-success);
+    }
+    .vc-status-text.error {
+      color: var(--color-error);
+    }
+    .vc-status-text.warning {
+      color: var(--color-warning);
+    }
+
+    /* Pulsing indicator while listening */
+    .vc-pulse {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--color-success);
+      margin-right: 8px;
+      vertical-align: middle;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    /* ===================================================================
+       9. TRANSCRIPT LOG
+       =================================================================== */
+    .vc-transcript {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: var(--color-surface);
+      padding: 16px;
+      max-height: 240px;
+      overflow-y: auto;
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+    }
+    .vc-transcript:empty::after {
+      content: 'Transcript will appear here…';
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+    .vc-transcript-entry {
+      padding: 6px 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .vc-transcript-entry:last-child { border-bottom: none; }
+    .vc-transcript-entry .label {
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--color-primary);
+    }
+    .vc-transcript-entry .matched {
+      color: var(--color-success);
+      font-weight: 600;
+    }
+
+    /* ===================================================================
+       10. TEXT-ENTRY FALLBACK
+       =================================================================== */
+    .vc-fallback {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: var(--color-surface);
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    .vc-fallback label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .vc-fallback-row {
+      display: flex;
+      gap: 8px;
+    }
+    .vc-fallback input[type="text"] {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: var(--color-surface-alt);
+      color: var(--color-text);
+      font-size: 0.95rem;
+      min-height: 44px;
+    }
+    .vc-fallback button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--color-primary);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+      min-width: 44px;
+    }
+    .vc-fallback button:hover {
+      background: var(--color-primary-hover);
+    }
+
+    /* ===================================================================
+       11. HELP / COMMAND LIST
+       =================================================================== */
+    .vc-help {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: var(--color-surface);
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    .vc-help summary {
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 0;
+      list-style: none;
+    }
+    .vc-help summary::-webkit-details-marker { display: none; }
+    .vc-help summary::before {
+      content: '▸ ';
+      display: inline-block;
+      transition: transform 0.15s;
+    }
+    .vc-help[open] summary::before { transform: rotate(90deg); }
+
+    .vc-help table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.9rem;
+    }
+    .vc-help th, .vc-help td {
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .vc-help th {
+      color: var(--color-text-muted);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+    .vc-help code {
+      font-family: var(--font-mono);
+      background: var(--color-surface-alt);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.85rem;
+    }
+
+    /* ===================================================================
+       12. NATIVE-ASSISTANT FALLBACK LINK
+       =================================================================== */
+    .vc-assistant-link {
+      display: inline-block;
+      padding: 10px 20px;
+      border: 2px solid var(--color-primary);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--color-primary);
+      font-weight: 600;
+      text-decoration: none;
+      margin-top: 8px;
+      min-height: 44px;
+      line-height: 1.4;
+    }
+    .vc-assistant-link:hover {
+      background: rgba(108, 140, 255, 0.1);
+    }
+
+    /* ===================================================================
+       13. VISUALLY-HIDDEN UTILITY (for SR-only text)
+       =================================================================== */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ================================================================
+       SKIP NAVIGATION
+       ================================================================ -->
+  <a href="#vc-main" class="skip-link">Skip to voice-command controls</a>
+
+  <!-- ================================================================
+       MAIN CONTENT
+       ================================================================ -->
+  <main id="vc-main" class="vc-container" role="main" aria-label="Voice command controls">
+
+    <!-- Header -->
+    <header class="vc-header">
+      <h1 id="vc-title">Voice Commands</h1>
+      <p>Control Tack with your voice. Works with VoiceOver, NVDA, and braille displays.</p>
+    </header>
+
+    <!-- ============================================================
+         TOGGLE BUTTON + SHORTCUT HINT
+         ============================================================ -->
+    <div class="vc-controls">
+      <!--
+        Accessible toggle button:
+        - role="button"  — explicit (though <button> is natively a button)
+        - aria-pressed   — communicates toggle state to screen readers
+        - aria-describedby — links to the keyboard-shortcut hint
+        - aria-controls  — points to the status region it governs
+      -->
+      <button
+        id="vc-toggle-btn"
+        type="button"
+        role="button"
+        aria-pressed="false"
+        aria-label="Voice commands"
+        aria-describedby="vc-shortcut-hint"
+        aria-controls="vc-status-region"
+        class="vc-toggle"
+      >
+        <!-- Microphone icon (decorative — aria-hidden) -->
+        <svg class="vc-toggle-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+        <span id="vc-toggle-label">Start listening</span>
+      </button>
+
+      <!-- Keyboard shortcut hint (visible & linked via aria-describedby) -->
+      <span id="vc-shortcut-hint" class="vc-shortcut-hint" aria-live="off">
+        <!-- JS fills in platform-correct shortcut -->
+      </span>
+    </div>
+
+    <!-- ============================================================
+         STATUS / LIVE REGION
+         Assertive so screen readers announce changes immediately.
+         Also reflected to braille displays via the live region.
+         ============================================================ -->
+    <div
+      id="vc-status-region"
+      class="vc-status"
+      role="status"
+      aria-live="assertive"
+      aria-atomic="true"
+      aria-relevant="text"
+    >
+      <div class="vc-status-label">Status</div>
+      <div id="vc-status-text" class="vc-status-text">
+        Voice commands are off. Press the button or use the keyboard shortcut to start.
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TRANSCRIPT LOG (role="log" so SR announces new entries)
+         ============================================================ -->
+    <div
+      id="vc-transcript"
+      class="vc-transcript"
+      role="log"
+      aria-label="Voice command transcript"
+      aria-live="polite"
+      aria-relevant="additions"
+      tabindex="0"
+    ></div>
+
+    <!-- ============================================================
+         TEXT-ENTRY FALLBACK
+         Shown when SpeechRecognition is unavailable or for users
+         who prefer typing commands.
+         ============================================================ -->
+    <div class="vc-fallback" id="vc-fallback-section">
+      <label for="vc-text-input">Type a command (fallback for unsupported browsers or preference):</label>
+      <div class="vc-fallback-row">
+        <input
+          type="text"
+          id="vc-text-input"
+          placeholder='e.g. "open inbox"'
+          autocomplete="off"
+          aria-describedby="vc-text-hint"
+        />
+        <button id="vc-text-submit" type="button" aria-label="Submit command">
+          Run
+        </button>
+      </div>
+      <span id="vc-text-hint" class="sr-only">
+        Type a voice command and press Enter or click Run to execute it.
+      </span>
+    </div>
+
+    <!-- ============================================================
+         NATIVE ASSISTANT FALLBACK AREA
+         Hidden by default; shown when the user says "activate siri"
+         or "activate cortana" and the deep-link is blocked.
+         ============================================================ -->
+    <div
+      id="vc-assistant-fallback"
+      class="vc-status"
+      role="alert"
+      aria-live="assertive"
+      style="display: none;"
+    >
+      <div class="vc-status-label">Native Assistant</div>
+      <div id="vc-assistant-msg"></div>
+    </div>
+
+    <!-- ============================================================
+         HELP — COMMAND REFERENCE (collapsible <details>)
+         ============================================================ -->
+    <details class="vc-help" id="vc-help-details">
+      <summary>Available voice commands</summary>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Command</th>
+            <th scope="col">Match type</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody id="vc-help-tbody">
+          <!-- JS populates rows from the command registry -->
+        </tbody>
+      </table>
+    </details>
+  </main>
+
+  <!-- ================================================================
+       JAVASCRIPT
+       ================================================================ -->
+  <script>
+    /* =================================================================
+       VoiceCommandSystem — self-contained, framework-free module.
+       =================================================================
+
+       Public API:
+         const vcs = new VoiceCommandSystem(options);
+         vcs.startListening();
+         vcs.stopListening();
+         vcs.registerCommand(name, pattern, handler, description);
+
+       Events (via options callbacks):
+         onRecognizedText(text)
+         onCommandMatched(commandName, text)
+         onError(errorObj)
+    ================================================================= */
+    (function () {
+      'use strict';
+
+      // ------------------------------------------------------------------
+      // 1. PLATFORM & CAPABILITY DETECTION
+      // ------------------------------------------------------------------
+      const platform = {
+        isMac: /macintosh|mac os x/i.test(navigator.userAgent),
+        isWindows: /windows/i.test(navigator.userAgent),
+        isSafari: /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
+        isEdge: /edg\//i.test(navigator.userAgent),
+        isChrome: /chrome/i.test(navigator.userAgent) && !/edg\//i.test(navigator.userAgent),
+        hasSpeechRecognition: !!(
+          window.SpeechRecognition || window.webkitSpeechRecognition
+        ),
+        SpeechRecognition:
+          window.SpeechRecognition || window.webkitSpeechRecognition || null,
+      };
+
+      // ------------------------------------------------------------------
+      // 2. DOM REFERENCES
+      // ------------------------------------------------------------------
+      const $ = (id) => document.getElementById(id);
+      const dom = {
+        toggleBtn:       $('vc-toggle-btn'),
+        toggleLabel:     $('vc-toggle-label'),
+        shortcutHint:    $('vc-shortcut-hint'),
+        statusText:      $('vc-status-text'),
+        transcript:      $('vc-transcript'),
+        textInput:       $('vc-text-input'),
+        textSubmit:      $('vc-text-submit'),
+        fallbackSection: $('vc-fallback-section'),
+        assistantFallback: $('vc-assistant-fallback'),
+        assistantMsg:    $('vc-assistant-msg'),
+        helpTbody:       $('vc-help-tbody'),
+      };
+
+      // Set platform-specific keyboard shortcut hint
+      const shortcutLabel = platform.isMac
+        ? 'Ctrl + Option + Shift + V'
+        : 'Ctrl + Alt + Shift + V';
+      dom.shortcutHint.textContent = shortcutLabel;
+
+      // ------------------------------------------------------------------
+      // 3. VOICE COMMAND SYSTEM CLASS
+      // ------------------------------------------------------------------
+      class VoiceCommandSystem {
+        /**
+         * @param {Object} options
+         * @param {Function} [options.onRecognizedText]  — called with raw transcript
+         * @param {Function} [options.onCommandMatched]  — called with (name, text)
+         * @param {Function} [options.onError]           — called with error object
+         * @param {boolean}  [options.continuous=true]    — continuous listening mode
+         * @param {boolean}  [options.autoRestart=true]   — restart if recognition stops unexpectedly
+         * @param {string}   [options.lang='en-US']       — recognition language
+         */
+        constructor(options = {}) {
+          this.onRecognizedText = options.onRecognizedText || (() => {});
+          this.onCommandMatched = options.onCommandMatched || (() => {});
+          this.onError          = options.onError          || (() => {});
+          this.continuous       = options.continuous  !== undefined ? options.continuous  : true;
+          this.autoRestart      = options.autoRestart !== undefined ? options.autoRestart : true;
+          this.lang             = options.lang || 'en-US';
+
+          this._recognition = null;
+          this._listening   = false;
+          this._intentionalStop = false;
+          this._commands    = new Map(); // name → { pattern, handler, matchType, description }
+
+          this._registerDefaultCommands();
+        }
+
+        // ----------------------------------------------------------------
+        // PUBLIC API
+        // ----------------------------------------------------------------
+
+        /**
+         * Register a custom command.
+         * @param {string}          name        — unique command name
+         * @param {string|RegExp}   pattern     — string (exact, case-insensitive) or RegExp
+         * @param {Function}        handler     — called when command matches
+         * @param {string}          description — human-readable description
+         * @param {string}          [matchType] — 'exact', 'regex', or 'fuzzy' (for docs)
+         */
+        registerCommand(name, pattern, handler, description, matchType) {
+          this._commands.set(name, {
+            pattern,
+            handler,
+            description: description || name,
+            matchType: matchType || (pattern instanceof RegExp ? 'regex' : 'exact'),
+          });
+        }
+
+        /** Start speech recognition. Requests mic permission if needed. */
+        async startListening() {
+          if (this._listening) return;
+          if (!platform.hasSpeechRecognition) {
+            this._announceStatus(
+              'Speech recognition is not supported in this browser. Use the text input below to type commands.',
+              'warning'
+            );
+            dom.textInput.focus();
+            return;
+          }
+
+          // Request microphone permission explicitly
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // Release the stream immediately — we only needed the permission grant.
+            stream.getTracks().forEach((t) => t.stop());
+          } catch (err) {
+            this._handlePermissionError(err);
+            return;
+          }
+
+          this._initRecognition();
+          try {
+            this._recognition.start();
+          } catch (e) {
+            // Already started — ignore
+          }
+        }
+
+        /** Stop speech recognition. */
+        stopListening() {
+          this._intentionalStop = true;
+          this._listening = false;
+          if (this._recognition) {
+            try { this._recognition.stop(); } catch (_) { /* ignore */ }
+          }
+          this._setToggleState(false);
+          this._announceStatus('Voice commands stopped.', '');
+        }
+
+        /** @returns {boolean} Whether currently listening. */
+        get isListening() {
+          return this._listening;
+        }
+
+        /** @returns {Map} Registered commands map. */
+        get commands() {
+          return this._commands;
+        }
+
+        // ----------------------------------------------------------------
+        // PRIVATE — SPEECH RECOGNITION SETUP
+        // ----------------------------------------------------------------
+
+        _initRecognition() {
+          if (this._recognition) return;
+
+          const SR = platform.SpeechRecognition;
+          const rec = new SR();
+
+          /*
+           * Safari note: Safari's webkitSpeechRecognition does NOT support
+           * continuous mode reliably. We attempt it but fall back to
+           * one-shot + auto-restart if it fails.
+           *
+           * Chrome/Edge: Continuous mode works well but may still time out
+           * after ~60 s of silence; auto-restart handles this.
+           */
+          rec.continuous     = this.continuous;
+          rec.interimResults = false;
+          rec.maxAlternatives = 1;
+          rec.lang           = this.lang;
+
+          rec.addEventListener('start', () => {
+            this._listening = true;
+            this._intentionalStop = false;
+            this._setToggleState(true);
+            this._announceStatus('Listening… Speak a command.', 'listening');
+          });
+
+          rec.addEventListener('result', (event) => {
+            const last = event.results[event.results.length - 1];
+            if (!last.isFinal) return;
+            const text = last[0].transcript.trim();
+            this.onRecognizedText(text);
+            this._addTranscriptEntry('Heard', text);
+            this._processCommand(text);
+          });
+
+          rec.addEventListener('error', (event) => {
+            const err = event.error;
+            // 'no-speech' is common — just keep listening
+            if (err === 'no-speech') {
+              this._announceStatus('No speech detected. Still listening…', 'listening');
+              return;
+            }
+            if (err === 'not-allowed' || err === 'service-not-allowed') {
+              this._handlePermissionError(err);
+              return;
+            }
+            // 'aborted' happens on intentional stop
+            if (err === 'aborted' && this._intentionalStop) return;
+
+            this.onError({ type: 'recognition', error: err });
+            this._announceStatus(
+              `Speech recognition error: ${err}. Try again.`,
+              'error'
+            );
+          });
+
+          rec.addEventListener('end', () => {
+            this._listening = false;
+            if (!this._intentionalStop && this.autoRestart) {
+              // Auto-restart after short delay
+              setTimeout(() => {
+                if (!this._intentionalStop) {
+                  try { rec.start(); } catch (_) { /* ignore */ }
+                }
+              }, 300);
+            } else {
+              this._setToggleState(false);
+            }
+          });
+
+          this._recognition = rec;
+        }
+
+        // ----------------------------------------------------------------
+        // COMMAND PROCESSING
+        // ----------------------------------------------------------------
+
+        _processCommand(text) {
+          const normalized = text.toLowerCase().trim();
+
+          for (const [name, cmd] of this._commands) {
+            let matched = false;
+
+            if (cmd.pattern instanceof RegExp) {
+              matched = cmd.pattern.test(normalized);
+            } else {
+              // Exact case-insensitive match
+              const target = String(cmd.pattern).toLowerCase();
+              // Also try fuzzy substring match
+              matched = normalized === target || normalized.includes(target);
+            }
+
+            if (matched) {
+              this.onCommandMatched(name, text);
+              this._addTranscriptEntry('Command', name, true);
+              cmd.handler(text, name);
+              return;
+            }
+          }
+
+          // No match
+          this._addTranscriptEntry('No match', text);
+          this._announceStatus(`Command not recognized: "${text}". Say "voice commands help" for a list.`, '');
+        }
+
+        // ----------------------------------------------------------------
+        // DEFAULT COMMANDS
+        // ----------------------------------------------------------------
+
+        _registerDefaultCommands() {
+          // "open inbox"
+          this.registerCommand(
+            'open inbox',
+            'open inbox',
+            () => {
+              this._announceStatus('Opening inbox…', '');
+              // App-specific: navigate to inbox
+              // window.location.href = '/inbox';
+            },
+            'Navigate to the inbox.',
+            'exact'
+          );
+
+          // "next heading" — useful for SR navigation
+          this.registerCommand(
+            'next heading',
+            'next heading',
+            () => {
+              this._announceStatus('Navigating to next heading.', '');
+              this._simulateKeyPress('h');
+            },
+            'Move screen reader to next heading.',
+            'exact'
+          );
+
+          // "go back"
+          this.registerCommand(
+            'go back',
+            'go back',
+            () => {
+              this._announceStatus('Going back…', '');
+              history.back();
+            },
+            'Navigate to the previous page.',
+            'exact'
+          );
+
+          // "repeat" — re-announce last status
+          this.registerCommand(
+            'repeat',
+            'repeat',
+            () => {
+              const current = dom.statusText.textContent;
+              this._announceStatus(current, '');
+            },
+            'Repeat the last status announcement.',
+            'exact'
+          );
+
+          // "stop listening"
+          this.registerCommand(
+            'stop listening',
+            'stop listening',
+            () => {
+              this.stopListening();
+            },
+            'Turn off voice commands.',
+            'exact'
+          );
+
+          // "voice commands help"
+          this.registerCommand(
+            'voice commands help',
+            /voice commands? help/,
+            () => {
+              this._announceStatus('Opening command list.', '');
+              const details = document.getElementById('vc-help-details');
+              if (details) {
+                details.open = true;
+                details.querySelector('summary').focus();
+              }
+            },
+            'Show available voice commands.',
+            'regex'
+          );
+
+          // "click [button name]" — dynamic target
+          this.registerCommand(
+            'click [name]',
+            /^click\s+(.+)$/i,
+            (text) => {
+              const match = text.match(/^click\s+(.+)$/i);
+              if (!match) return;
+              const target = match[1].trim().toLowerCase();
+              const clickable = this._findClickableByLabel(target);
+              if (clickable) {
+                clickable.focus();
+                clickable.click();
+                this._announceStatus(`Clicked "${target}".`, '');
+              } else {
+                this._announceStatus(`Could not find a button or link labeled "${target}".`, 'warning');
+              }
+            },
+            'Click a button or link by its label.',
+            'regex'
+          );
+
+          // "activate siri" — macOS only
+          this.registerCommand(
+            'activate siri',
+            /activate siri/i,
+            () => { this._activateSiri(); },
+            'Attempt to open Siri via macOS Shortcut deep-link.',
+            'regex'
+          );
+
+          // "activate cortana" — Windows only
+          this.registerCommand(
+            'activate cortana',
+            /activate cortana/i,
+            () => { this._activateCortana(); },
+            'Attempt to open Cortana via protocol handler.',
+            'regex'
+          );
+        }
+
+        // ----------------------------------------------------------------
+        // NATIVE ASSISTANT ACTIVATION
+        // ----------------------------------------------------------------
+
+        /**
+         * macOS: Attempt to invoke Siri via a pre-created macOS Shortcut
+         * named "Run Siri Bridge" using the shortcuts:// URL scheme.
+         *
+         * Limitation: Browsers may block the custom URL scheme or show a
+         * confirmation dialog. The user must have created the Shortcut
+         * beforehand (see VOICE_COMMANDS_GUIDE.md).
+         */
+        _activateSiri() {
+          if (!platform.isMac) {
+            this._announceStatus('Siri is only available on macOS.', 'warning');
+            return;
+          }
+
+          const shortcutURL = 'shortcuts://run-shortcut?name=Run%20Siri%20Bridge';
+
+          this._announceStatus(
+            'Attempting to activate Siri via macOS Shortcut…',
+            ''
+          );
+
+          // Attempt to open the Shortcuts URL scheme.
+          // We use a hidden iframe trick to avoid navigating away, falling
+          // back to window.open if needed.
+          const opened = this._tryOpenURL(shortcutURL);
+
+          // Show fallback after a short delay (the browser may block silently)
+          setTimeout(() => {
+            this._showAssistantFallback(
+              'siri',
+              shortcutURL,
+              opened
+            );
+          }, 1500);
+        }
+
+        /**
+         * Windows: Attempt to invoke Cortana.
+         *
+         * Strategy:
+         * 1. Try ms-cortana:// (works in older Edge / Windows 10).
+         * 2. Try a custom protocol handler the user may have registered.
+         * 3. Fall back to showing a clickable link and instructions.
+         */
+        _activateCortana() {
+          if (!platform.isWindows) {
+            this._announceStatus('Cortana is only available on Windows.', 'warning');
+            return;
+          }
+
+          // Try ms-cortana:// first
+          const cortanaURL = 'ms-cortana://';
+          const customURL  = 'myapp-cortana://activate';
+
+          this._announceStatus(
+            'Attempting to activate Cortana…',
+            ''
+          );
+
+          let opened = this._tryOpenURL(cortanaURL);
+
+          // If ms-cortana didn't work, try custom protocol
+          if (!opened) {
+            opened = this._tryOpenURL(customURL);
+          }
+
+          setTimeout(() => {
+            this._showAssistantFallback(
+              'cortana',
+              customURL,
+              opened
+            );
+          }, 1500);
+        }
+
+        /**
+         * Attempt to open a URL scheme without navigating away.
+         * Returns true if the attempt was made (does NOT guarantee success).
+         */
+        _tryOpenURL(url) {
+          try {
+            // Use window.open for best compatibility
+            const w = window.open(url, '_blank');
+            if (w) {
+              // Some browsers return a window object even for blocked popups
+              setTimeout(() => {
+                try { w.close(); } catch (_) { /* cross-origin */ }
+              }, 500);
+              return true;
+            }
+          } catch (_) { /* blocked */ }
+
+          // Fallback: hidden iframe (some browsers allow protocol URLs this way)
+          try {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = url;
+            document.body.appendChild(iframe);
+            setTimeout(() => iframe.remove(), 2000);
+            return true;
+          } catch (_) { /* blocked */ }
+
+          return false;
+        }
+
+        /**
+         * Show a visible fallback area with a clickable link and guidance.
+         */
+        _showAssistantFallback(assistant, url, attemptMade) {
+          dom.assistantFallback.style.display = 'block';
+
+          let msg = '';
+          if (assistant === 'siri') {
+            msg = attemptMade
+              ? `<p>Siri activation was attempted. If the Shortcuts app did not open, your browser may have blocked it.</p>
+                 <p>Ensure you have created the <strong>"Run Siri Bridge"</strong> Shortcut (see setup guide).</p>
+                 <a href="${url}" class="vc-assistant-link" aria-label="Open Run Siri Bridge shortcut">
+                   Click here to open the Shortcut manually
+                 </a>`
+              : `<p>Could not activate Siri. Your browser blocked the Shortcuts URL scheme.</p>
+                 <p>You can try clicking the link below, or open Siri manually (hold the Command key or say "Hey Siri").</p>
+                 <a href="${url}" class="vc-assistant-link" aria-label="Open Run Siri Bridge shortcut">
+                   Open Siri Bridge Shortcut
+                 </a>`;
+          } else {
+            msg = attemptMade
+              ? `<p>Cortana activation was attempted. If nothing happened, your browser may have blocked the protocol.</p>
+                 <p>You can try the link below, or activate Cortana manually (press <kbd>Win + C</kbd> or say "Hey Cortana").</p>
+                 <a href="${url}" class="vc-assistant-link" aria-label="Activate Cortana via protocol handler">
+                   Click here to activate Cortana
+                 </a>`
+              : `<p>Could not activate Cortana. See the setup guide to register a custom protocol handler.</p>
+                 <p>You can also press <kbd>Win + C</kbd> to open Cortana directly.</p>`;
+          }
+
+          dom.assistantMsg.innerHTML = msg;
+
+          this._announceStatus(
+            `${assistant === 'siri' ? 'Siri' : 'Cortana'} activation attempted. Check the assistant panel below for details.`,
+            'warning'
+          );
+        }
+
+        // ----------------------------------------------------------------
+        // HELPERS
+        // ----------------------------------------------------------------
+
+        /**
+         * Find a clickable element (button, link) by its accessible label.
+         */
+        _findClickableByLabel(label) {
+          const selectors = 'a, button, [role="button"], [role="link"]';
+          const elements = document.querySelectorAll(selectors);
+          for (const el of elements) {
+            const name = (
+              el.getAttribute('aria-label') ||
+              el.textContent ||
+              ''
+            ).toLowerCase().trim();
+            if (name.includes(label)) return el;
+          }
+          return null;
+        }
+
+        /**
+         * Simulate a key press (for screen-reader navigation helpers).
+         * Note: This is a best-effort helper. Screen readers intercept keys
+         * before the browser in many cases.
+         */
+        _simulateKeyPress(key) {
+          document.dispatchEvent(
+            new KeyboardEvent('keydown', { key, bubbles: true })
+          );
+        }
+
+        /**
+         * Update the status live region. Screen readers and braille displays
+         * will announce the new text because aria-live="assertive".
+         */
+        _announceStatus(text, cssClass) {
+          dom.statusText.textContent = text;
+          dom.statusText.className = 'vc-status-text' + (cssClass ? ' ' + cssClass : '');
+        }
+
+        /**
+         * Append an entry to the transcript log.
+         */
+        _addTranscriptEntry(label, text, isMatched) {
+          const entry = document.createElement('div');
+          entry.className = 'vc-transcript-entry';
+          entry.innerHTML = `
+            <span class="label">${this._escapeHTML(label)}:</span>
+            <span class="${isMatched ? 'matched' : ''}">${this._escapeHTML(text)}</span>
+          `;
+          dom.transcript.appendChild(entry);
+          // Scroll to bottom
+          dom.transcript.scrollTop = dom.transcript.scrollHeight;
+        }
+
+        _escapeHTML(str) {
+          const div = document.createElement('div');
+          div.textContent = str;
+          return div.innerHTML;
+        }
+
+        /**
+         * Update the toggle button's visual and ARIA state.
+         */
+        _setToggleState(active) {
+          dom.toggleBtn.setAttribute('aria-pressed', String(active));
+          dom.toggleLabel.textContent = active ? 'Stop listening' : 'Start listening';
+
+          // Add / remove pulse indicator in status
+          if (active) {
+            const pulse = document.createElement('span');
+            pulse.className = 'vc-pulse';
+            pulse.setAttribute('aria-hidden', 'true');
+            if (!dom.statusText.querySelector('.vc-pulse')) {
+              dom.statusText.prepend(pulse);
+            }
+          } else {
+            const pulse = dom.statusText.querySelector('.vc-pulse');
+            if (pulse) pulse.remove();
+          }
+        }
+
+        /**
+         * Handle microphone permission errors with accessible messaging.
+         */
+        _handlePermissionError(err) {
+          let guidance = '';
+          if (platform.isChrome || platform.isEdge) {
+            guidance = 'Click the lock/tune icon in the address bar → Site Settings → Microphone → Allow.';
+          } else if (platform.isSafari) {
+            guidance = 'Go to Safari → Settings → Websites → Microphone → Allow for this site.';
+          } else {
+            guidance = 'Check your browser settings to allow microphone access for this site.';
+          }
+
+          this._announceStatus(
+            `Microphone access denied. ${guidance}`,
+            'error'
+          );
+          this.onError({ type: 'permission', error: err, guidance });
+          this._setToggleState(false);
+        }
+
+        /**
+         * Populate the help table with all registered commands.
+         */
+        populateHelpTable() {
+          dom.helpTbody.innerHTML = '';
+          for (const [name, cmd] of this._commands) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><code>"${this._escapeHTML(name)}"</code></td>
+              <td>${this._escapeHTML(cmd.matchType)}</td>
+              <td>${this._escapeHTML(cmd.description)}</td>
+            `;
+            dom.helpTbody.appendChild(tr);
+          }
+        }
+      }
+
+      // ------------------------------------------------------------------
+      // 4. INITIALIZATION
+      // ------------------------------------------------------------------
+      const vcs = new VoiceCommandSystem({
+        onRecognizedText: (text) => {
+          console.log('[VCS] Recognized:', text);
+        },
+        onCommandMatched: (name, text) => {
+          console.log('[VCS] Matched command:', name, '| Text:', text);
+        },
+        onError: (err) => {
+          console.warn('[VCS] Error:', err);
+        },
+        continuous: true,
+        autoRestart: true,
+      });
+
+      // Populate help table
+      vcs.populateHelpTable();
+
+      // ----------------------------------------------------------------
+      // 5. TOGGLE BUTTON CLICK HANDLER
+      // ----------------------------------------------------------------
+      dom.toggleBtn.addEventListener('click', () => {
+        if (vcs.isListening) {
+          vcs.stopListening();
+        } else {
+          vcs.startListening();
+        }
+      });
+
+      // ----------------------------------------------------------------
+      // 6. KEYBOARD SHORTCUT — Ctrl+Alt+Shift+V (Win) / Ctrl+Opt+Shift+V (Mac)
+      // ----------------------------------------------------------------
+      document.addEventListener('keydown', (e) => {
+        if (
+          e.ctrlKey &&
+          e.altKey &&
+          e.shiftKey &&
+          (e.key === 'v' || e.key === 'V')
+        ) {
+          e.preventDefault();
+          dom.toggleBtn.click();
+          // Move focus to toggle button so SR users know context
+          dom.toggleBtn.focus();
+        }
+      });
+
+      // ----------------------------------------------------------------
+      // 7. TEXT-ENTRY FALLBACK HANDLERS
+      // ----------------------------------------------------------------
+      dom.textSubmit.addEventListener('click', () => {
+        const text = dom.textInput.value.trim();
+        if (text) {
+          vcs._addTranscriptEntry('Typed', text);
+          vcs._processCommand(text);
+          dom.textInput.value = '';
+        }
+      });
+
+      dom.textInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          dom.textSubmit.click();
+        }
+      });
+
+      // ----------------------------------------------------------------
+      // 8. EXPOSE PUBLIC API ON WINDOW (for integration / debugging)
+      // ----------------------------------------------------------------
+      window.VoiceCommandSystem = VoiceCommandSystem;
+      window.voiceCommands = vcs;
+
+      // Log platform info for debugging
+      console.log('[VCS] Platform:', platform);
+      console.log('[VCS] SpeechRecognition available:', platform.hasSpeechRecognition);
+
+    })();
+  </script>
+</body>
+</html>

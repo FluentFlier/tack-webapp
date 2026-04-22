@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, DM_Sans, Newsreader } from "next/font/google";
-import Script from "next/script";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { InsforgeProvider } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
-const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
-const newsreader = Newsreader({
+const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-serif",
-  style: ["normal", "italic"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -83,6 +81,8 @@ export default function RootLayout({
             `,
           }}
         />
+      </head>
+      <body className={`${inter.className} ${playfair.variable}`}>
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[hsl(180,100%,50%)] focus:text-[hsl(220,25%,6%)] focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:font-semibold"
@@ -98,3 +98,4 @@ export default function RootLayout({
     </html>
   );
 }
+

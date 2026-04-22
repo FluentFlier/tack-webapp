@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SendHorizontal } from "lucide-react";
 import { CommandPalette } from "./CommandPalette";
+import { SlashCommandButtons } from "./SlashCommandButtons";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -52,13 +53,20 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   };
 
   return (
-    <div className="border-t p-4">
+    <div className="app-chat-input-area">
+      {/* Quick-access slash command buttons */}
+      {!showCommands && (
+        <SlashCommandButtons
+          onSelect={handleCommandSelect}
+          disabled={disabled}
+        />
+      )}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
-        className="relative flex items-end gap-2 max-w-3xl mx-auto"
+        className="relative flex items-end gap-2 max-w-3xl mx-auto px-4 pb-4"
       >
         <CommandPalette
           filter={commandFilter}
@@ -77,7 +85,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
           placeholder="Type a message or /help for commands..."
           disabled={disabled}
           rows={1}
-          className="min-h-[44px] max-h-32 resize-none"
+          className="app-chat-textarea min-h-[44px] max-h-32 resize-none"
           aria-describedby="input-hint"
         />
         <span id="input-hint" className="sr-only">
@@ -88,7 +96,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
           size="icon"
           disabled={disabled || !input.trim()}
           aria-label="Send message"
-          className="shrink-0 h-[44px] w-[44px]"
+          className="app-send-btn shrink-0 h-[44px] w-[44px]"
         >
           <SendHorizontal className="h-4 w-4" aria-hidden="true" />
         </Button>

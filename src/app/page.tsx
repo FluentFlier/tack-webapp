@@ -1,85 +1,138 @@
 import Link from "next/link";
+import Image from "next/image";
 import { SignedIn, SignedOut, SignInButton } from "@insforge/nextjs";
 import { Button } from "@/components/ui/button";
-import { Header } from "@/components/layout";
-import { MessageSquare, Globe, Zap } from "lucide-react";
+//import { Search } from "lucide-react";
 
-export default function HomePage() {
+export default function Home() {
   return (
-    <>
-      <Header />
-      <main className="flex flex-col items-center justify-center px-4 py-16">
-        <section aria-labelledby="hero-heading" className="text-center max-w-2xl">
-          <h1
-            id="hero-heading"
-            className="text-4xl font-bold tracking-tight sm:text-5xl"
-          >
-            The internet, made accessible
+    <div className="landing-root">
+      {/* ─── Background image layer ─── */}
+      <div className="landing-bg" aria-hidden="true">
+        <Image
+          src="/hero-bg.png"
+          alt=""
+          fill
+          priority
+          style={{ objectFit: "cover" }}
+        />
+      </div>
+
+      {/* ─── Dark overlay + gradient ─── */}
+      <div className="landing-overlay" aria-hidden="true" />
+
+      {/* ─── Ambient gradient orbs ─── */}
+      <div className="landing-orb landing-orb--purple" aria-hidden="true" />
+      <div className="landing-orb landing-orb--blue" aria-hidden="true" />
+
+      {/* ─── Top Navigation ─── */}
+      <header role="banner" className="landing-nav">
+        <div aria-label="Main Navigation" className="landing-nav__inner">
+          {/* Logo */}
+          <Link href="/" className="landing-logo" aria-label="Tack – Home">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 28 28"
+              fill="none"
+              aria-hidden="true"
+            >
+              <circle cx="14" cy="14" r="13" stroke="currentColor" strokeWidth="1.5" />
+              <path
+                d="M9 14.5C9 11.5 11.5 9 14 9C16.5 9 19 11.5 19 14.5C19 17.5 16.5 19 14 19"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+            <span>TACK</span>
+          </Link>
+
+          {/* Navigation links */}
+          <div aria-label="" className="landing-nav__links">
+            <Link href="/" className="landing-nav__link landing-nav__link--active">
+              Home
+            </Link>
+            <Link aria-label="About Us"href="/" aria-disabled={true} className="landing-nav__link">
+              About Us
+            </Link>
+          </div>
+
+          {/* Right side actions */}
+          <div className="landing-nav__actions">
+            {/*<button
+              className="landing-nav__icon-btn"
+              aria-label="Search"
+              type="button"
+            >
+              <Search className="h-4 w-4" aria-hidden="true" />
+            </button>*/}
+
+            <SignedOut>
+              <SignInButton className="landing-signin-btn">
+                  Sign In
+              </SignInButton>
+            </SignedOut>
+
+            <SignedIn>
+              <Link href="/chat">
+                <button className="landing-signin-btn" type="button">
+                  Open Chat
+                </button>
+              </Link>
+              <Link href="/pdf-reading">
+                <button className="landing-signin-btn" type="button">
+                  PDF Reader
+                </button>
+              </Link>
+            </SignedIn>
+          </div>
+        </div>
+      </header>
+
+      {/* ─── Hero Section ─── */}
+      <main className="landing-hero">
+        <section aria-labelledby="hero-heading" className="landing-hero__content">
+          <h1 id="hero-heading" className="landing-hero__heading">
+            <span className="landing-hero__heading-line">The Internet,</span>
+            <span className="landing-hero__heading-line landing-hero__heading-line--accent">
+              Made Accessible
+            </span>
           </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
+
+          <p className="landing-hero__subtext">
             Tack is an AI assistant that helps blind and visually impaired users
-            navigate the web. Summarize pages, extract content, and browse — all
-            through a simple chat interface optimized for screen readers.
+            navigate, read, and understand web content through natural conversation.
           </p>
 
-          <div className="mt-8 flex gap-4 justify-center">
+          <div className="landing-hero__cta-group flex flex-row gap-3">
             <SignedOut>
+              <Link href="/about">
+                <Button size="lg" disabled={true} className="landing-cta-btn">
+                  Learn More
+                </Button>
+              </Link>
               <SignInButton>
-                <Button size="lg">Get Started</Button>
+                <Button size="lg" className="landing-cta-btn">
+                  Get Started Free
+                </Button>
               </SignInButton>
             </SignedOut>
             <SignedIn>
               <Link href="/chat">
-                <Button size="lg">Open Chat</Button>
+                <Button size="lg" className="landing-cta-btn m-2">
+                  Open Chat
+                </Button>
+              </Link>
+              <Link href="/pdf-reading">
+                <Button size="lg" className="landing-cta-btn m-2">
+                  Open PDF Reader
+                </Button>
               </Link>
             </SignedIn>
           </div>
         </section>
-
-        <section
-          aria-labelledby="features-heading"
-          className="mt-20 max-w-4xl w-full"
-        >
-          <h2 id="features-heading" className="sr-only">
-            Features
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="flex flex-col items-center text-center p-6 rounded-lg border">
-              <MessageSquare
-                className="h-10 w-10 mb-4 text-primary"
-                aria-hidden="true"
-              />
-              <h3 className="font-semibold text-lg">Chat Interface</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Ask questions naturally. Tack responds with clear, structured
-                content optimized for screen readers.
-              </p>
-            </div>
-            <div className="flex flex-col items-center text-center p-6 rounded-lg border">
-              <Globe
-                className="h-10 w-10 mb-4 text-primary"
-                aria-hidden="true"
-              />
-              <h3 className="font-semibold text-lg">Web Summaries</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Paste any URL and get an accessible summary. No more wrestling
-                with cluttered web pages.
-              </p>
-            </div>
-            <div className="flex flex-col items-center text-center p-6 rounded-lg border">
-              <Zap
-                className="h-10 w-10 mb-4 text-primary"
-                aria-hidden="true"
-              />
-              <h3 className="font-semibold text-lg">Slash Commands</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Power users can use commands like /summarize and /read for
-                lightning-fast workflows.
-              </p>
-            </div>
-          </div>
-        </section>
       </main>
-    </>
+    </div>
   );
 }

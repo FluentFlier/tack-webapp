@@ -1,141 +1,27 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import {
-  Search,
-  Mic,
-  Newspaper,
-  Cloud,
-  BookOpen,
-  Heart,
-  Cpu,
-  GraduationCap,
-  Volume2,
-  MicIcon,
-  Zap,
-  Accessibility,
-  History,
-  Keyboard,
-} from "lucide-react";
-import { AccessibilityModeButtons } from "@/components/a11y/AccessibilityModeButtons";
-import { ReadingGuide } from "@/components/a11y/ReadingGuide";
-import { LiveRegion } from "@/components/a11y/LiveRegion";
-import { useAccessibility } from "@/contexts/AccessibilityContext";
+import { useEffect, useRef } from "react";
+import { ChatHistory, ChatInput } from "@/components/chat";
+import { LiveRegion } from "@/components/a11y";
+import { useChat } from "@/hooks/useChat";
+//import { useVoice } from "@/hooks/useVoice";
 
-const QUICK_ACTIONS = [
-  { label: "Latest News", icon: Newspaper },
-  { label: "Weather", icon: Cloud },
-  { label: "Tutorials", icon: BookOpen },
-  { label: "Health Info", icon: Heart },
-  { label: "Technology", icon: Cpu },
-  { label: "Education", icon: GraduationCap },
-];
+//Note built in text to speech disabled on 4-14-2026 since it speaks even if a screen reader is in use
 
-const GETTING_STARTED = [
-  {
-    icon: Volume2,
-    title: "Text-to-Speech",
-    desc: 'Click "TTS" in the header to have all content read aloud.',
-    color: "hsl(180, 100%, 50%)",
-  },
-  {
-    icon: MicIcon,
-    title: "Voice Search",
-    desc: "Click the microphone and speak your search query.",
-    color: "hsl(270, 80%, 65%)",
-  },
-  {
-    icon: Zap,
-    title: "Quick Actions",
-    desc: "Use category buttons above for instant topic searches.",
-    color: "hsl(150, 80%, 50%)",
-  },
-  {
-    icon: Accessibility,
-    title: "Full Accessibility",
-    desc: "4 specialized modes for different needs. Click to customize.",
-    color: "hsl(30, 90%, 55%)",
-  },
-  {
-    icon: History,
-    title: "Search History",
-    desc: "Recent searches are saved below for quick re-access.",
-    color: "hsl(210, 100%, 60%)",
-  },
-  {
-    icon: Keyboard,
-    title: "Keyboard Friendly",
-    desc: "Tab to navigate, Enter to search, Escape to close panels.",
-    color: "hsl(330, 80%, 60%)",
-  },
-];
+export default function ChatPage() {
+  const { messages, loading, error, sendMessage } = useChat();
+  //const { speak } = useVoice();
+  const prevMessageCountRef = useRef(0);
 
-export default function DashboardPage() {
-  const [query, setQuery] = useState("");
-  const [isListening, setIsListening] = useState(false);
-  const [announcement, setAnnouncement] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { isModeActive } = useAccessibility();
-  const isFocusMode = isModeActive("adhd");
-
-  const handleSearch = () => {
-    if (!query.trim()) return;
-    setAnnouncement(`Searching for: ${query}`);
-    // Search logic would go here
-  };
-
-  const handleVoice = () => {
-    const SpeechRecognition =
-      (window as unknown as Record<string, unknown>).SpeechRecognition ||
-      (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      setAnnouncement("Voice search is not supported in this browser.");
-      return;
+  /*useEffect(() => {
+    if (messages.length > prevMessageCountRef.current) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage?.role === "assistant") {
+        speak(lastMessage.content.slice(0, 500));
+      }
     }
-
-    if (isListening) {
-      setIsListening(false);
-      return;
-    }
-
-    const recognition = new (SpeechRecognition as new () => SpeechRecognition)();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = "en-US";
-
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const transcript = event.results[0]?.[0]?.transcript || "";
-      setQuery(transcript);
-      setAnnouncement(`Voice input received: ${transcript}`);
-      setIsListening(false);
-    };
-
-    recognition.onerror = () => {
-      setIsListening(false);
-      setAnnouncement("Voice search error. Please try again.");
-    };
-
-    recognition.onend = () => setIsListening(false);
-
-    recognition.start();
-    setIsListening(true);
-    setAnnouncement("Listening for voice input...");
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    } else if (e.key === "Escape") {
-      setQuery("");
-      inputRef.current?.blur();
-    }
-  };
-
-  // Focus input on mount
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    prevMessageCountRef.current = messages.length;
+  }, [messages, speak]);*/
 
   return (
     <div className="min-h-full bg-[var(--va-bg)] va-page">

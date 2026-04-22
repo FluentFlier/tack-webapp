@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@insforge/nextjs";
 import { Button } from "@/components/ui/button";
+import { Settings } from "lucide-react";
 import { AccessibilityPanel } from "@/components/a11y/AccessibilityPanel";
 import { LiveRegion } from "@/components/a11y/LiveRegion";
 import {
