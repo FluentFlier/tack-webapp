@@ -1,11 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { SignedIn, SignedOut } from "@insforge/nextjs";
-import SignInFirst from "@/components/sign-in-first";
-
-//this file generated using Copilot to prevent issues with pdf reading pages being rendered on the server where localStorage can't be accessed (since user settings are stored there)
-
+import { SignedIn } from "@insforge/nextjs";
 
 const PdfReaderSettingsPage = dynamic(
 () => import("@/components/pdf-reading/pdf-reader-settings"),
@@ -15,14 +11,9 @@ const PdfReaderSettingsPage = dynamic(
 );
 
 export default function Page() {
- 
-
-  return <>
+  return (
     <SignedIn>
       <PdfReaderSettingsPage />
     </SignedIn>
-    <SignedOut>
-      <SignInFirst />
-    </SignedOut>
-  </>;
+  );
 }

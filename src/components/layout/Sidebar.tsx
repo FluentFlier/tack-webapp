@@ -12,13 +12,14 @@ import { cn } from "@/lib/utils";
 
 export function Sidebar() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { isSignedIn } = useAuth();
 
   const loadConversations = useCallback(async () => {
     if (!isSignedIn) return;
+    setLoading(true);
     const { data, error } = await insforge.database
       .from("conversations")
       .select("id, title, updated_at")

@@ -14,6 +14,7 @@ import {
   useInView,
 } from "framer-motion";
 import { useRef } from "react";
+import { LandingNavMobile } from "@/components/layout/LandingNavMobile";
 
 // ─── Team data ───────────────────────────────────────────────────────────────
 const team = [
@@ -109,7 +110,12 @@ export default function Home() {
               <Link href="/#team" className="landing-nav__link">
                 About Us
               </Link>
+              <Link href="/contact" className="landing-nav__link">
+                Contact Us
+              </Link>
             </nav>
+
+            <LandingNavMobile />
 
             <div className="landing-nav__actions">
               <SignedOut>
