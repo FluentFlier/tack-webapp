@@ -20,18 +20,17 @@ export function useChat(initialConversationId?: string) {
       const parsed = parseCommand(input);
 
       if (parsed.isCommand && parsed.command) {
-        const result = parsed.command.execute(parsed.args || "");
-
-        // Handle local-only commands
-        if (result === "__COMMAND__:clear") {
+        // /clear — local only
+        if (parsed.command.name === "clear") {
           setMessages([]);
           setConversationId(undefined);
+          // Fix: clear the URL so refresh doesn't reload the old conversation
+          window.history.pushState(null, "", "/chat");
           return;
         }
 
-        // Handle /help command locally
+        // /help — local only
         if (parsed.command.name === "help") {
-          const helpId = crypto.randomUUID();
           const userMsg: Message = {
             id: crypto.randomUUID(),
             conversation_id: conversationId || "",
@@ -41,7 +40,7 @@ export function useChat(initialConversationId?: string) {
             created_at: new Date().toISOString(),
           };
           const assistantMsg: Message = {
-            id: helpId,
+            id: crypto.randomUUID(),
             conversation_id: conversationId || "",
             role: "assistant",
             content: `Available commands:\n\n${COMMANDS.map((cmd) => `${cmd.usage} — ${cmd.description}`).join("\n")}`,
@@ -52,25 +51,38 @@ export function useChat(initialConversationId?: string) {
           return;
         }
 
-        // For commands that need AI processing, modify the message
-        if (result.startsWith("__COMMAND__:summarize:")) {
-          const url = result.replace("__COMMAND__:summarize:", "");
-          input = `Please summarize the content at this URL: ${url}`;
-        } else if (result.startsWith("__COMMAND__:read:")) {
-          const url = result.replace("__COMMAND__:read:", "");
-          input = `Please read and simplify the content at this URL: ${url}`;
-        } else if (result.startsWith("__COMMAND__:search:")) {
-          const query = result.replace("__COMMAND__:search:", "");
-          input = `Please search the web for: ${query}`;
+        // Server commands — validate args before sending
+        if (parsed.command.requiresArgs && !parsed.args?.trim()) {
+          // Show the usage error as a local assistant-style message
+          const userMsg: Message = {
+            id: crypto.randomUUID(),
+            conversation_id: conversationId || "",
+            role: "user",
+            content: input,
+            metadata: { command: parsed.command.name },
+            created_at: new Date().toISOString(),
+          };
+          const errorMsg: Message = {
+            id: crypto.randomUUID(),
+            conversation_id: conversationId || "",
+            role: "assistant",
+            content:
+              parsed.command.argError || `Usage: ${parsed.command.usage}`,
+            metadata: { command: parsed.command.name },
+            created_at: new Date().toISOString(),
+          };
+          setMessages((prev) => [...prev, userMsg, errorMsg]);
+          return;
         }
       }
 
-      // Add optimistic user message
+      // Add optimistic user message — keep original input as content
+      const msgId = crypto.randomUUID();
       const userMessage: Message = {
-        id: crypto.randomUUID(),
+        id: msgId,
         conversation_id: conversationId || "",
         role: "user",
-        content: input,
+        content: input, // original input, NOT rewritten
         metadata: parsed.isCommand ? { command: parsed.command?.name } : {},
         created_at: new Date().toISOString(),
       };
@@ -78,13 +90,33 @@ export function useChat(initialConversationId?: string) {
       setLoading(true);
 
       try {
+        // Build request body: include command + args when a server command was parsed
+        const requestBody: {
+          message: string;
+          conversation_id?: string;
+          command?: string;
+          args?: string;
+        } = {
+          message: input,
+          conversation_id: conversationId,
+        };
+
+        if (
+          parsed.isCommand &&
+          parsed.command &&
+          !["help", "clear"].includes(parsed.command.name)
+        ) {
+          requestBody.command = parsed.command.name as
+            | "summarize"
+            | "read"
+            | "search";
+          requestBody.args = parsed.args || "";
+        }
+
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: input,
-            conversation_id: conversationId,
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         if (!response.ok) {
@@ -101,10 +133,12 @@ export function useChat(initialConversationId?: string) {
         }
 
         setMessages((prev) => [...prev, data.message]);
-      } catch (err) {
+      } catch {
+        // Mark the optimistic message as failed — do NOT remove it
+        setMessages((prev) =>
+          prev.map((m) => (m.id === msgId ? { ...m, failed: true } : m))
+        );
         setError("Failed to send message. Please try again.");
-        // Remove optimistic message on error
-        setMessages((prev) => prev.filter((m) => m.id !== userMessage.id));
       } finally {
         setLoading(false);
       }
@@ -112,12 +146,30 @@ export function useChat(initialConversationId?: string) {
     [conversationId]
   );
 
+  // Retry a failed message: remove the failed copy then re-send the same content
+  const retryMessage = useCallback(
+    async (id: string) => {
+      const msg = messages.find((m) => m.id === id);
+      if (!msg) return;
+      // Remove the failed message before re-sending so the list stays clean
+      setMessages((prev) => prev.filter((m) => m.id !== id));
+      await sendMessage(msg.content);
+    },
+    [messages, sendMessage]
+  );
+
   const loadMessages = useCallback(async (convId: string) => {
-    const response = await fetch(`/api/conversations/${convId}/messages`);
-    if (response.ok) {
+    try {
+      const response = await fetch(`/api/conversations/${convId}/messages`);
+      if (!response.ok) {
+        setError("Failed to load conversation.");
+        return;
+      }
       const data = await response.json();
       setMessages(data.messages || []);
       setConversationId(convId);
+    } catch {
+      setError("Failed to load conversation.");
     }
   }, []);
 
@@ -127,6 +179,7 @@ export function useChat(initialConversationId?: string) {
     loading,
     error,
     sendMessage,
+    retryMessage,
     loadMessages,
   };
 }
