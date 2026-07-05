@@ -74,15 +74,17 @@ export function findMostRecentScrapedMessage(
 }
 
 /**
- * Build the follow-up context system message from prior conversation history.
+ * Build the follow-up context string from prior conversation history.
  *
  * Finds the most recent assistant message with `metadata.scraped_content` and
- * returns a system message that injects the page URL and truncated content
- * (first 8000 chars). Returns undefined when no such message exists.
+ * returns a string (suitable for appending to the system prompt) that injects
+ * the page URL and truncated content (first 8000 chars) wrapped in the
+ * injection-guard fence markers the system prompt polices.
+ * Returns undefined when no such message exists.
  */
 export function buildFollowUpContextMessage(
   messages: MessageRow[]
-): { role: "system"; content: string } | undefined {
+): string | undefined {
   const scraped = findMostRecentScrapedMessage(messages);
   if (!scraped) return undefined;
 
@@ -97,10 +99,7 @@ export function buildFollowUpContextMessage(
       ? `Earlier in this conversation the user loaded this page: ${sourceUrl}`
       : "Earlier in this conversation the user loaded a page.";
 
-  return {
-    role: "system",
-    content: `${urlLine}\n\nPage content (truncated):\n${scrapedContent}`,
-  };
+  return `${urlLine}\n\nPage content (truncated):\n--- BEGIN PAGE CONTENT ---\n${scrapedContent}\n--- END PAGE CONTENT ---`;
 }
 
 /**

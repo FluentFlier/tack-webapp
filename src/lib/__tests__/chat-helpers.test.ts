@@ -200,7 +200,7 @@ describe("buildFollowUpContextMessage", () => {
     expect(buildFollowUpContextMessage(messages)).toBeUndefined();
   });
 
-  it("returns a system message with the source_url and truncated content", () => {
+  it("returns a string with the source_url, fence markers, and truncated content", () => {
     const messages: MessageRow[] = [
       {
         role: "assistant",
@@ -213,9 +213,10 @@ describe("buildFollowUpContextMessage", () => {
     ];
     const result = buildFollowUpContextMessage(messages);
     expect(result).not.toBeUndefined();
-    expect(result!.role).toBe("system");
-    expect(result!.content).toContain("https://example.com");
-    expect(result!.content).toContain("page text");
+    expect(result).toContain("https://example.com");
+    expect(result).toContain("page text");
+    expect(result).toContain("--- BEGIN PAGE CONTENT ---");
+    expect(result).toContain("--- END PAGE CONTENT ---");
   });
 
   it("truncates scraped_content to 8000 chars in the output", () => {
@@ -231,9 +232,9 @@ describe("buildFollowUpContextMessage", () => {
       },
     ];
     const result = buildFollowUpContextMessage(messages);
-    // The content field must not exceed 8000 chars of the scraped text
-    expect(result!.content).toContain("x".repeat(8000));
-    expect(result!.content).not.toContain("x".repeat(8001));
+    // The returned string must not exceed 8000 chars of the scraped text
+    expect(result).toContain("x".repeat(8000));
+    expect(result).not.toContain("x".repeat(8001));
   });
 
   it("handles missing source_url gracefully", () => {
@@ -246,8 +247,8 @@ describe("buildFollowUpContextMessage", () => {
     ];
     const result = buildFollowUpContextMessage(messages);
     expect(result).not.toBeUndefined();
-    expect(result!.content).toContain("some text");
-    expect(result!.content).toContain("loaded a page");
+    expect(result).toContain("some text");
+    expect(result).toContain("loaded a page");
   });
 });
 
