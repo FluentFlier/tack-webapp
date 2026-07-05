@@ -1,3 +1,11 @@
+/**
+ * In-memory rate limiter backed by a plain Map.
+ *
+ * IMPORTANT: This Map is per-process instance and resets on every deploy or
+ * cold start. In a multi-instance or serverless production environment the
+ * limit is not enforced across instances. Replace with a Redis-backed (or
+ * other durable) store for correct multi-instance behaviour.
+ */
 const rateLimit = new Map<string, { count: number; resetTime: number }>();
 
 const MAX_ENTRIES = 10_000;

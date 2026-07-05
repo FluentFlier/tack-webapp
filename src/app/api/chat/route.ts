@@ -5,6 +5,8 @@ import {
   serperScrapeContext,
   serperSearchContext,
 } from "@/lib/serper";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { chatSchema, withTimeout } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,14 +16,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { message, conversation_id } = await request.json();
-
-    if (!message || typeof message !== "string") {
+    const { allowed } = checkRateLimit(`chat:${userId}`, 20, 60000);
+    if (!allowed) {
       return NextResponse.json(
-        { error: "Message is required" },
+        { error: "Too many requests. Please wait a moment." },
+        { status: 429 }
+      );
+    }
+
+    const body = await request.json();
+    const parsed = chatSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid request" },
         { status: 400 }
       );
     }
+
+    const { message, conversation_id } = parsed.data;
 
     const baseUrl = process.env.NEXT_PUBLIC_INSFORGE_BASE_URL;
     if (!baseUrl) {
@@ -219,10 +231,14 @@ ${searchContext}
       { role: "user" as const, content: aiUserMessage },
     ];
 
-    const completion = await insforge.ai.chat.completions.create({
-      model: "openai/gpt-4o-mini",
-      messages: messagesToSend,
-    });
+    const completion = await withTimeout(
+      insforge.ai.chat.completions.create({
+        model: "openai/gpt-4o-mini",
+        messages: messagesToSend,
+      }),
+      60000,
+      "Chat completion"
+    );
 
     const assistantContent =
       completion.choices[0]?.message?.content ||

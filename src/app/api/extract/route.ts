@@ -4,6 +4,9 @@ import { createClient } from "@insforge/sdk";
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { extractSchema, assertPublicUrl } from "@/lib/validation";
+
+const MAX_REDIRECTS = 3;
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,28 +23,72 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { url } = await request.json();
-    if (!url || typeof url !== "string") {
-      return NextResponse.json({ error: "URL is required" }, { status: 400 });
+    const body = await request.json();
+    const parsed = extractSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid request" },
+        { status: 400 }
+      );
     }
 
-    let parsedUrl: URL;
+    // SSRF guard: validate the URL and every redirect destination
+    let validatedUrl: URL;
     try {
-      parsedUrl = new URL(url);
-      if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-        throw new Error("Invalid protocol");
-      }
-    } catch {
-      return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
+      validatedUrl = await assertPublicUrl(parsed.data.url);
+    } catch (e) {
+      return NextResponse.json(
+        { error: (e as Error).message ?? "Invalid URL" },
+        { status: 400 }
+      );
     }
 
-    const response = await fetch(url, {
-      headers: {
-        "User-Agent": "Tack/1.0 (Accessibility Assistant)",
-        "Accept": "text/html,application/xhtml+xml",
-      },
-      signal: AbortSignal.timeout(10000),
-    });
+    // Follow redirects manually so we can re-validate each Location header
+    let currentUrl = validatedUrl.href;
+    let response!: Response;
+
+    for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+      response = await fetch(currentUrl, {
+        headers: {
+          "User-Agent": "Tack/1.0 (Accessibility Assistant)",
+          Accept: "text/html,application/xhtml+xml",
+        },
+        signal: AbortSignal.timeout(10000),
+        redirect: "manual",
+      });
+
+      if (response.status >= 300 && response.status < 400) {
+        if (hop === MAX_REDIRECTS) {
+          return NextResponse.json(
+            { error: "Too many redirects" },
+            { status: 502 }
+          );
+        }
+        const location = response.headers.get("Location");
+        if (!location) {
+          return NextResponse.json(
+            { error: "Redirect with no Location header" },
+            { status: 502 }
+          );
+        }
+        // Resolve relative redirects against the current URL
+        const absoluteLocation = new URL(location, currentUrl).href;
+        try {
+          const nextUrl = await assertPublicUrl(absoluteLocation);
+          currentUrl = nextUrl.href;
+        } catch (e) {
+          return NextResponse.json(
+            {
+              error: `Redirect blocked: ${(e as Error).message ?? "Invalid redirect target"}`,
+            },
+            { status: 400 }
+          );
+        }
+        continue;
+      }
+
+      break;
+    }
 
     if (!response.ok) {
       return NextResponse.json(
@@ -51,7 +98,7 @@ export async function POST(request: NextRequest) {
     }
 
     const html = await response.text();
-    const dom = new JSDOM(html, { url });
+    const dom = new JSDOM(html, { url: currentUrl });
     const reader = new Readability(dom.window.document);
     const article = reader.parse();
 
@@ -64,10 +111,12 @@ export async function POST(request: NextRequest) {
 
     const articleDom = new JSDOM(article.content || "");
     const imgElements = articleDom.window.document.querySelectorAll("img");
-    const images = Array.from(imgElements).map((img) => ({
-      src: img.getAttribute("src") || "",
-      alt: img.getAttribute("alt") || "",
-    })).filter((img) => img.src);
+    const images = Array.from(imgElements)
+      .map((img) => ({
+        src: img.getAttribute("src") || "",
+        alt: img.getAttribute("alt") || "",
+      }))
+      .filter((img) => img.src);
 
     // Generate alt text for images missing it (limit to 5)
     const insforge = createClient({
@@ -84,7 +133,8 @@ export async function POST(request: NextRequest) {
             messages: [
               {
                 role: "system",
-                content: "Generate concise alt text for this image in under 125 characters. Do not start with 'Image of'. Just output the alt text.",
+                content:
+                  "Generate concise alt text for this image in under 125 characters. Do not start with 'Image of'. Just output the alt text.",
               },
               {
                 role: "user",
@@ -109,7 +159,7 @@ export async function POST(request: NextRequest) {
       excerpt: article.excerpt,
       byline: article.byline,
       siteName: article.siteName,
-      url,
+      url: currentUrl,
       images: imagesWithAlt,
     });
   } catch (error) {

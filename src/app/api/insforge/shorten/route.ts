@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@insforge/nextjs/server";
+import { createClient } from "@insforge/sdk";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { shortenSchema, withTimeout } from "@/lib/validation";
 
 //this file written almost entirely by GitHub Copilot with some fixes after Copilot tried guessing the API methods
 //Copilot used to add authorization checks following design from chat api
-
-type ReqBody = {
-  text: string;
-  percent: number; // percent to shorten (e.g., 30 means reduce length by 30%)
-};
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +13,7 @@ export async function POST(request: NextRequest) {
     if (!token || !userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    //this rate limiting copied from chat route
+
     const { allowed } = checkRateLimit(`shorten:${userId}`, 20, 60000);
     if (!allowed) {
       return NextResponse.json(
@@ -25,58 +22,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { text, percent } = (await request.json()) as ReqBody;
-    if (typeof text !== "string" || typeof percent !== "number") {
-      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    const body = await request.json();
+    const parsed = shortenSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid request" },
+        { status: 400 }
+      );
     }
 
-    const base = process.env.NEXT_PUBLIC_INSFORGE_BASE_URL;
-    const apiKey = process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY;
+    const { text, percent } = parsed.data;
+
+    const baseUrl = process.env.NEXT_PUBLIC_INSFORGE_BASE_URL;
+    if (!baseUrl) {
+      console.error("[shorten] NEXT_PUBLIC_INSFORGE_BASE_URL is not set");
+      return NextResponse.json(
+        { error: "Shortening is not configured." },
+        { status: 500 }
+      );
+    }
+
+    const insforge = createClient({ baseUrl, edgeFunctionToken: token });
 
     const targetLen = Math.max(20, Math.round(text.length * (1 - percent / 100)));
+    const prompt = `Shorten the following paragraph to approximately ${targetLen} characters (preserve meaning and key points). Any quotes should be left intact even if it means not shortening the paragraph. \n\nParagraph:\n${text}`;
 
-    // Best-effort: try calling InsForge model gateway if env is configured.
-    if (base && apiKey) {
-      
-        const host = base.replace(/\/?$/g, "");
-        const endpoint = `${host}/api/ai/chat/completion`;
+    const completion = await withTimeout(
+      insforge.ai.chat.completions.create({
+        model: "openai/gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        maxTokens: 1024,
+      }),
+      60000,
+      "Shorten completion"
+    );
 
-        const prompt = `Shorten the following paragraph to approximately ${targetLen} characters (preserve meaning and key points). Any quotes should be left intact even if it means not shortening the paragraph. \n\nParagraph:\n${text}`;
-
-        const body = {
-          model: "openai/gpt-4o-mini",
-          messages: [{ role: "user", content: prompt }],
-          maxTokens: 1024,
-        };
-
-        const r = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify(body),
-        });
-
-        const json = await r.json().catch(() => ({}));
-
-        // InsForge documented response shape: { success: true, text: "..." }
-        if (r.ok && json && typeof json.text === "string") {
-          return NextResponse.json({ shortened: json.text });
-        }
-        console.error("[shorten] upstream failure", { status: r.status, json });
-        return NextResponse.json(
-          { error: "Shortening service is unavailable. Please try again." },
-          { status: 502 }
-        );
-    }
-    else {
-        return NextResponse.json({ error: "Shortening is not configured." }, { status: 500 });
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      console.error("[shorten] upstream returned empty content");
+      return NextResponse.json(
+        { error: "Shortening service is unavailable. Please try again." },
+        { status: 502 }
+      );
     }
 
-  }
-    catch (err: unknown) {
+    return NextResponse.json({ shortened: content });
+  } catch (err: unknown) {
     console.error("[shorten] handler error", err);
-    return NextResponse.json({ error: "Unexpected server error." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Unexpected server error." },
+      { status: 500 }
+    );
   }
 }

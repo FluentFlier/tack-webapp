@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@insforge/nextjs/server";
+import { createClient } from "@insforge/sdk";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { summarizeSchema, withTimeout } from "@/lib/validation";
 
 //this file copied from src/app/insforge/shorten/route.ts (which was mostly written using GitHub Copilot) and then the prompt was modified manually
 //Copilot used to add authorization checks following design from chat api
-
-type ReqBody = {
-  text: string;
-  targetLength: number; 
-};
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +14,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    //this rate limiting copied from chat route
     const { allowed } = checkRateLimit(`summarize:${userId}`, 20, 60000);
     if (!allowed) {
       return NextResponse.json(
@@ -25,59 +21,56 @@ export async function POST(request: NextRequest) {
         { status: 429 }
       );
     }
-        
-    const { text, targetLength } = (await request.json()) as ReqBody;
-    if (typeof text !== "string" || typeof targetLength !== "number") {
-      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+
+    const body = await request.json();
+    const parsed = summarizeSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid request" },
+        { status: 400 }
+      );
     }
 
-    const base = process.env.NEXT_PUBLIC_INSFORGE_BASE_URL;
-    const apiKey = process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY;
+    const { text, targetLength } = parsed.data;
 
-    const targetLen = targetLength
-
-    // Best-effort: try calling InsForge model gateway if env is configured.
-    if (base && apiKey) {
-      
-        const host = base.replace(/\/?$/g, "");
-        const endpoint = `${host}/api/ai/chat/completion`;
-
-        const prompt = `Summarize the following text to approximately ${targetLen} characters (give a general overview of the text). \n\nText to summarize:\n${text}`;
-
-        const body = {
-          model: "openai/gpt-4o-mini",
-          messages: [{ role: "user", content: prompt }],
-          maxTokens: 1024,
-        };
-
-        const r = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify(body),
-        });
-
-        const json = await r.json().catch(() => ({}));
-
-        // InsForge documented response shape: { success: true, text: "..." }
-        if (r.ok && json && typeof json.text === "string") {
-          return NextResponse.json({ summary: json.text });
-        }
-        console.error("[summarize] upstream failure", { status: r.status, json });
-        return NextResponse.json(
-          { error: "Summarization service is unavailable. Please try again." },
-          { status: 502 }
-        );
-    }
-    else {
-        return NextResponse.json({ error: "Summarization is not configured." }, { status: 500 });
+    const baseUrl = process.env.NEXT_PUBLIC_INSFORGE_BASE_URL;
+    if (!baseUrl) {
+      console.error("[summarize] NEXT_PUBLIC_INSFORGE_BASE_URL is not set");
+      return NextResponse.json(
+        { error: "Summarization is not configured." },
+        { status: 500 }
+      );
     }
 
-  }
-    catch (err: unknown) {
+    const insforge = createClient({ baseUrl, edgeFunctionToken: token });
+
+    const prompt = `Summarize the following text to approximately ${targetLength} characters (give a general overview of the text). \n\nText to summarize:\n${text}`;
+
+    const completion = await withTimeout(
+      insforge.ai.chat.completions.create({
+        model: "openai/gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        maxTokens: 1024,
+      }),
+      60000,
+      "Summarize completion"
+    );
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      console.error("[summarize] upstream returned empty content");
+      return NextResponse.json(
+        { error: "Summarization service is unavailable. Please try again." },
+        { status: 502 }
+      );
+    }
+
+    return NextResponse.json({ summary: content });
+  } catch (err: unknown) {
     console.error("[summarize] handler error", err);
-    return NextResponse.json({ error: "Unexpected server error." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Unexpected server error." },
+      { status: 500 }
+    );
   }
 }

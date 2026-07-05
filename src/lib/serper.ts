@@ -81,6 +81,7 @@ export async function serperSearch(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ q: query, num }),
+    signal: AbortSignal.timeout(15000),
   });
 
   if (!res.ok) {
@@ -110,6 +111,7 @@ export async function serperScrape(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ url }),
+    signal: AbortSignal.timeout(15000),
   });
 
   if (!res.ok) {
