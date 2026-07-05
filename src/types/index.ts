@@ -13,6 +13,7 @@ export interface Message {
   content: string;
   metadata: MessageMetadata;
   created_at: string;
+  failed?: boolean;
 }
 
 export interface MessageMetadata {
@@ -59,6 +60,8 @@ export interface SlashCommand {
   description: string;
   usage: string;
   execute: (args: string) => string;
+  requiresArgs?: boolean;
+  argError?: string;
 }
 
 export interface ExtractedContent {
