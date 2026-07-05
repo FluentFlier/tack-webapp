@@ -15,30 +15,37 @@ export const COMMANDS: SlashCommand[] = [
     name: "summarize",
     description: "Summarize a web page",
     usage: "/summarize <url>",
+    requiresArgs: true,
+    argError: "Please provide a URL. Usage: /summarize <url>",
     execute: (args: string) => {
       const url = args.trim();
       if (!url) return "Please provide a URL. Usage: /summarize <url>";
-      return `__COMMAND__:summarize:${url}`;
+      return url;
     },
   },
   {
     name: "read",
     description: "Read and simplify a web page",
     usage: "/read <url>",
+    requiresArgs: true,
+    argError: "Please provide a URL. Usage: /read <url>",
     execute: (args: string) => {
       const url = args.trim();
       if (!url) return "Please provide a URL. Usage: /read <url>";
-      return `__COMMAND__:read:${url}`;
+      return url;
     },
   },
   {
     name: "search",
     description: "Search the web via Google",
     usage: "/search <query>",
+    requiresArgs: true,
+    argError: "Please provide a search query. Usage: /search <query>",
     execute: (args: string) => {
       const query = args.trim();
-      if (!query) return "Please provide a search query. Usage: /search <query>";
-      return `__COMMAND__:search:${query}`;
+      if (!query)
+        return "Please provide a search query. Usage: /search <query>";
+      return query;
     },
   },
   {

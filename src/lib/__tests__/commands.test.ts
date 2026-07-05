@@ -71,21 +71,52 @@ describe("parseCommand", () => {
 
   // ── execute() behaviour ───────────────────────────────────────────────────
 
-  it("/summarize execute returns __COMMAND__:summarize:<url>", () => {
+  it("/summarize with no args returns the argError string", () => {
+    const cmd = COMMANDS.find((c) => c.name === "summarize")!;
+    expect(cmd.execute("")).toContain("URL");
+  });
+
+  it("/summarize execute with URL returns the URL as-is (for local validation)", () => {
     const { command, args } = parseCommand("/summarize https://example.com");
-    expect(command!.execute(args!)).toBe(
-      "__COMMAND__:summarize:https://example.com"
-    );
+    expect(command!.execute(args!)).toBe("https://example.com");
   });
 
-  it("/search execute returns __COMMAND__:search:<query>", () => {
+  it("/search with no args returns the argError string", () => {
+    const cmd = COMMANDS.find((c) => c.name === "search")!;
+    expect(cmd.execute("")).toContain("query");
+  });
+
+  it("/search execute with query returns the query as-is", () => {
     const { command, args } = parseCommand("/search my query");
-    expect(command!.execute(args!)).toBe("__COMMAND__:search:my query");
+    expect(command!.execute(args!)).toBe("my query");
   });
 
-  it("/clear execute returns __COMMAND__:clear", () => {
+  it("/clear execute returns __COMMAND__:clear (local sentinel unchanged)", () => {
     const { command, args } = parseCommand("/clear");
     expect(command!.execute(args ?? "")).toBe("__COMMAND__:clear");
+  });
+
+  it("summarize has requiresArgs true and non-empty argError", () => {
+    const cmd = COMMANDS.find((c) => c.name === "summarize")!;
+    expect(cmd.requiresArgs).toBe(true);
+    expect(cmd.argError).toBeTruthy();
+  });
+
+  it("search has requiresArgs true and non-empty argError", () => {
+    const cmd = COMMANDS.find((c) => c.name === "search")!;
+    expect(cmd.requiresArgs).toBe(true);
+    expect(cmd.argError).toBeTruthy();
+  });
+
+  it("read has requiresArgs true and non-empty argError", () => {
+    const cmd = COMMANDS.find((c) => c.name === "read")!;
+    expect(cmd.requiresArgs).toBe(true);
+    expect(cmd.argError).toBeTruthy();
+  });
+
+  it("clear does not require args", () => {
+    const cmd = COMMANDS.find((c) => c.name === "clear")!;
+    expect(cmd.requiresArgs).toBeFalsy();
   });
 
   // ── COMMANDS registry ─────────────────────────────────────────────────────
