@@ -11,7 +11,7 @@ import { useChat } from "@/hooks/useChat";
 export default function ConversationPage() {
   const params = useParams();
   const conversationId = params.id as string;
-  const { messages, loading, error, sendMessage, loadMessages } =
+  const { messages, loading, error, sendMessage, loadMessages, retryMessage } =
     useChat(conversationId);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function ConversationPage() {
                 : ""
         }
       />
-      <ChatHistory messages={messages} loading={loading} />
+      <ChatHistory messages={messages} loading={loading} onRetry={retryMessage} />
       <ChatInput onSend={sendMessage} disabled={loading} />
       {error && (
         <p role="alert" className="px-4 py-2 text-sm text-destructive">

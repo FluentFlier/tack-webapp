@@ -7,9 +7,10 @@ import type { Message } from "@/types";
 interface ChatHistoryProps {
   messages: Message[];
   loading?: boolean;
+  onRetry?: (id: string) => void;
 }
 
-export function ChatHistory({ messages, loading = false }: ChatHistoryProps) {
+export function ChatHistory({ messages, loading = false, onRetry }: ChatHistoryProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export function ChatHistory({ messages, loading = false }: ChatHistoryProps) {
       aria-live="polite"
     >
       {messages.map((msg) => (
-        <ChatMessage key={msg.id} message={msg} />
+        <ChatMessage key={msg.id} message={msg} onRetry={onRetry} />
       ))}
       {loading && (
         <div className="app-chat-thinking flex gap-3 px-4 py-4" role="status">
