@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     //this rate limiting copied from chat route
-    const { allowed } = checkRateLimit(userId, 20, 60000);
+    const { allowed } = checkRateLimit(`summarize:${userId}`, 20, 60000);
     if (!allowed) {
       return NextResponse.json(
         { error: "Too many requests. Please wait a moment." },
@@ -65,23 +65,19 @@ export async function POST(request: NextRequest) {
         if (r.ok && json && typeof json.text === "string") {
           return NextResponse.json({ summary: json.text });
         }
-        else if (!r.ok) {
-          return NextResponse.json({ error: "!r.ok" }, { status: 500 });
-        }
-        else if (!json) {
-          return NextResponse.json({ error: "!json" }, { status: 500 });
-        }
-        else if (!(typeof json.text === "string")) {
-          return NextResponse.json({ error: "!(typeof json.txt === 'string')" }, { status: 500 });
-        }
-      
+        console.error("[summarize] upstream failure", { status: r.status, json });
+        return NextResponse.json(
+          { error: "Summarization service is unavailable. Please try again." },
+          { status: 502 }
+        );
     }
     else {
-        return NextResponse.json({ error: "InsForge API not configured" }, { status: 500 });
+        return NextResponse.json({ error: "Summarization is not configured." }, { status: 500 });
     }
 
   }
-    catch (err: any) {
-    return NextResponse.json({ error: String(err?.message ?? err) }, { status: 500 });
+    catch (err: unknown) {
+    console.error("[summarize] handler error", err);
+    return NextResponse.json({ error: "Unexpected server error." }, { status: 500 });
   }
 }

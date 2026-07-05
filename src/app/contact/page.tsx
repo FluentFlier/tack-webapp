@@ -1,10 +1,49 @@
 "use client";
 
 import Link from "next/link";
+import { useState, type FormEvent } from "react";
 import { SignedIn, SignedOut, SignInButton } from "@insforge/nextjs";
 import { Search } from "lucide-react";
+import { LandingNavMobile } from "@/components/layout/LandingNavMobile";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type FieldErrors = Partial<Record<"name" | "email" | "subject" | "message", string>>;
 
 export default function ContactPage() {
+  const [status, setStatus] = useState<"idle" | "sent">("idle");
+  const [errors, setErrors] = useState<FieldErrors>({});
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const name = String(data.get("name") ?? "").trim();
+    const email = String(data.get("email") ?? "").trim();
+    const subject = String(data.get("subject") ?? "").trim();
+    const message = String(data.get("message") ?? "").trim();
+
+    const next: FieldErrors = {};
+    if (!name) next.name = "Name is required.";
+    if (!email) next.email = "Email is required.";
+    else if (!EMAIL_RE.test(email)) next.email = "Enter a valid email address.";
+    if (!subject) next.subject = "Subject is required.";
+    if (!message) next.message = "Message is required.";
+
+    if (Object.keys(next).length > 0) {
+      setErrors(next);
+      setStatus("idle");
+      return;
+    }
+
+    const body = `From: ${name} <${email}>\n\n${message}`;
+    const mailto = `mailto:support@tack.ai?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+    setErrors({});
+    setStatus("sent");
+    form.reset();
+  }
+
   return (
     <div className="about-root">
       <div className="landing-orb landing-orb--purple" aria-hidden="true" />
@@ -30,6 +69,8 @@ export default function ContactPage() {
             <Link href="/about" className="landing-nav__link">About Us</Link>
             <Link href="/contact" className="landing-nav__link landing-nav__link--active">Contact Us</Link>
           </nav>
+
+          <LandingNavMobile />
 
           <div className="landing-nav__actions">
             <button className="landing-nav__icon-btn" aria-label="Search" type="button">
@@ -64,7 +105,8 @@ export default function ContactPage() {
             <form
               className="contact-form"
               aria-label="Contact form"
-              onSubmit={(e) => e.preventDefault()}
+              noValidate
+              onSubmit={handleSubmit}
             >
               <div className="contact-form__group">
                 <label htmlFor="contact-name" className="contact-form__label">Name</label>
@@ -75,8 +117,13 @@ export default function ContactPage() {
                   className="contact-form__input"
                   placeholder="Your name"
                   autoComplete="name"
+                  aria-invalid={errors.name ? true : undefined}
+                  aria-describedby={errors.name ? "contact-name-error" : undefined}
                   required
                 />
+                {errors.name && (
+                  <p id="contact-name-error" role="alert" className="contact-form__error">{errors.name}</p>
+                )}
               </div>
 
               <div className="contact-form__group">
@@ -88,8 +135,13 @@ export default function ContactPage() {
                   className="contact-form__input"
                   placeholder="you@example.com"
                   autoComplete="email"
+                  aria-invalid={errors.email ? true : undefined}
+                  aria-describedby={errors.email ? "contact-email-error" : undefined}
                   required
                 />
+                {errors.email && (
+                  <p id="contact-email-error" role="alert" className="contact-form__error">{errors.email}</p>
+                )}
               </div>
 
               <div className="contact-form__group">
@@ -100,8 +152,13 @@ export default function ContactPage() {
                   name="subject"
                   className="contact-form__input"
                   placeholder="How can we help?"
+                  aria-invalid={errors.subject ? true : undefined}
+                  aria-describedby={errors.subject ? "contact-subject-error" : undefined}
                   required
                 />
+                {errors.subject && (
+                  <p id="contact-subject-error" role="alert" className="contact-form__error">{errors.subject}</p>
+                )}
               </div>
 
               <div className="contact-form__group">
@@ -112,13 +169,24 @@ export default function ContactPage() {
                   className="contact-form__input contact-form__textarea"
                   placeholder="Tell us more…"
                   rows={6}
+                  aria-invalid={errors.message ? true : undefined}
+                  aria-describedby={errors.message ? "contact-message-error" : undefined}
                   required
                 />
+                {errors.message && (
+                  <p id="contact-message-error" role="alert" className="contact-form__error">{errors.message}</p>
+                )}
               </div>
 
               <button type="submit" className="contact-form__submit">
                 Send Message
               </button>
+
+              {status === "sent" && (
+                <p role="status" className="contact-form__success">
+                  Your email client should open shortly. If it doesn&apos;t, write us at support@tack.ai.
+                </p>
+              )}
             </form>
           </div>
         </section>

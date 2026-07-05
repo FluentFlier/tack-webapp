@@ -111,8 +111,9 @@ export default function SettingsPage() {
   const savePreferences = async () => {
     if (!preferences || !user) return;
     setSaving(true);
+    setStatusMessage("");
 
-    const { error } = await insforge.database
+    const { error: insertError } = await insforge.database
       .from("user_preferences")
       .insert({
         ...preferences,
@@ -120,15 +121,23 @@ export default function SettingsPage() {
         updated_at: new Date().toISOString(),
       });
 
-    if (error) {
-      // Try update if insert fails (row exists)
-      await insforge.database
+    let saveError: unknown = null;
+    if (insertError) {
+      const { error: updateError } = await insforge.database
         .from("user_preferences")
         .update({
           ...preferences,
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", user.id);
+      if (updateError) saveError = updateError;
+    }
+
+    if (saveError) {
+      console.error("[settings] save failed", saveError);
+      setSaving(false);
+      setStatusMessage("Couldn’t save settings. Please try again.");
+      return;
     }
 
     // Apply to DOM immediately so the user sees the change

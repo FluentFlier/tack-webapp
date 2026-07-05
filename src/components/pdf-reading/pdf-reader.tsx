@@ -124,10 +124,10 @@ export default function Page() {
       if (!isCancelled() && mounted.current) {
         setDocumentSummary(summary);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (!isCancelled() && mounted.current) {
         setDocumentSummary(null);
-        setSummaryError(String(err.message ?? err));
+        setSummaryError(err instanceof Error ? err.message : String(err));
       }
     } finally {
       if (!isCancelled() && mounted.current) {
@@ -428,8 +428,10 @@ export default function Page() {
             void generateDocumentSummary(fullDocumentText, () => cancelled);
           }
         }
-      } catch (err: any) {
-        if (!cancelled && mounted.current) setError(String(err.message ?? err));
+      } catch (err: unknown) {
+        if (!cancelled && mounted.current) {
+          setError(err instanceof Error ? err.message : String(err));
+        }
       } finally {
         if (!cancelled && mounted.current) setLoading(false);
       }
@@ -469,13 +471,23 @@ export default function Page() {
             </Link>
           </div>
 
+          <div
+            role="alert"
+            style={{ ...styleDictTextColor, borderColor: "rgba(255, 180, 90, 0.45)" }}
+            className="mb-4 rounded-md border-l-4 bg-amber-500/10 p-4 text-sm"
+          >
+            <p className="font-semibold mb-1">Before uploading, please read:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>The PDF Reader may upload your document to third-party AI providers to enable summarization features (which may be on by default).</li>
+              <li>AI output may misrepresent or invent information. Do not blindly trust it.</li>
+            </ul>
+          </div>
+
           <Card style={styleDictMiddleground}>
             <CardHeader>
               <CardTitle style={styleDictTextColor}>Upload PDF</CardTitle>
             </CardHeader>
             <CardContent>
-              <h3 style={styleDictTextColor} className="font-bold">Note: the PDF Reader may upload your document to various online providers in order to provide AI features which may be enabled by default. Only use the PDF Reader if you are comfortable with and agree with that.</h3>
-              <h3 style={styleDictTextColor} className="font-bold">Note2: AI may change the meaning of the original text or provide incorrect information. Do not blindly trust the output of the AI features. </h3>
               <Label htmlFor="pdf-upload" style={styleDictTextColor}>Select a PDF file — the text content will appear below.</Label>
               <input
                 id="pdf-upload"

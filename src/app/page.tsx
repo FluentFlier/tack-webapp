@@ -318,8 +318,6 @@ export default function Home() {
                       <div className="iso-team-card__info">
                         <h3 className="iso-team-card__name">{member.name}</h3>
                         <p className="iso-team-card__title">{member.title}</p>
-                        {/* TODO: replace placeholder with real bio */}
-                        <p className="iso-team-card__bio">Placeholder bio — update before launch.</p>
                       </div>
                     </li>
                   </FadeIn>

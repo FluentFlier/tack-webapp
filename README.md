@@ -32,7 +32,7 @@ Visit [http://localhost:3000](http://localhost:3000)
 
 | Technology | Purpose |
 |-----------|---------|
-| Next.js 14 | App Router, Server Components |
+| Next.js 16 | App Router, Server Components |
 | TypeScript 5 | Type safety |
 | Tailwind CSS 3.4 | Utility-first styling |
 | shadcn/ui | Accessible Radix-based components |

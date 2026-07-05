@@ -119,7 +119,19 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
         "color": textColor
     }
 
-    let summarizeButton = <button style={pStyleDict} className="text-xs text-muted-foreground underline mb-1" onClick={doToggle}>summarize line? {`${isSummary ? "enabled" : "disabled"}`}</button>;
+    let summarizeButton = (
+      <button
+        type="button"
+        style={pStyleDict}
+        className="text-xs underline mb-1 disabled:opacity-50 disabled:cursor-not-allowed"
+        onClick={doToggle}
+        disabled={loading || fading}
+        aria-busy={loading}
+        aria-pressed={isSummary}
+      >
+        summarize line? {loading ? "loading…" : isSummary ? "enabled" : "disabled"}
+      </button>
+    );
     
     return (
     <div tabIndex={0}  className="focus:outline-none">

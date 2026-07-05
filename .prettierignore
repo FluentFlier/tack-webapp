@@ -1,0 +1,6 @@
+.next
+node_modules
+public
+sdks
+docs
+tsconfig.tsbuildinfo

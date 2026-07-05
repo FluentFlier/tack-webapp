@@ -23,8 +23,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const baseUrl = process.env.NEXT_PUBLIC_INSFORGE_BASE_URL;
+    if (!baseUrl) {
+      console.error("[chat] NEXT_PUBLIC_INSFORGE_BASE_URL is not set");
+      return NextResponse.json(
+        { error: "Chat service is not configured." },
+        { status: 500 }
+      );
+    }
+
     const insforge = createClient({
-      baseUrl: process.env.NEXT_PUBLIC_INSFORGE_BASE_URL!,
+      baseUrl,
       edgeFunctionToken: token,
     });
 
