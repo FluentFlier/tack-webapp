@@ -68,6 +68,9 @@ function isPrivateAddress(addr: string): boolean {
  *
  * Literal IP hostnames are checked directly without performing a DNS lookup.
  *
+ * **DNS rebinding caveat:** DNS is resolved at call time; a short-TTL record
+ * could resolve to a different (private) address at actual fetch time.
+ *
  * @throws {Error} with a descriptive message when the URL is blocked
  */
 export async function assertPublicUrl(url: string): Promise<URL> {
@@ -147,19 +150,21 @@ export const extractSchema = z.object({
 /**
  * Races a promise against a timeout. Rejects with an Error when the
  * timeout elapses before the promise settles.
+ *
+ * The internal timer is always cleared once the race settles, preventing
+ * a leaked setTimeout when the main promise wins.
  */
 export function withTimeout<T>(
   promise: Promise<T>,
   ms: number,
   label = "Operation"
 ): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<never>((_, reject) =>
-      setTimeout(
-        () => reject(new Error(`${label} timed out after ${ms}ms`)),
-        ms
-      )
-    ),
-  ]);
+  let id: ReturnType<typeof setTimeout>;
+  const timeout = new Promise<never>((_, reject) => {
+    id = setTimeout(
+      () => reject(new Error(`${label} timed out after ${ms}ms`)),
+      ms
+    );
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(id!));
 }

@@ -4,7 +4,7 @@ import { createClient } from "@insforge/sdk";
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { extractSchema, assertPublicUrl } from "@/lib/validation";
+import { extractSchema, assertPublicUrl, withTimeout } from "@/lib/validation";
 
 const MAX_REDIRECTS = 3;
 
@@ -128,20 +128,24 @@ export async function POST(request: NextRequest) {
       images.slice(0, 5).map(async (img) => {
         if (img.alt) return img;
         try {
-          const completion = await insforge.ai.chat.completions.create({
-            model: "openai/gpt-4o-mini",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "Generate concise alt text for this image in under 125 characters. Do not start with 'Image of'. Just output the alt text.",
-              },
-              {
-                role: "user",
-                content: `Image URL: ${img.src}\nPage title: ${article.title}`,
-              },
-            ],
-          });
+          const completion = await withTimeout(
+            insforge.ai.chat.completions.create({
+              model: "openai/gpt-4o-mini",
+              messages: [
+                {
+                  role: "system",
+                  content:
+                    "Generate concise alt text for this image in under 125 characters. Do not start with 'Image of'. Just output the alt text.",
+                },
+                {
+                  role: "user",
+                  content: `Image URL: ${img.src}\nPage title: ${article.title}`,
+                },
+              ],
+            }),
+            60000,
+            "Alt text completion"
+          );
           return {
             ...img,
             alt: completion.choices[0]?.message?.content || "Image",
