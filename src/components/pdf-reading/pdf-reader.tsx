@@ -23,6 +23,7 @@ import { aiRequestQueue, RateLimitError, UnauthorizedError } from "@/lib/request
 
 
 export default function Page() {
+  // 18k gives headroom under the summarize route's Zod 20k text cap (not model context).
   const FULL_DOCUMENT_SUMMARY_MAX_CHARS = 18_000;
   const FULL_DOCUMENT_SUMMARY_IDEAL_LENGTH = 300;
   const CHUNK_SUMMARY_LENGTH = 600;
@@ -642,21 +643,18 @@ export default function Page() {
                   {settings.AIFullDocumentSummary && (
                     <>
                       <h3 className="text-md font-medium mb-1" style={styleDictTextColor}>Full document summary</h3>
-                      {summaryLoading && (
-                        <>
-                          {summaryProgress ? (
-                            <p
-                              role="status"
-                              className="text-sm text-muted-foreground"
-                              style={styleDictTextColor}
-                            >
-                              Summarizing part {summaryProgress.current} of {summaryProgress.total}…
-                            </p>
-                          ) : (
-                            <p className="text-sm text-muted-foreground" style={styleDictTextColor}>Generating summary...</p>
-                          )}
-                        </>
-                      )}
+                      {/* Always mounted so screen readers catch the first announcement. */}
+                      <p
+                        role="status"
+                        className="text-sm text-muted-foreground"
+                        style={styleDictTextColor}
+                      >
+                        {summaryProgress
+                          ? `Summarizing part ${summaryProgress.current} of ${summaryProgress.total}…`
+                          : summaryLoading
+                          ? "Generating summary..."
+                          : ""}
+                      </p>
                       {summaryError && (
                         <div className="flex flex-col gap-2">
                           <p className="text-sm text-destructive" style={styleDictTextColor}>Error: {summaryError}</p>

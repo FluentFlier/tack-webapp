@@ -33,7 +33,8 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
     const [fading, setFading] = useState(false);
     const didInitDefaultSummary = useRef(false);
 
-    async function fetchSummary() {
+    // Returns the fetched summary string on success, or null on failure/empty.
+    async function fetchSummary(): Promise<string | null> {
         setLoading(true);
         try {
             const json = await aiRequestQueue.enqueue(async () => {
@@ -52,6 +53,7 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
             });
             const s = (json as { shortened?: string }).shortened ?? null;
             if (s) setSummaryText(s);
+            return s;
         } catch (err) {
             if (err instanceof RateLimitError) {
                 onRateLimit?.();
@@ -60,6 +62,7 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
             } else {
                 console.error("Failed to fetch summary:", err);
             }
+            return null;
         } finally {
             setLoading(false);
         }
@@ -87,7 +90,10 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
         }
 
         //if a summary hasn't been generated yet, then this code will fetch and display one
-        await fetchSummary();
+        const fetched = await fetchSummary();
+        // Only flip to summary view if a summary was actually retrieved — avoids
+        // button showing "Show original"/aria-pressed=true when summaryText is null.
+        if (!fetched) return;
         setFading(true);
         setTimeout(() => {
             setIsSummary(true);

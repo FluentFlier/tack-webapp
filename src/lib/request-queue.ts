@@ -137,7 +137,19 @@ export class AiRequestQueue {
       return await fn();
     } catch (err) {
       if (err instanceof RateLimitError) {
-        // Pause the queue for _pauseMs, then retry once
+        // Pause the queue for _pauseMs, then retry once.
+        //
+        // Slot-hold note: this task holds its concurrency slot for the entire
+        // 30 s pause. This is bounded (not a deadlock) — waiting tasks are
+        // blocked for at most _pauseMs before the slot is released. With
+        // maxConcurrent = 2 and _pauseMs = 30 s the worst-case wait for a
+        // queued task is 30 s, which is acceptable.
+        //
+        // Dual-mechanism note: `delay(_pauseMs)` here and `_pauseUntilMs` in
+        // the scheduler loop are complementary. The delay keeps this slot
+        // occupied so the retry runs after the pause; _pauseUntilMs blocks the
+        // scheduler from starting *other* pending tasks during the same window.
+        // Both values must stay in sync — always set them together.
         this._pauseUntilMs = Date.now() + this._pauseMs;
         await delay(this._pauseMs);
         // Second RateLimitError propagates to the caller
