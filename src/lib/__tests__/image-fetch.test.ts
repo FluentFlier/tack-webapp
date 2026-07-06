@@ -114,7 +114,62 @@ describe("fetchImageAsDataUrl", () => {
     ).rejects.toThrow(ImageFetchError);
   });
 
-  // ── Content-Type enforcement ────────────────────────────────────────────
+  // ── Redirect: fetch called with redirect: "manual" ──────────────────────
+
+  it.each([301, 302, 307, 308])(
+    "calls fetch with redirect: manual on HTTP %i",
+    async (status) => {
+      mockFetch.mockResolvedValueOnce(
+        mockResponse({ status, contentType: "", body: null })
+      );
+
+      await expect(
+        fetchImageAsDataUrl("https://example.com/img.png")
+      ).rejects.toThrow(ImageFetchError);
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        "https://example.com/img.png",
+        expect.objectContaining({ redirect: "manual" })
+      );
+    }
+  );
+
+  // ── 200 with null body (no reader) ──────────────────────────────────────
+
+  it("rejects a 200 response whose body is null", async () => {
+    mockFetch.mockResolvedValueOnce(
+      mockResponse({ status: 200, contentType: "image/png", body: null })
+    );
+
+    await expect(
+      fetchImageAsDataUrl("https://example.com/img.png")
+    ).rejects.toThrow(ImageFetchError);
+  });
+
+  // ── Content-Type allowlist ───────────────────────────────────────────────
+
+  it("rejects image/svg+xml (not a raster format; vision model cannot process)", async () => {
+    mockFetch.mockResolvedValueOnce(
+      mockResponse({ contentType: "image/svg+xml" })
+    );
+
+    await expect(
+      fetchImageAsDataUrl("https://example.com/icon.svg")
+    ).rejects.toThrow(ImageFetchError);
+  });
+
+  it("accepts image/avif", async () => {
+    mockFetch.mockResolvedValueOnce(
+      mockResponse({
+        contentType: "image/avif",
+        body: new Uint8Array([0x00, 0x00, 0x00]),
+      })
+    );
+
+    const result = await fetchImageAsDataUrl("https://example.com/photo.avif");
+    expect(result.mimeType).toBe("image/avif");
+    expect(result.dataUrl).toMatch(/^data:image\/avif;base64,/);
+  });
 
   it("rejects text/html content-type", async () => {
     mockFetch.mockResolvedValueOnce(

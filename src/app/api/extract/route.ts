@@ -130,58 +130,62 @@ export async function POST(request: NextRequest) {
       edgeFunctionToken: token,
     });
 
-    const imagesWithAlt = await Promise.all(
-      images.slice(0, 5).map(async (img) => {
-        if (img.alt) return img;
-        try {
-          // Resolve relative src against the final page URL
-          const absoluteSrc = new URL(img.src, currentUrl).href;
+    // Process images sequentially to avoid holding multiple ~5 MB base64
+    // payloads in memory simultaneously (serverless memory constraint).
+    const imagesWithAlt: typeof images = [];
+    for (const img of images.slice(0, 5)) {
+      if (img.alt) {
+        imagesWithAlt.push(img);
+        continue;
+      }
+      try {
+        // Resolve relative src against the final page URL
+        const absoluteSrc = new URL(img.src, currentUrl).href;
 
-          // SSRF guard: block private/reserved addresses
-          await assertPublicUrl(absoluteSrc);
+        // SSRF guard: block private/reserved addresses
+        await assertPublicUrl(absoluteSrc);
 
-          // Fetch image body; rejects redirects and enforces 4 MB cap
-          const { dataUrl } = await fetchImageAsDataUrl(absoluteSrc);
+        // Fetch image body; rejects redirects and enforces 4 MB cap
+        const { dataUrl } = await fetchImageAsDataUrl(absoluteSrc);
 
-          // Vision completion — model sees actual pixels
-          const completion = await withTimeout(
-            insforge.ai.chat.completions.create({
-              model: "openai/gpt-4o-mini",
-              messages: [
-                {
-                  role: "user",
-                  content: [
-                    {
-                      type: "text",
-                      text: "Write concise alt text for this image in under 125 characters. Describe only what is visible. Do not start with 'Image of'. Output only the alt text.",
-                    },
-                    {
-                      type: "image_url",
-                      image_url: { url: dataUrl },
-                    },
-                  ],
-                },
-              ],
-              maxTokens: 100,
-            }),
-            60000,
-            "Alt text completion"
-          );
+        // Vision completion — model sees actual pixels
+        const completion = await withTimeout(
+          insforge.ai.chat.completions.create({
+            model: "openai/gpt-4o-mini",
+            messages: [
+              {
+                role: "user",
+                content: [
+                  {
+                    type: "text",
+                    text: "Write concise alt text for this image in under 125 characters. Describe only what is visible. Do not start with 'Image of'. Output only the alt text.",
+                  },
+                  {
+                    type: "image_url",
+                    image_url: { url: dataUrl },
+                  },
+                ],
+              },
+            ],
+            maxTokens: 100,
+          }),
+          60000,
+          "Alt text completion"
+        );
 
-          const alt = completion.choices[0]?.message?.content?.trim();
-          if (!alt) throw new Error("Empty alt text completion");
+        const alt = completion.choices[0]?.message?.content?.trim();
+        if (!alt) throw new Error("Empty alt text completion");
 
-          return { ...img, alt, generated: true };
-        } catch {
-          // Any failure: honest fallback — never fabricate from the filename
-          return {
-            ...img,
-            alt: "Image (no description available)",
-            generated: false,
-          };
-        }
-      })
-    );
+        imagesWithAlt.push({ ...img, alt, generated: true } as typeof img & { alt: string; generated: boolean });
+      } catch {
+        // Any failure: honest fallback — never fabricate from the filename
+        imagesWithAlt.push({
+          ...img,
+          alt: "Image (no description available)",
+          generated: false,
+        } as typeof img & { alt: string; generated: boolean });
+      }
+    }
 
     return NextResponse.json({
       title: article.title,

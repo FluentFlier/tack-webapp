@@ -160,14 +160,27 @@ describe("summarizeSchema", () => {
 // ── extractSchema ─────────────────────────────────────────────────────────────
 
 describe("extractSchema", () => {
-  it("accepts a non-empty url string", () => {
+  it("accepts a valid https URL", () => {
     const result = extractSchema.safeParse({ url: "https://example.com" });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts a valid http URL with a path", () => {
+    const result = extractSchema.safeParse({
+      url: "http://example.com/articles/1",
+    });
     expect(result.success).toBe(true);
   });
 
   it("rejects an empty url string", () => {
     const result = extractSchema.safeParse({ url: "" });
     expect(result.success).toBe(false);
+  });
+
+  it("rejects a non-URL string", () => {
+    const result = extractSchema.safeParse({ url: "not a url" });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBeTruthy();
   });
 
   it("rejects a missing url field", () => {

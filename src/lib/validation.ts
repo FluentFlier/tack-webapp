@@ -142,7 +142,7 @@ export const summarizeSchema = z.object({
 });
 
 export const extractSchema = z.object({
-  url: z.string().min(1),
+  url: z.url(),
 });
 
 // ── Timeout Helper ────────────────────────────────────────────────────────────

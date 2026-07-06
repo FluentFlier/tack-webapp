@@ -57,9 +57,16 @@ export async function fetchImageAsDataUrl(
 
   const rawContentType = response.headers.get("Content-Type") ?? "";
   const mimeType = rawContentType.split(";")[0].trim().toLowerCase();
-  if (!mimeType.startsWith("image/")) {
+  const ALLOWED_MIME_TYPES = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+    "image/avif",
+  ] as const;
+  if (!ALLOWED_MIME_TYPES.includes(mimeType as (typeof ALLOWED_MIME_TYPES)[number])) {
     throw new ImageFetchError(
-      `Expected image/* content-type, got "${mimeType || "(none)"}"`
+      `Unsupported image content-type "${mimeType || "(none)"}". Allowed: ${ALLOWED_MIME_TYPES.join(", ")}`
     );
   }
 
@@ -105,7 +112,7 @@ export async function fetchImageAsDataUrl(
     );
   }
 
-  const buffer = Buffer.concat(chunks.map((c) => Buffer.from(c)));
+  const buffer = Buffer.concat(chunks);
   const dataUrl = `data:${mimeType};base64,${buffer.toString("base64")}`;
   return { dataUrl, mimeType };
 }
