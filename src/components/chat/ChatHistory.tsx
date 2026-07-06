@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChatMessage } from "./ChatMessage";
 import type { Message } from "@/types";
+
 
 interface ChatHistoryProps {
   messages: Message[];
@@ -32,6 +33,20 @@ export function ChatHistory({
   streamingMessageId,
 }: ChatHistoryProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  /**
+   * Records how many messages existed in the first non-empty render so that
+   * pre-loaded history messages are not animated. Any message with an index
+   * at or above this count (appended after the initial load) is treated as new.
+   * Stays null until the first non-empty messages array arrives.
+   */
+  const [initialCount, setInitialCount] = useState<number | null>(null);
+
+  // Capture the settled initial count once — never overwrite after that.
+  useEffect(() => {
+    if (initialCount === null && messages.length > 0) {
+      setInitialCount(messages.length);
+    }
+  }, [initialCount, messages.length]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -63,17 +78,18 @@ export function ChatHistory({
       role="log"
       aria-label="Chat messages"
     >
-      {messages.map((msg) =>
-        msg.id === streamingMessageId ? (
+      {messages.map((msg, index) => {
+        const isNew = initialCount !== null && index >= initialCount;
+        return msg.id === streamingMessageId ? (
           // Suppress per-token announcements while streaming. The full message
           // is announced once via the LiveRegion when streaming completes.
           <div key={msg.id} aria-live="off">
-            <ChatMessage message={msg} onRetry={onRetry} loading={loading} />
+            <ChatMessage message={msg} onRetry={onRetry} loading={loading} isNew={isNew} />
           </div>
         ) : (
-          <ChatMessage key={msg.id} message={msg} onRetry={onRetry} loading={loading} />
-        ),
-      )}
+          <ChatMessage key={msg.id} message={msg} onRetry={onRetry} loading={loading} isNew={isNew} />
+        );
+      })}
       {loading && !streaming && (
         <div className="app-chat-thinking flex gap-3 px-4 py-4" role="status">
           <div className="app-msg__avatar--bot flex h-8 w-8 shrink-0 items-center justify-center rounded-full">

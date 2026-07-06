@@ -584,7 +584,7 @@ export default function Page() {
             </ul>
           </div>
 
-          <Card style={styleDictMiddleground} className="rounded-[14px] border-[rgba(99,102,241,0.3)]">
+          <Card style={styleDictMiddleground} className="rounded-[14px]">
             <CardHeader>
               <CardTitle style={styleDictTextColor} className="font-serif text-lg font-medium tracking-normal">Upload PDF</CardTitle>
             </CardHeader>
@@ -607,7 +607,7 @@ export default function Page() {
             </CardContent>
           </Card>
 
-          <Card style={styleDictMiddleground} className="rounded-[14px] border-[rgba(99,102,241,0.3)]">
+          <Card style={styleDictMiddleground} className="rounded-[14px]">
             <CardHeader>
               <CardTitle style={styleDictTextColor} className="font-serif text-lg font-medium tracking-normal">Output</CardTitle>
             </CardHeader>

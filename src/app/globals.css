@@ -1398,6 +1398,23 @@ html {
   -webkit-text-fill-color: transparent;
 }
 
+/* ── Accessibility: High-contrast & forced-colors overrides ────────── */
+[data-color-profile="high-contrast"] .app-page-title,
+[data-color-profile="high-contrast"] .app-settings-title {
+  background: none !important;
+  -webkit-text-fill-color: hsl(var(--foreground)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+@media (forced-colors: active) {
+  .app-page-title,
+  .app-settings-title {
+    background: none !important;
+    -webkit-text-fill-color: CanvasText !important;
+    color: CanvasText !important;
+  }
+}
+
 .app-settings-card {
   background: rgba(255, 255, 255, 0.03) !important;
   border: 1px solid rgba(79, 70, 229, 0.26) !important;

@@ -144,7 +144,7 @@ export default function Page() {
             <h4 className="mt-4 rounded-lg border border-[rgba(99,102,241,0.3)] bg-[rgba(79,70,229,0.08)] px-4 py-3 text-sm font-medium leading-relaxed" style={styleTextColorDict}>Note: These settings only apply to the PDF reader and will not be saved to your account. For now they are only saved in your browser</h4>
           </div>
 
-          <Card style={styleMiddlegroundColorDict} className="rounded-[14px] border-[rgba(99,102,241,0.3)]">
+          <Card style={styleMiddlegroundColorDict} className="rounded-[14px]">
             <CardHeader style={styleTextColorDict}>
               <CardTitle className="font-serif text-lg font-medium tracking-normal">AI Features</CardTitle>
             </CardHeader>
@@ -164,7 +164,7 @@ export default function Page() {
             </CardContent>
           </Card>
 
-          <Card style={styleMiddlegroundColorDict} className="rounded-[14px] border-[rgba(99,102,241,0.3)]">
+          <Card style={styleMiddlegroundColorDict} className="rounded-[14px]">
             <CardHeader style={styleTextColorDict}>
               <CardTitle className="font-serif text-lg font-medium tracking-normal">Display</CardTitle>
             </CardHeader>

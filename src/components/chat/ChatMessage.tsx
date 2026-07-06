@@ -8,9 +8,11 @@ interface ChatMessageProps {
   message: Message;
   onRetry?: (id: string) => void;
   loading?: boolean;
+  /** When true the message entrance animation plays. False for pre-loaded history. */
+  isNew?: boolean;
 }
 
-export function ChatMessage({ message, onRetry, loading }: ChatMessageProps) {
+export function ChatMessage({ message, onRetry, loading, isNew }: ChatMessageProps) {
   const isAssistant = message.role === "assistant";
   const isFailed = message.failed === true;
 
@@ -26,7 +28,8 @@ export function ChatMessage({ message, onRetry, loading }: ChatMessageProps) {
   return (
     <div
       className={cn(
-        "app-msg-enter flex gap-3 px-4 py-5",
+        "flex gap-3 px-4 py-5",
+        isNew && "app-msg-enter",
         isAssistant && "app-msg--assistant",
         isFailed && "opacity-70"
       )}
