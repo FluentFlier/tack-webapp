@@ -80,6 +80,15 @@
   ::selection {
     background-color: hsl(244 68% 60% / 0.35);
   }
+
+  /* #main-content (the full-page wrapper) is focused programmatically after
+     every route change by FocusManager to move the screen-reader reading
+     position. It is a tabIndex={-1} container, not an interactive control, so
+     the browser's default focus outline would frame the entire viewport with
+     thin lines. Suppress it — the focus move stays effective for AT. */
+  #main-content:focus {
+    outline: none;
+  }
 }
 
 @layer utilities {
