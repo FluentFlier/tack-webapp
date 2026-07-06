@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { LiveRegion } from "@/components/a11y";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { insforge } from "@/lib/insforge";
 import { useUser } from "@insforge/nextjs";
 import type { UserPreferences, ColorProfile } from "@/types";
@@ -180,6 +181,21 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* ── Appearance / Theme ── */}
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="theme-toggle" className="text-sm font-medium">
+                Appearance
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Toggle between light and dark mode
+              </p>
+            </div>
+            <ThemeToggle />
+          </div>
+
+          <Separator />
+
           {/* ── Color-Blindness Profile ── */}
           <fieldset className="space-y-3 rounded-lg border border-[rgba(79,70,229,0.24)] p-4">
             <legend className="px-2 text-sm font-semibold">Color-Blindness Profile</legend>

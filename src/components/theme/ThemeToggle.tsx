@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -7,7 +8,9 @@ import { useTheme } from "@/hooks/useTheme";
  * ThemeToggle — toggles between light and dark themes.
  *
  * - Real <button>, keyboard-operable.
- * - aria-label reflects the action (what you'll switch TO).
+ * - Fixed aria-label "Dark mode" + aria-pressed conveys current state to AT.
+ * - Mounted guard prevents SSR hydration mismatch (server always renders a
+ *   size-matched placeholder until the client has read the stored preference).
  * - Visible focus ring via CSS :focus-visible (ring token).
  * - Sun icon = currently dark, click to go light.
  * - Moon icon = currently light, click to go dark.
@@ -15,12 +18,18 @@ import { useTheme } from "@/hooks/useTheme";
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  const [mounted, setMounted] = useState(false);
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- canonical one-shot SSR mount guard
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return <span className="h-8 w-8" aria-hidden="true" />;
 
   return (
     <button
       type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+      aria-label="Dark mode"
       aria-pressed={isDark}
       className={[
         "inline-flex items-center justify-center",

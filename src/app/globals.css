@@ -74,7 +74,7 @@
     --chart-5: 38 21% 35%;
 
     /* ── Editorial extras ─────────────────────────────────────────── */
-    --hairline:      rgba(236, 231, 219, 0.10); /* translucent warm separator */
+    --hairline:      40 32% 89%;                /* raw HSL — use hsl(var(--hairline) / <alpha>) */
     --user-tint:     rgba(134, 189, 169, 0.08); /* sage wash for user rows    */
     --focus:         158 29% 63%;               /* == --ring                  */
     --accent-strong: 157 31% 71%;               /* #9fccbb brighter sage hover*/

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export type Theme = "light" | "dark" | "system";
 export type ResolvedTheme = "light" | "dark";
@@ -12,11 +12,6 @@ function getSystemTheme(): ResolvedTheme {
   return window.matchMedia("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
-}
-
-function resolveTheme(theme: Theme): ResolvedTheme {
-  if (theme === "system") return getSystemTheme();
-  return theme;
 }
 
 function applyThemeToRoot(resolved: ResolvedTheme): void {
@@ -50,25 +45,29 @@ export function useTheme(): {
 } {
   const [theme, setThemeState] = useState<Theme>(readStoredTheme);
 
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() =>
-    resolveTheme(readStoredTheme())
+  // Tracks the live OS preference — updated via native event handler only,
+  // so it does not trigger the react-hooks/set-state-in-effect warning.
+  const [osPrefers, setOsPrefers] = useState<ResolvedTheme>(getSystemTheme);
+
+  // Derive resolvedTheme — no extra state, no setState-in-effect.
+  const resolvedTheme = useMemo<ResolvedTheme>(
+    () => (theme === "system" ? osPrefers : (theme as ResolvedTheme)),
+    [theme, osPrefers]
   );
 
-  // Apply theme to <html> whenever the chosen theme changes
+  // Apply theme to <html> whenever resolvedTheme changes.
   useEffect(() => {
-    const resolved = resolveTheme(theme);
-    setResolvedTheme(resolved);
-    applyThemeToRoot(resolved);
-  }, [theme]);
+    applyThemeToRoot(resolvedTheme);
+  }, [resolvedTheme]);
 
-  // When theme === "system", follow OS preference changes live
+  // When theme === "system", follow OS preference changes live.
+  // setOsPrefers is called from a native event handler, not directly
+  // inside the effect body, so no react-hooks/set-state-in-effect warning.
   useEffect(() => {
     if (theme !== "system") return;
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const handler = (e: MediaQueryListEvent): void => {
-      const resolved: ResolvedTheme = e.matches ? "dark" : "light";
-      setResolvedTheme(resolved);
-      applyThemeToRoot(resolved);
+      setOsPrefers(e.matches ? "dark" : "light");
     };
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
