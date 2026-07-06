@@ -5,6 +5,7 @@ import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { extractSchema, assertPublicUrl, withTimeout } from "@/lib/validation";
+import { fetchImageAsDataUrl } from "@/lib/image-fetch";
 
 const MAX_REDIRECTS = 3;
 
@@ -118,7 +119,12 @@ export async function POST(request: NextRequest) {
       }))
       .filter((img) => img.src);
 
-    // Generate alt text for images missing it (limit to 5)
+    // Generate vision-based alt text for images missing it (limit to 5).
+    // Each image is fetched as a base64 data URL and sent to gpt-4o-mini as a
+    // multimodal content part so the model describes actual pixels — never a
+    // filename-derived guess. Any failure (SSRF block, bad content-type, too
+    // large, gateway error, empty response) yields an honest fallback so that
+    // blind users always receive truthful information.
     const insforge = createClient({
       baseUrl: process.env.NEXT_PUBLIC_INSFORGE_BASE_URL!,
       edgeFunctionToken: token,
@@ -128,31 +134,51 @@ export async function POST(request: NextRequest) {
       images.slice(0, 5).map(async (img) => {
         if (img.alt) return img;
         try {
+          // Resolve relative src against the final page URL
+          const absoluteSrc = new URL(img.src, currentUrl).href;
+
+          // SSRF guard: block private/reserved addresses
+          await assertPublicUrl(absoluteSrc);
+
+          // Fetch image body; rejects redirects and enforces 4 MB cap
+          const { dataUrl } = await fetchImageAsDataUrl(absoluteSrc);
+
+          // Vision completion — model sees actual pixels
           const completion = await withTimeout(
             insforge.ai.chat.completions.create({
               model: "openai/gpt-4o-mini",
               messages: [
                 {
-                  role: "system",
-                  content:
-                    "Generate concise alt text for this image in under 125 characters. Do not start with 'Image of'. Just output the alt text.",
-                },
-                {
                   role: "user",
-                  content: `Image URL: ${img.src}\nPage title: ${article.title}`,
+                  content: [
+                    {
+                      type: "text",
+                      text: "Write concise alt text for this image in under 125 characters. Describe only what is visible. Do not start with 'Image of'. Output only the alt text.",
+                    },
+                    {
+                      type: "image_url",
+                      image_url: { url: dataUrl },
+                    },
+                  ],
                 },
               ],
+              maxTokens: 100,
             }),
             60000,
             "Alt text completion"
           );
+
+          const alt = completion.choices[0]?.message?.content?.trim();
+          if (!alt) throw new Error("Empty alt text completion");
+
+          return { ...img, alt, generated: true };
+        } catch {
+          // Any failure: honest fallback — never fabricate from the filename
           return {
             ...img,
-            alt: completion.choices[0]?.message?.content || "Image",
-            generated: true,
+            alt: "Image (no description available)",
+            generated: false,
           };
-        } catch {
-          return { ...img, alt: "Image", generated: true };
         }
       })
     );
