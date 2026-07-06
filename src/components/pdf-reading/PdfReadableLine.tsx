@@ -2,6 +2,7 @@
 //rate limiting and account needing to be signed in notifications were added using Copilot, basically when a rate limit error is encountered a function is the pdf-reader component is called (this makes sure an alert about the error is only shown once per page load, instead of once per error)
 
 import React, { useEffect, useRef, useState } from "react";
+import { aiRequestQueue, RateLimitError, UnauthorizedError } from "@/lib/request-queue";
 
 type Props = {
     headingLevel: number;
@@ -35,27 +36,30 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
     async function fetchSummary() {
         setLoading(true);
         try {
-            const res = await fetch("/api/insforge/shorten", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: content, percent: summarizePercent }),
+            const json = await aiRequestQueue.enqueue(async () => {
+                const res = await fetch("/api/insforge/shorten", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: content, percent: summarizePercent }),
+                });
+                if (res.status === 429) throw new RateLimitError();
+                if (res.status === 401) throw new UnauthorizedError();
+                if (!res.ok) {
+                    const txt = await res.text();
+                    throw new Error(txt || "Summarize request failed");
+                }
+                return res.json();
             });
-            if (res.status === 429) {
-                onRateLimit?.();
-            }
-            if (res.status === 401) {
-                onUnauthorized?.();
-            }
-            
-            if (!res.ok) {
-            const txt = await res.text();
-            throw new Error(txt || "Summarize request failed");
-            }
-            const json = await res.json();
-            const s = json.shortened ?? null;
+            const s = (json as { shortened?: string }).shortened ?? null;
             if (s) setSummaryText(s);
         } catch (err) {
-            console.error("Failed to fetch summary:", err);
+            if (err instanceof RateLimitError) {
+                onRateLimit?.();
+            } else if (err instanceof UnauthorizedError) {
+                onUnauthorized?.();
+            } else {
+                console.error("Failed to fetch summary:", err);
+            }
         } finally {
             setLoading(false);
         }
@@ -128,8 +132,9 @@ export const PdfReadableLine: React.FC<Props> = ({ headingLevel, content, onOpen
         disabled={loading || fading}
         aria-busy={loading}
         aria-pressed={isSummary}
+        aria-label={`Toggle summary for paragraph starting: ${content.slice(0, 40)}`}
       >
-        summarize line? {loading ? "loading…" : isSummary ? "enabled" : "disabled"}
+        {loading ? "Summarizing…" : isSummary ? "Show original" : "Show summary"}
       </button>
     );
     

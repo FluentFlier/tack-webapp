@@ -14,15 +14,18 @@ import PdfImageLine from "@/components/pdf-reading/PdfImageLine";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Settings } from "lucide-react";
-import { getDocumentProxy, extractImages } from 'unpdf';
+import { Settings, X } from "lucide-react";
+import { getDocumentProxy } from 'unpdf';
 import type { TextItem, TextContent } from 'pdfjs-dist/types/src/display/api';
+import { chunkTextForSummary } from "@/lib/chunk-text";
+import { aiRequestQueue, RateLimitError, UnauthorizedError } from "@/lib/request-queue";
 
 
 
 export default function Page() {
-  const FULL_DOCUMENT_SUMMARY_MAX_CHARS = 1000;
+  const FULL_DOCUMENT_SUMMARY_MAX_CHARS = 18_000;
   const FULL_DOCUMENT_SUMMARY_IDEAL_LENGTH = 300;
+  const CHUNK_SUMMARY_LENGTH = 600;
 
 
   const [file, setFile] = useState<File | null>(null);
@@ -33,22 +36,26 @@ export default function Page() {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [summaryUsedTruncation, setSummaryUsedTruncation] = useState(false);
+  const [summaryCoveragePercent, setSummaryCoveragePercent] = useState(100);
+  const [summaryProgress, setSummaryProgress] = useState<{ current: number; total: number } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isScannedPdf, setIsScannedPdf] = useState(false);
+  const [aiNotice, setAiNotice] = useState<"rateLimit" | "unauthorized" | null>(null);
   const mounted = useRef(true);
-  const didShowRateLimitAlert = useRef(false);
-  const didShowUnauthorizedAlert = useRef(false);
+  const didShowRateLimitNotice = useRef(false);
+  const didShowUnauthorizedNotice = useRef(false);
 
-  function showRateLimitAlertOnce() {
-    if (didShowRateLimitAlert.current) return;
-    didShowRateLimitAlert.current = true;
-    alert("Rate limit exceeded for AI features, please adjust your settings to increase the minimum size of a line/paragraph that is allowed to be summarized in order to reduce your AI usage and therefore avoid this error.");
+  function showRateLimitNoticeOnce() {
+    if (didShowRateLimitNotice.current) return;
+    didShowRateLimitNotice.current = true;
+    setAiNotice("rateLimit");
   }
 
-  function showUnauthorizedAlertOnce() {
-    if (didShowUnauthorizedAlert.current) return;
-    didShowUnauthorizedAlert.current = true;
-    alert("You must be signed in to use AI summarization features.");
+  function showUnauthorizedNoticeOnce() {
+    if (didShowUnauthorizedNotice.current) return;
+    didShowUnauthorizedNotice.current = true;
+    setAiNotice("unauthorized");
   }
 
 
@@ -68,10 +75,10 @@ export default function Page() {
   };
 
   type PDFReaderSettings = typeof defaultSettings;
-  
+
   //this function written using Copilot inline suggestions then edited
   function getsettings() {
-    
+
     try {
       const localStorageSettings = localStorage.getItem("pdfReaderSettings");
       if (localStorageSettings) {
@@ -95,7 +102,8 @@ export default function Page() {
     };
   }, []);
 
-  //this function written by Copilot to generate document summaries using the first part of a document
+  //this function written by Copilot to generate document summaries using the full text of a document
+  //map-reduce approach: split into ≤18000-char chunks, summarize each, then summarize the combined results
   async function generateDocumentSummary(rawText: string, isCancelled: () => boolean = () => false) {
     if (!rawText.trim()) {
       setDocumentSummary(null);
@@ -105,33 +113,94 @@ export default function Page() {
       return;
     }
 
-    const textForSummary = rawText.slice(0, FULL_DOCUMENT_SUMMARY_MAX_CHARS);
-    const usedTruncation = rawText.length > FULL_DOCUMENT_SUMMARY_MAX_CHARS;
-
     if (!isCancelled() && mounted.current) {
       setSummaryLoading(true);
       setSummaryError(null);
-      setSummaryUsedTruncation(usedTruncation);
+      setSummaryUsedTruncation(false);
+      setSummaryProgress(null);
     }
 
     try {
-      const summary = await summarizeWithInsforge(
-        textForSummary,
-        FULL_DOCUMENT_SUMMARY_IDEAL_LENGTH,
-        showRateLimitAlertOnce,
-        showUnauthorizedAlertOnce
-      );
+      let summary: string;
+
+      if (rawText.length <= FULL_DOCUMENT_SUMMARY_MAX_CHARS) {
+        // Short document — single summarize call
+        summary = await aiRequestQueue.enqueue(() =>
+          summarizeWithInsforge(rawText, FULL_DOCUMENT_SUMMARY_IDEAL_LENGTH)
+        );
+      } else {
+        // Long document — map-reduce
+        const { chunks, truncated, coveragePercent } = chunkTextForSummary(
+          rawText,
+          FULL_DOCUMENT_SUMMARY_MAX_CHARS
+        );
+
+        if (!isCancelled() && mounted.current) {
+          setSummaryUsedTruncation(truncated);
+          setSummaryCoveragePercent(coveragePercent);
+        }
+
+        // Map phase: summarize each chunk
+        const chunkSummaries: string[] = [];
+        for (let i = 0; i < chunks.length; i++) {
+          if (isCancelled() || !mounted.current) return;
+          setSummaryProgress({ current: i + 1, total: chunks.length });
+          const chunkSummary = await aiRequestQueue.enqueue(() =>
+            summarizeWithInsforge(chunks[i], CHUNK_SUMMARY_LENGTH)
+          );
+          chunkSummaries.push(chunkSummary);
+        }
+
+        if (isCancelled() || !mounted.current) return;
+        setSummaryProgress(null);
+
+        // Reduce phase: concatenate chunk summaries and summarize once more
+        let combined = chunkSummaries.join("\n\n");
+
+        if (combined.length > FULL_DOCUMENT_SUMMARY_MAX_CHARS) {
+          // Re-chunk the combined summaries if they are still very long
+          const { chunks: reducedChunks } = chunkTextForSummary(
+            combined,
+            FULL_DOCUMENT_SUMMARY_MAX_CHARS
+          );
+          const reducedSummaries: string[] = [];
+          for (let i = 0; i < reducedChunks.length; i++) {
+            if (isCancelled() || !mounted.current) return;
+            setSummaryProgress({ current: i + 1, total: reducedChunks.length });
+            const s = await aiRequestQueue.enqueue(() =>
+              summarizeWithInsforge(reducedChunks[i], CHUNK_SUMMARY_LENGTH)
+            );
+            reducedSummaries.push(s);
+          }
+          combined = reducedSummaries.join("\n\n");
+        }
+
+        if (isCancelled() || !mounted.current) return;
+        setSummaryProgress(null);
+
+        // Final summarize
+        summary = await aiRequestQueue.enqueue(() =>
+          summarizeWithInsforge(combined, FULL_DOCUMENT_SUMMARY_IDEAL_LENGTH)
+        );
+      }
+
       if (!isCancelled() && mounted.current) {
         setDocumentSummary(summary);
       }
     } catch (err: unknown) {
       if (!isCancelled() && mounted.current) {
+        if (err instanceof RateLimitError) {
+          showRateLimitNoticeOnce();
+        } else if (err instanceof UnauthorizedError) {
+          showUnauthorizedNoticeOnce();
+        }
         setDocumentSummary(null);
         setSummaryError(err instanceof Error ? err.message : String(err));
       }
     } finally {
       if (!isCancelled() && mounted.current) {
         setSummaryLoading(false);
+        setSummaryProgress(null);
       }
     }
   }
@@ -155,9 +224,12 @@ export default function Page() {
     setSummaryLoading(false);
     setSummaryError(null);
     setSummaryUsedTruncation(false);
+    setSummaryProgress(null);
+    setIsScannedPdf(false);
+    setAiNotice(null);
     setError(null);
-    didShowRateLimitAlert.current = false;
-    didShowUnauthorizedAlert.current = false;
+    didShowRateLimitNotice.current = false;
+    didShowUnauthorizedNotice.current = false;
   }
 
   useEffect(() => {
@@ -170,8 +242,8 @@ export default function Page() {
 
 
       try {
-       
-        
+
+
         if (file == null) throw new Error("No file to process");
         const arrayBuffer = await file.arrayBuffer();
 
@@ -179,19 +251,20 @@ export default function Page() {
 
 
         const pdf = await getDocumentProxy(new Uint8Array(arrayBuffer));
-        console.log(await pdf.numPages);
-        
+        const numPages = pdf.numPages;
+        console.log(numPages);
+
         //load list of all pages
         let listOfPagePromises = [];
-        for (let i = 1; i <= pdf.numPages; i++) {
+        for (let i = 1; i <= numPages; i++) {
           listOfPagePromises.push(pdf.getPage(i));
         }
         const pages = await Promise.all(listOfPagePromises);
-        
+
 
         //for each page extract the textContent elements
         let textContents : TextItem[][] = [];
-        
+
         for (let page of pages) {
           const textContent : TextContent = await page.getTextContent({includeMarkedContent: false}); //get the list of TextContent objects without any TextMarkedContentObjects
           let textContentItems = textContent.items as TextItem[];
@@ -233,22 +306,22 @@ export default function Page() {
             heightToHeading[heights[i]] = level;
           }
         }
-        
+
 
         let lastXIndent = -999;
         //populate docElements with text items (with position tracking)
         let tempDocText: { text: string; headingLevel: number; yPos: number }[] = [];
         let pageStartYPos = 0; //track the yPos of the start of each page
-        
+
         for (let pageNum = 0; pageNum < textContents.length; pageNum++) {
           const pageItems = textContents[pageNum];
           const pageHeight = pageHeights[pageNum];
-          
+
           //update pageStartYPos for the current page
           if (pageNum > 0) {
             pageStartYPos += pageHeights[pageNum - 1];
           }
-          
+
           let lastLineWasPageNumber = false;
           for (let i = 0; i < pageItems.length; i++) {
             const item = pageItems[i] as TextItem;
@@ -257,18 +330,18 @@ export default function Page() {
 
             //if the text is empty or only whitespace, skip it
             if (lineText.trim() === "") continue;
-            
+
 
             //check whether this is a new page (first item of this page)
             let newPage = (i == 0);
 
             //check the heading level
             const headingLevel = heightToHeading[item.height] || 6; //default to 6 if height not recognized
-            
+
 
             //if it's a new page then check whether this line or the last line is likely a page number and reformat it
             if (newPage) {
-              
+
               //check whether the lineText is a arabic or roman numeral
               let pageNumberInDocument = Number(lineText.trim());
               if (isNaN(pageNumberInDocument)) {
@@ -282,13 +355,13 @@ export default function Page() {
               //if the lineText is likely a page number, reformat it to "Page X"
               if (!isNaN(pageNumberInDocument)) {
                 lineText = "Page " + pageNumberInDocument;
-                
-                
+
+
                 if (settings.displayPageNumbers) {
                   lastLineWasPageNumber = true //so that the next line gets set as a new paragraph
-                  const adjustedYPos = calculateAdjustedYPos(pageHeight, item.transform[5], pageStartYPos) 
+                  const adjustedYPos = calculateAdjustedYPos(pageHeight, item.transform[5], pageStartYPos)
                   tempDocText.push({"text": lineText, "headingLevel": headingLevel, "yPos": adjustedYPos});
-                  
+
                 }
                 continue; //skip the other parsing logic for this line
               }
@@ -303,7 +376,7 @@ export default function Page() {
               lastXIndent = item.transform[4]; //only update lastXIndent if we are not starting a new paragraph, to allow for multiple lines of the same paragraph to have slightly different indents without breaking the paragraph
             }
 
-          
+
             //if the last line was displayed as a page number then treat this line as a new paragraph, and reset the state keeping track of whether the last line was a page number
             if (lastLineWasPageNumber) {
               isNewParagraph = true
@@ -321,13 +394,13 @@ export default function Page() {
               else {
                 tempDocText[tempDocText.length - 1].text += " " + lineText;
               }
-              
+
             }
             else {
               //otherwise add the text and the corresponding heading level to tempDocText with yPos
               const adjustedYPos = calculateAdjustedYPos(pageHeight, item.transform[5], pageStartYPos);
               tempDocText.push({"text": lineText, "headingLevel": headingLevel, "yPos": adjustedYPos});
-              
+
             }
           }
 
@@ -340,7 +413,7 @@ export default function Page() {
             for (const imgObj of extractedImages) {
               const canvas = document.createElement('canvas');
               const context = canvas.getContext('2d');
-              
+
               if (!context) continue;
 
               canvas.width = imgObj.width;
@@ -349,13 +422,13 @@ export default function Page() {
               //create ImageData from the extracted image data
               const imageData = context.createImageData(imgObj.width, imgObj.height);
               imageData.data.set(imgObj.data);
-              
+
               //put the image data on the canvas
               context.putImageData(imageData, 0, 0);
 
               //convert canvas to data URL
               const imageDataUrl = canvas.toDataURL('image/png');
-              
+
               //add the extracted image to docElements
               //use a large negative yPos to place it with the text from the same page
               docElements.push({
@@ -389,6 +462,17 @@ export default function Page() {
 
         if (cancelled) return;
 
+        // Detect scanned/image-only PDFs (no extractable text layer)
+        if (fullDocumentText.trim().length < 50 && numPages >= 1) {
+          if (!cancelled && mounted.current) {
+            setIsScannedPdf(true);
+            setReadableHtml(null);
+            setDocumentText("");
+          }
+          return;
+        }
+        setIsScannedPdf(false);
+
         //sort docElements by yPos (in accending order, then by type to keep images together)
         docElements.sort((a, b) => {
           if (a.yPos !== b.yPos) return a.yPos - b.yPos;
@@ -406,14 +490,14 @@ export default function Page() {
                 textColor={settings.textColor}
                 minLengthToSummarize={settings.minLengthToSummarize}
                 summarizePercent={settings.targetSummaryLength}
-                onRateLimit={showRateLimitAlertOnce}
-                onUnauthorized={showUnauthorizedAlertOnce}
+                onRateLimit={showRateLimitNoticeOnce}
+                onUnauthorized={showUnauthorizedNoticeOnce}
               />
             );
           } else {
             return (
-              <PdfImageLine 
-                key={idx} 
+              <PdfImageLine
+                key={idx}
                 src={element.src}
               />
             );
@@ -454,6 +538,13 @@ export default function Page() {
   const styleDictTextColor = {
     color: settings.textColor
   }
+
+  const aiNoticeMessage =
+    aiNotice === "rateLimit"
+      ? "AI request limit reached. Summarization is paused briefly — it will resume automatically. You can raise the minimum paragraph length in PDF Reader Settings to reduce AI usage."
+      : aiNotice === "unauthorized"
+      ? "Sign in to use AI summarization features."
+      : null;
 
   return (
     <>
@@ -508,15 +599,58 @@ export default function Page() {
               <CardTitle style={styleDictTextColor}>Output</CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Inline AI error notice — replaces blocking alert() */}
+              {aiNotice && aiNoticeMessage && (
+                <div
+                  role="alert"
+                  style={{ borderColor: "rgba(255, 120, 90, 0.55)", ...styleDictTextColor }}
+                  className="mb-4 flex items-start gap-3 rounded-md border-l-4 bg-red-500/10 p-4 text-sm"
+                >
+                  <p className="flex-1">{aiNoticeMessage}</p>
+                  <button
+                    type="button"
+                    aria-label="Dismiss notice"
+                    onClick={() => setAiNotice(null)}
+                    className="shrink-0 rounded p-0.5 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-current"
+                  >
+                    <X className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                </div>
+              )}
+
               {loading && <p className="text-sm text-muted-foreground" style={styleDictTextColor}>Processing PDF...</p>}
               {error && <p className="text-sm text-destructive">Error: {error}</p>}
+
+              {/* Scanned PDF detection notice */}
+              {!loading && !error && isScannedPdf && (
+                <div
+                  role="alert"
+                  style={{ borderColor: "rgba(255, 180, 90, 0.45)", ...styleDictTextColor }}
+                  className="rounded-md border-l-4 bg-amber-500/10 p-4 text-sm"
+                >
+                  This PDF appears to contain scanned images without a text layer. Text extraction is not possible for this document yet.
+                </div>
+              )}
+
               {!loading && !error && readableHtml && (
                 <div className="border border-border rounded-lg p-4 space-y-4" style={styleDictMiddleground}>
                   {settings.AIFullDocumentSummary && (
                     <>
                       <h3 className="text-md font-medium mb-1" style={styleDictTextColor}>Full document summary</h3>
                       {summaryLoading && (
-                        <p className="text-sm text-muted-foreground" style={styleDictTextColor}>Generating summary...</p>
+                        <>
+                          {summaryProgress ? (
+                            <p
+                              role="status"
+                              className="text-sm text-muted-foreground"
+                              style={styleDictTextColor}
+                            >
+                              Summarizing part {summaryProgress.current} of {summaryProgress.total}…
+                            </p>
+                          ) : (
+                            <p className="text-sm text-muted-foreground" style={styleDictTextColor}>Generating summary...</p>
+                          )}
+                        </>
                       )}
                       {summaryError && (
                         <div className="flex flex-col gap-2">
@@ -541,18 +675,18 @@ export default function Page() {
                       )}
                       {summaryUsedTruncation && (
                         <p className="text-xs text-muted-foreground mt-2" style={styleDictTextColor}>
-                          Summary generated from the first {FULL_DOCUMENT_SUMMARY_MAX_CHARS.toLocaleString()} characters because this PDF is very long.
+                          Summary covers approximately the first {summaryCoveragePercent}% of the document because it exceeds the maximum supported length.
                         </p>
                       )}
                     </>
                   )}
                   <p className="text-sm text-muted-foreground" style={styleDictTextColor}>
-                    Below is the content of the document. When you select a button labeled &quot;summarize line?&quot; you can press it to toggle an AI shortened version of the following line or paragraph. Pressing again returns the original.
+                    Below is the content of the document. For each long paragraph you will see a &quot;Show summary&quot; button — press it to toggle an AI-shortened version of that paragraph. Press &quot;Show original&quot; to return to the full text.
                   </p>
                   <div>{readableHtml}</div>
                 </div>
               )}
-              {!loading && !error && !readableHtml && (
+              {!loading && !error && !readableHtml && !isScannedPdf && (
                 <p className="text-sm text-muted-foreground" style={styleDictTextColor}>
                   Once you upload a PDF above, the text content of the document will appear here.
                 </p>
@@ -575,6 +709,12 @@ export async function shortenWithInsforge(text: string, percent: number) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text, percent }),
   });
+  if (res.status === 429) {
+    throw new RateLimitError();
+  }
+  if (res.status === 401) {
+    throw new UnauthorizedError();
+  }
   if (!res.ok) {
     const body = await res.text();
     throw new Error(body || "Request failed");
@@ -587,8 +727,6 @@ export async function shortenWithInsforge(text: string, percent: number) {
 export async function summarizeWithInsforge(
   text: string,
   targetLength: number,
-  onRateLimit?: () => void,
-  onUnauthorized?: () => void
 ) {
   const res = await fetch("/api/insforge/summarize", {
     method: "POST",
@@ -596,10 +734,10 @@ export async function summarizeWithInsforge(
     body: JSON.stringify({ text, targetLength }),
   });
   if (res.status === 429) {
-    onRateLimit?.();
+    throw new RateLimitError();
   }
   if (res.status === 401) {
-    onUnauthorized?.();
+    throw new UnauthorizedError();
   }
   if (!res.ok) {
     const body = await res.text();
@@ -633,7 +771,6 @@ export function parseRomanNumeral(input: string): number {
 
 //when repeatedly caled with the y information extracted from a pdf about the location of text elements this function will adjust the y values so they are always increasing when an element is lower in a document.
 function calculateAdjustedYPos(pageHeight: number, originalYTransform: number, pageStartYPos: number) {
-  
+
   return (pageHeight - originalYTransform) + pageStartYPos;
 }
-
