@@ -8,9 +8,22 @@ interface ChatHistoryProps {
   messages: Message[];
   loading?: boolean;
   onRetry?: (id: string) => void;
+  /**
+   * The id of the message currently being streamed in (e.g. "streaming").
+   * That message is wrapped in `aria-live="off"` to prevent screen readers
+   * from announcing every incremental token update. Once streaming ends and
+   * the placeholder is replaced by the persisted server row, normal log
+   * semantics resume.
+   */
+  streamingMessageId?: string | null;
 }
 
-export function ChatHistory({ messages, loading = false, onRetry }: ChatHistoryProps) {
+export function ChatHistory({
+  messages,
+  loading = false,
+  onRetry,
+  streamingMessageId,
+}: ChatHistoryProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,9 +57,17 @@ export function ChatHistory({ messages, loading = false, onRetry }: ChatHistoryP
       aria-label="Chat messages"
       aria-live="polite"
     >
-      {messages.map((msg) => (
-        <ChatMessage key={msg.id} message={msg} onRetry={onRetry} loading={loading} />
-      ))}
+      {messages.map((msg) =>
+        msg.id === streamingMessageId ? (
+          // Suppress per-token announcements while streaming. The full message
+          // is announced once via the LiveRegion when streaming completes.
+          <div key={msg.id} aria-live="off">
+            <ChatMessage message={msg} onRetry={onRetry} loading={loading} />
+          </div>
+        ) : (
+          <ChatMessage key={msg.id} message={msg} onRetry={onRetry} loading={loading} />
+        ),
+      )}
       {loading && (
         <div className="app-chat-thinking flex gap-3 px-4 py-4" role="status">
           <div className="app-msg__avatar--bot flex h-8 w-8 shrink-0 items-center justify-center rounded-full">

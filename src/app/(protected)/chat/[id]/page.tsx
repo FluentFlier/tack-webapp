@@ -11,8 +11,16 @@ import { useChat } from "@/hooks/useChat";
 export default function ConversationPage() {
   const params = useParams();
   const conversationId = params.id as string;
-  const { messages, loading, error, sendMessage, loadMessages, retryMessage } =
-    useChat(conversationId);
+  const {
+    messages,
+    loading,
+    error,
+    sendMessage,
+    loadMessages,
+    retryMessage,
+    streamingMessageId,
+    streamStatus,
+  } = useChat(conversationId);
 
   useEffect(() => {
     if (conversationId) {
@@ -24,14 +32,19 @@ export default function ConversationPage() {
     <div className="flex flex-col h-full">
       <LiveRegion
         message={
-          loading
-            ? "Tack is thinking..."
-            : messages.length > 0
-              ? `Tack responded: ${messages[messages.length - 1]?.content.slice(0, 100)}`
+          streamStatus
+            ? streamStatus
+            : loading
+              ? "Tack is thinking..."
               : ""
         }
       />
-      <ChatHistory messages={messages} loading={loading} onRetry={retryMessage} />
+      <ChatHistory
+        messages={messages}
+        loading={loading}
+        onRetry={retryMessage}
+        streamingMessageId={streamingMessageId}
+      />
       <ChatInput onSend={sendMessage} disabled={loading} />
       {error && (
         <p role="alert" className="px-4 py-2 text-sm text-destructive">

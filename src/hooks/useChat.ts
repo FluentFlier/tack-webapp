@@ -2,34 +2,41 @@
 
 import { useState, useCallback } from "react";
 import { parseCommand, COMMANDS } from "@/lib/commands";
+import { parseSSEChunk } from "@/lib/sse";
 import type { Message } from "@/types";
+
+/** Stable id used while an assistant reply is being streamed. */
+const STREAMING_ID = "streaming";
 
 export function useChat(initialConversationId?: string) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversationId, setConversationId] = useState<string | undefined>(
-    initialConversationId
+    initialConversationId,
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /**
+   * Live announcement text for the screen-reader LiveRegion.
+   * Set to status messages from the server and key lifecycle strings
+   * ("Response started", "Response complete"). Never set per token.
+   */
+  const [streamStatus, setStreamStatus] = useState("");
 
   const sendMessage = useCallback(
     async (input: string) => {
       setError(null);
 
-      // Check for slash commands
+      // ── Local-only slash commands ────────────────────────────────────────
       const parsed = parseCommand(input);
 
       if (parsed.isCommand && parsed.command) {
-        // /clear — local only
         if (parsed.command.name === "clear") {
           setMessages([]);
           setConversationId(undefined);
-          // Fix: clear the URL so refresh doesn't reload the old conversation
           window.history.pushState(null, "", "/chat");
           return;
         }
 
-        // /help — local only
         if (parsed.command.name === "help") {
           const userMsg: Message = {
             id: crypto.randomUUID(),
@@ -51,9 +58,7 @@ export function useChat(initialConversationId?: string) {
           return;
         }
 
-        // Server commands — validate args before sending
         if (parsed.command.requiresArgs && !parsed.args?.trim()) {
-          // Show the usage error as a local assistant-style message
           const userMsg: Message = {
             id: crypto.randomUUID(),
             conversation_id: conversationId || "",
@@ -76,21 +81,21 @@ export function useChat(initialConversationId?: string) {
         }
       }
 
-      // Add optimistic user message — keep original input as content
+      // ── Optimistic user message ─────────────────────────────────────────
       const msgId = crypto.randomUUID();
       const userMessage: Message = {
         id: msgId,
         conversation_id: conversationId || "",
         role: "user",
-        content: input, // original input, NOT rewritten
+        content: input,
         metadata: parsed.isCommand ? { command: parsed.command?.name } : {},
         created_at: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, userMessage]);
       setLoading(true);
+      setStreamStatus("");
 
       try {
-        // Build request body: include command + args when a server command was parsed
         const requestBody: {
           message: string;
           conversation_id?: string;
@@ -115,7 +120,10 @@ export function useChat(initialConversationId?: string) {
 
         const response = await fetch("/api/chat", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "text/event-stream",
+          },
           body: JSON.stringify(requestBody),
         });
 
@@ -123,27 +131,118 @@ export function useChat(initialConversationId?: string) {
           throw new Error("Failed to get response");
         }
 
-        const data = await response.json();
+        const contentType = response.headers.get("Content-Type") ?? "";
 
-        if (!conversationId) {
-          setConversationId(data.conversation_id);
-          // Update URL without full navigation
-          window.history.pushState(null, "", `/chat/${data.conversation_id}`);
-          window.dispatchEvent(new CustomEvent("sidebar:refresh"));
+        if (contentType.includes("text/event-stream") && response.body) {
+          // ── SSE streaming path ──────────────────────────────────────────
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = "";
+          let firstToken = true;
+
+          // Add a placeholder streaming message (grows as tokens arrive).
+          const streamingMsg: Message = {
+            id: STREAMING_ID,
+            conversation_id: conversationId || "",
+            role: "assistant",
+            content: "",
+            metadata: {},
+            created_at: new Date().toISOString(),
+          };
+          setMessages((prev) => [...prev, streamingMsg]);
+
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+
+            const text = decoder.decode(value, { stream: true });
+            const result = parseSSEChunk(text, buffer);
+            buffer = result.buffer;
+
+            for (const evt of result.events) {
+              if (evt.event === "token") {
+                const payload = JSON.parse(evt.data) as { delta: string };
+                if (firstToken) {
+                  firstToken = false;
+                  // Announce response start once — not on every token.
+                  setStreamStatus("Response started");
+                }
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === STREAMING_ID
+                      ? { ...m, content: m.content + payload.delta }
+                      : m,
+                  ),
+                );
+              } else if (evt.event === "status") {
+                const payload = JSON.parse(evt.data) as { message: string };
+                // Status events (e.g. "Fetching page...") are safe to announce.
+                setStreamStatus(payload.message);
+              } else if (evt.event === "done") {
+                const payload = JSON.parse(evt.data) as {
+                  message: Message;
+                  conversation_id: string;
+                };
+                // Replace the streaming placeholder with the persisted row.
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === STREAMING_ID ? payload.message : m,
+                  ),
+                );
+                if (!conversationId) {
+                  setConversationId(payload.conversation_id);
+                  window.history.pushState(
+                    null,
+                    "",
+                    `/chat/${payload.conversation_id}`,
+                  );
+                  window.dispatchEvent(new CustomEvent("sidebar:refresh"));
+                }
+                setStreamStatus("Response complete");
+              } else if (evt.event === "error") {
+                const payload = JSON.parse(evt.data) as { error: string };
+                // Remove the streaming placeholder and mark user msg failed.
+                setMessages((prev) =>
+                  prev
+                    .filter((m) => m.id !== STREAMING_ID)
+                    .map((m) =>
+                      m.id === msgId ? { ...m, failed: true } : m,
+                    ),
+                );
+                setError(payload.error || "Failed to send message. Please try again.");
+                setStreamStatus("");
+              }
+            }
+          }
+        } else {
+          // ── JSON fallback path (old clients / SSE unavailable) ──────────
+          const data = (await response.json()) as {
+            message: Message;
+            conversation_id: string;
+          };
+
+          if (!conversationId) {
+            setConversationId(data.conversation_id);
+            window.history.pushState(null, "", `/chat/${data.conversation_id}`);
+            window.dispatchEvent(new CustomEvent("sidebar:refresh"));
+          }
+
+          setMessages((prev) => [...prev, data.message]);
         }
-
-        setMessages((prev) => [...prev, data.message]);
       } catch {
-        // Mark the optimistic message as failed — do NOT remove it
+        // Network failure — mark the optimistic message as failed.
         setMessages((prev) =>
-          prev.map((m) => (m.id === msgId ? { ...m, failed: true } : m))
+          prev
+            .filter((m) => m.id !== STREAMING_ID)
+            .map((m) => (m.id === msgId ? { ...m, failed: true } : m)),
         );
         setError("Failed to send message. Please try again.");
+        setStreamStatus("");
       } finally {
         setLoading(false);
       }
     },
-    [conversationId]
+    [conversationId],
   );
 
   // Retry a failed message: remove the failed copy then re-send the same content
@@ -151,11 +250,10 @@ export function useChat(initialConversationId?: string) {
     async (id: string) => {
       const msg = messages.find((m) => m.id === id);
       if (!msg) return;
-      // Remove the failed message before re-sending so the list stays clean
       setMessages((prev) => prev.filter((m) => m.id !== id));
       await sendMessage(msg.content);
     },
-    [messages, sendMessage]
+    [messages, sendMessage],
   );
 
   const loadMessages = useCallback(async (convId: string) => {
@@ -165,7 +263,7 @@ export function useChat(initialConversationId?: string) {
         setError("Failed to load conversation.");
         return;
       }
-      const data = await response.json();
+      const data = (await response.json()) as { messages: Message[] };
       setMessages(data.messages || []);
       setConversationId(convId);
     } catch {
@@ -178,6 +276,12 @@ export function useChat(initialConversationId?: string) {
     conversationId,
     loading,
     error,
+    /** Stable id of the in-flight streaming message, or null when not streaming. */
+    streamingMessageId: messages.some((m) => m.id === STREAMING_ID)
+      ? STREAMING_ID
+      : null,
+    /** Text to surface via LiveRegion (status, lifecycle events). Never per-token. */
+    streamStatus,
     sendMessage,
     retryMessage,
     loadMessages,
