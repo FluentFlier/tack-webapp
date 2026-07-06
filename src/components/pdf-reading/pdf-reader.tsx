@@ -30,6 +30,7 @@ export default function Page() {
 
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [readableHtml, setReadableHtml] = useState<React.ReactNode | null>(null);
   const [documentText, setDocumentText] = useState("");
   const [documentSummary, setDocumentSummary] = useState<string | null>(null);
@@ -210,12 +211,13 @@ export default function Page() {
     if (!f) return;
     const isPdf = f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf");
     if (!isPdf) {
-      alert("Please upload a PDF file.");
+      setFileError("Please upload a PDF file.");
       e.currentTarget.value = "";
       setFile(null);
       setFileName(null);
       return;
     }
+    setFileError(null);
     setFile(f);
     setFileName(f.name);
     setReadableHtml(null);
@@ -588,6 +590,9 @@ export default function Page() {
                 className="mt-2 block text-sm text-muted-foreground file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:bg-secondary file:text-secondary-foreground hover:file:bg-secondary/80"
                 style={{...styleDictTextColor, ...styleDictMiddleground}}
               />
+              {fileError && (
+                <p role="alert" className="mt-2 text-sm text-destructive">{fileError}</p>
+              )}
               {fileName && (
                 <p className="mt-2 text-sm text-muted-foreground" style={styleDictTextColor}>Selected: {fileName}</p>
               )}
