@@ -4,26 +4,28 @@
 
 @layer base {
   :root {
-    /* ─── Dark Cinematic Palette ─── */
+    /* ─── Interstellar Observatory Palette ───
+       Aligned with the landing page: near-black base, electric indigo
+       primary (#4F46E5 family), cyan-ice focus ring (#67E8F9). */
     --background: 240 15% 4.5%;         /* #0a0a0f */
     --foreground: 220 10% 92%;          /* soft white */
     --card: 240 12% 8%;                 /* slightly lighter dark */
     --card-foreground: 220 10% 92%;
     --popover: 240 12% 8%;
     --popover-foreground: 220 10% 92%;
-    --primary: 255 60% 62%;             /* purple accent */
+    --primary: 244 68% 60%;             /* electric indigo */
     --primary-foreground: 0 0% 100%;
     --secondary: 240 10% 14%;
     --secondary-foreground: 220 10% 88%;
     --muted: 240 10% 12%;
-    --muted-foreground: 220 8% 55%;
-    --accent: 255 50% 58%;
-    --accent-foreground: 0 0% 100%;
+    --muted-foreground: 222 10% 62%;
+    --accent: 244 30% 19%;              /* muted indigo hover surface */
+    --accent-foreground: 224 30% 92%;
     --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 10% 16%;
-    --input: 240 10% 16%;
-    --ring: 255 55% 60%;
+    --border: 242 14% 17%;
+    --input: 242 14% 17%;
+    --ring: 187 80% 62%;                /* cyan-ice focus */
     --chart-1: 255 65% 60%;
     --chart-2: 200 60% 50%;
     --chart-3: 340 55% 55%;
@@ -39,19 +41,19 @@
     --card-foreground: 220 10% 92%;
     --popover: 240 12% 8%;
     --popover-foreground: 220 10% 92%;
-    --primary: 255 60% 62%;
+    --primary: 244 68% 60%;
     --primary-foreground: 0 0% 100%;
     --secondary: 240 10% 14%;
     --secondary-foreground: 220 10% 88%;
     --muted: 240 10% 12%;
-    --muted-foreground: 220 8% 55%;
-    --accent: 255 50% 58%;
-    --accent-foreground: 0 0% 100%;
+    --muted-foreground: 222 10% 62%;
+    --accent: 244 30% 19%;
+    --accent-foreground: 224 30% 92%;
     --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 10% 16%;
-    --input: 240 10% 16%;
-    --ring: 255 55% 60%;
+    --border: 242 14% 17%;
+    --input: 242 14% 17%;
+    --ring: 187 80% 62%;
     --chart-1: 255 65% 60%;
     --chart-2: 200 60% 50%;
     --chart-3: 340 55% 55%;
@@ -71,7 +73,7 @@
   }
 
   ::selection {
-    background-color: hsl(34 76% 52% / 0.25);
+    background-color: hsl(244 68% 60% / 0.35);
   }
 }
 
@@ -786,8 +788,8 @@ html {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
-  background: #050508;
-  color: #f0eded;
+  background: #05060a;
+  color: #f0f4ff;
 }
 
 /* ── Shared section layout ─────────────────────────────────────── */
@@ -807,11 +809,12 @@ html {
 }
 
 .about-section__eyebrow {
-  font-size: 0.72rem;
-  font-weight: 500;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.68rem;
+  font-weight: 400;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(180, 160, 255, 0.7);
+  color: rgba(103, 232, 249, 0.78);
   margin: 0 0 1rem;
 }
 
@@ -831,11 +834,7 @@ html {
 }
 
 .about-heading--accent {
-  background: linear-gradient(
-    135deg,
-    rgba(200, 180, 255, 0.9) 0%,
-    rgba(140, 100, 255, 0.7) 100%
-  );
+  background: linear-gradient(135deg, #a5b4fc 0%, #67e8f9 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1078,9 +1077,12 @@ html {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   APP-WIDE DARK CINEMATIC THEME
+   APP-WIDE INTERSTELLAR THEME
    These styles extend the design tokens above to give every page
-   the same elegant, dark, futuristic look as the landing page.
+   the same near-black / indigo-glass / cyan-ice look as the landing
+   page ("Interstellar Observatory"). Accent logic:
+     structure + surfaces  →  indigo  rgba(79, 70, 229, …)
+     interaction + focus   →  cyan    rgba(103, 232, 249, …)
    ═══════════════════════════════════════════════════════════════════ */
 
 /* ── Scrollbar Styling ─────────────────────────────────────────── */
@@ -1093,28 +1095,83 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(140, 120, 200, 0.2);
+  background: rgba(99, 102, 241, 0.25);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(140, 120, 200, 0.35);
+  background: rgba(99, 102, 241, 0.45);
 }
 
 /* ── Selection Highlight ───────────────────────────────────────── */
 ::selection {
-  background: rgba(140, 100, 220, 0.3);
+  background: rgba(79, 70, 229, 0.4);
   color: inherit;
+}
+
+/* ── Shared primitives ─────────────────────────────────────────── */
+
+/* Serif gradient page title (Settings, Reader, …) — mirrors the
+   landing hero heading treatment. */
+.app-page-title {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  background: linear-gradient(
+    180deg,
+    rgba(240, 244, 255, 0.98) 0%,
+    rgba(165, 180, 252, 0.62) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Mono eyebrow microlabel — mirrors .iso-eyebrow on the landing page. */
+.app-eyebrow {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.66rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(103, 232, 249, 0.75);
+}
+
+/* Glass panel — mirrors .iso-glass. */
+.app-panel {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(79, 70, 229, 0.28);
+  border-radius: 14px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* One-shot entrance for chat messages. The global .reduced-motion and
+   prefers-reduced-motion rules force animation-duration to 0.001ms,
+   so this is automatically disabled for motion-sensitive users. */
+@keyframes appMsgEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-msg-enter {
+  animation: appMsgEnter 0.35s ease both;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    Header — Translucent Dark Glass
    ═══════════════════════════════════════════════════════════════════ */
 .app-header {
-  background: rgba(10, 10, 15, 0.85) !important;
+  background: rgba(5, 6, 10, 0.82) !important;
   backdrop-filter: blur(20px) saturate(1.3);
   -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  border-bottom: 1px solid rgba(140, 120, 200, 0.1) !important;
+  border-bottom: 1px solid rgba(79, 70, 229, 0.18) !important;
 }
 
 .app-header__logo {
@@ -1122,48 +1179,65 @@ html {
   letter-spacing: 0.15em;
   font-weight: 600;
   font-size: 1.05rem;
-  color: rgba(240, 237, 237, 0.92);
+  color: rgba(240, 244, 255, 0.92);
 }
 
 .app-header__logo-icon {
-  color: hsl(255 60% 62%);
+  color: #818cf8;
+}
+
+/* Header nav link buttons — quiet uppercase, echoing the landing nav */
+.app-header__nav-btn {
+  font-size: 0.72rem !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(240, 244, 255, 0.6);
+  transition: color 0.25s ease, background 0.25s ease;
+}
+
+.app-header__nav-btn:hover {
+  color: rgba(240, 244, 255, 0.95);
+  background: rgba(79, 70, 229, 0.14);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Sidebar — Dark Panel with Purple Accents
+   Sidebar — Dark Panel with Indigo Accents
    ═══════════════════════════════════════════════════════════════════ */
 .app-sidebar {
-  background: rgba(10, 10, 18, 0.95) !important;
-  border-right: 1px solid rgba(140, 120, 200, 0.08) !important;
+  background: rgba(7, 8, 14, 0.95) !important;
+  border-right: 1px solid rgba(79, 70, 229, 0.14) !important;
 }
 
 .app-sidebar__new-chat {
-  background: rgba(140, 100, 220, 0.12) !important;
-  border: 1px solid rgba(140, 120, 200, 0.2) !important;
-  color: rgba(240, 237, 237, 0.85) !important;
+  background: rgba(79, 70, 229, 0.13) !important;
+  border: 1px solid rgba(79, 70, 229, 0.35) !important;
+  color: rgba(240, 244, 255, 0.88) !important;
   transition: all 0.3s ease !important;
 }
 
 .app-sidebar__new-chat:hover {
-  background: rgba(140, 100, 220, 0.2) !important;
-  border-color: rgba(140, 120, 200, 0.35) !important;
+  background: rgba(79, 70, 229, 0.24) !important;
+  border-color: rgba(103, 232, 249, 0.4) !important;
+  box-shadow: 0 0 18px rgba(79, 70, 229, 0.18);
 }
 
 .app-sidebar__item {
-  color: rgba(240, 237, 237, 0.5);
+  color: rgba(240, 244, 255, 0.55);
   transition: all 0.25s ease;
   border-radius: 8px;
+  border-left: 2px solid transparent;
 }
 
 .app-sidebar__item:hover {
-  background: rgba(140, 100, 220, 0.08);
-  color: rgba(240, 237, 237, 0.85);
+  background: rgba(79, 70, 229, 0.1);
+  color: rgba(240, 244, 255, 0.88);
 }
 
 .app-sidebar__item--active {
-  background: rgba(140, 100, 220, 0.14) !important;
-  color: rgba(240, 237, 237, 0.95) !important;
-  border-left: 2px solid hsl(255 60% 62%);
+  background: rgba(79, 70, 229, 0.16) !important;
+  color: rgba(240, 244, 255, 0.95) !important;
+  border-left: 2px solid rgba(103, 232, 249, 0.8);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1177,8 +1251,8 @@ html {
   letter-spacing: -0.01em;
   background: linear-gradient(
     180deg,
-    rgba(240, 237, 237, 0.95) 0%,
-    rgba(240, 237, 237, 0.5) 100%
+    rgba(240, 244, 255, 0.98) 0%,
+    rgba(165, 180, 252, 0.6) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -1187,73 +1261,93 @@ html {
 
 /* Assistant message row */
 .app-msg--assistant {
-  background: rgba(140, 100, 220, 0.04);
-  border-bottom: 1px solid rgba(140, 120, 200, 0.06);
+  background: rgba(79, 70, 229, 0.055);
+  border-bottom: 1px solid rgba(79, 70, 229, 0.1);
 }
 
 /* Assistant avatar */
 .app-msg__avatar--bot {
   background: linear-gradient(
     135deg,
-    rgba(90, 60, 200, 0.8),
-    rgba(60, 80, 220, 0.8)
+    rgba(79, 70, 229, 0.85),
+    rgba(37, 99, 235, 0.85)
   ) !important;
-  border: 1px solid rgba(140, 120, 200, 0.3) !important;
-  box-shadow: 0 0 12px rgba(100, 70, 220, 0.15);
+  border: 1px solid rgba(129, 140, 248, 0.35) !important;
+  box-shadow: 0 0 14px rgba(79, 70, 229, 0.25);
 }
 
 /* User avatar */
 .app-msg__avatar--user {
-  background: rgba(240, 237, 237, 0.08) !important;
-  border: 1px solid rgba(240, 237, 237, 0.12) !important;
+  background: rgba(240, 244, 255, 0.08) !important;
+  border: 1px solid rgba(240, 244, 255, 0.14) !important;
+}
+
+/* Speaker microlabels above each message */
+.app-msg__speaker {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.app-msg__speaker--bot {
+  color: rgba(103, 232, 249, 0.85);
+}
+
+.app-msg__speaker--user {
+  color: rgba(240, 244, 255, 0.55);
 }
 
 /* Thinking indicator */
 .app-chat-thinking {
-  background: rgba(140, 100, 220, 0.06);
+  background: rgba(79, 70, 229, 0.07);
 }
 
 .app-chat-thinking__dot {
-  color: hsl(255 60% 62%);
+  color: #67e8f9;
 }
 
 /* Chat input area */
 .app-chat-input-area {
-  border-top: 1px solid rgba(140, 120, 200, 0.1) !important;
-  background: rgba(10, 10, 15, 0.6);
+  border-top: 1px solid rgba(79, 70, 229, 0.18) !important;
+  background: rgba(5, 6, 10, 0.6);
   backdrop-filter: blur(12px);
 }
 
 .app-chat-textarea {
-  background: rgba(20, 20, 30, 0.8) !important;
-  border: 1px solid rgba(140, 120, 200, 0.12) !important;
-  color: rgba(240, 237, 237, 0.9) !important;
-  transition: border-color 0.3s ease !important;
+  background: rgba(13, 14, 22, 0.85) !important;
+  border: 1px solid rgba(79, 70, 229, 0.28) !important;
+  border-radius: 10px !important;
+  color: rgba(240, 244, 255, 0.92) !important;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
 .app-chat-textarea:focus {
-  border-color: rgba(140, 120, 200, 0.3) !important;
-  box-shadow: 0 0 0 2px rgba(140, 100, 220, 0.1) !important;
+  border-color: rgba(103, 232, 249, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(103, 232, 249, 0.12) !important;
 }
 
 .app-chat-textarea::placeholder {
-  color: rgba(240, 237, 237, 0.3) !important;
+  color: rgba(240, 244, 255, 0.32) !important;
 }
 
-/* Send button */
+/* Send button — mirrors the landing CTA gradient */
 .app-send-btn {
   background: linear-gradient(
     135deg,
-    rgba(90, 60, 200, 0.8),
-    rgba(60, 80, 220, 0.8)
+    rgba(90, 60, 200, 0.85),
+    rgba(60, 80, 220, 0.85)
   ) !important;
-  border: 1px solid rgba(140, 120, 200, 0.25) !important;
+  border: 1px solid rgba(140, 120, 255, 0.25) !important;
+  border-radius: 10px !important;
   color: white !important;
   transition: all 0.3s ease !important;
 }
 
 .app-send-btn:hover:not(:disabled) {
-  box-shadow: 0 0 20px rgba(100, 70, 220, 0.25) !important;
+  box-shadow: 0 0 22px rgba(79, 70, 229, 0.4) !important;
+  border-color: rgba(160, 140, 255, 0.4) !important;
 }
 
 .app-send-btn:disabled {
@@ -1262,28 +1356,29 @@ html {
 
 /* Slash command pills */
 .app-slash-pill {
-  background: rgba(140, 100, 220, 0.08) !important;
-  border: 1px solid rgba(140, 120, 200, 0.15) !important;
-  color: rgba(240, 237, 237, 0.6) !important;
+  background: rgba(79, 70, 229, 0.1) !important;
+  border: 1px solid rgba(79, 70, 229, 0.32) !important;
+  color: rgba(240, 244, 255, 0.68) !important;
   transition: all 0.25s ease !important;
 }
 
 .app-slash-pill:hover {
-  background: rgba(140, 100, 220, 0.15) !important;
-  border-color: rgba(140, 120, 200, 0.3) !important;
-  color: rgba(240, 237, 237, 0.85) !important;
+  background: rgba(79, 70, 229, 0.2) !important;
+  border-color: rgba(103, 232, 249, 0.45) !important;
+  color: rgba(240, 244, 255, 0.92) !important;
+  box-shadow: 0 0 14px rgba(79, 70, 229, 0.18);
 }
 
 /* Command palette */
 .app-command-palette {
-  background: rgba(16, 16, 24, 0.97) !important;
-  border: 1px solid rgba(140, 120, 200, 0.15) !important;
+  background: rgba(8, 9, 16, 0.97) !important;
+  border: 1px solid rgba(79, 70, 229, 0.38) !important;
   backdrop-filter: blur(20px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 24px rgba(79, 70, 229, 0.1) !important;
 }
 
 .app-command-palette__item:hover {
-  background: rgba(140, 100, 220, 0.1) !important;
+  background: rgba(79, 70, 229, 0.16) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1295,8 +1390,8 @@ html {
   letter-spacing: -0.01em;
   background: linear-gradient(
     180deg,
-    rgba(240, 237, 237, 0.95) 0%,
-    rgba(240, 237, 237, 0.6) 100%
+    rgba(240, 244, 255, 0.98) 0%,
+    rgba(165, 180, 252, 0.62) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -1304,9 +1399,17 @@ html {
 }
 
 .app-settings-card {
-  background: rgba(14, 14, 22, 0.9) !important;
-  border: 1px solid rgba(140, 120, 200, 0.1) !important;
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(79, 70, 229, 0.26) !important;
+  border-radius: 14px !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.app-settings-card:hover {
+  border-color: rgba(103, 232, 249, 0.3);
+  box-shadow: 0 0 28px rgba(79, 70, 229, 0.1);
 }
 
 .app-settings-card__title {
@@ -1321,53 +1424,59 @@ html {
     rgba(90, 60, 200, 0.85) 0%,
     rgba(60, 80, 220, 0.85) 100%
   ) !important;
-  border: 1px solid rgba(140, 120, 200, 0.25) !important;
-  color: #f0eded !important;
+  border: 1px solid rgba(140, 120, 255, 0.25) !important;
+  color: #f0f4ff !important;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.8rem !important;
   transition: all 0.35s ease !important;
-  box-shadow: 0 0 20px rgba(100, 70, 220, 0.15) !important;
+  box-shadow: 0 0 20px rgba(79, 70, 229, 0.2) !important;
 }
 
 .app-settings-save-btn:hover {
-  box-shadow: 0 0 30px rgba(100, 70, 220, 0.3) !important;
+  box-shadow: 0 0 32px rgba(79, 70, 229, 0.4) !important;
+  border-color: rgba(160, 140, 255, 0.4) !important;
 }
 
 /* Select dropdowns */
 .app-select {
-  background: rgba(20, 20, 30, 0.8) !important;
-  border: 1px solid rgba(140, 120, 200, 0.12) !important;
-  color: rgba(240, 237, 237, 0.85) !important;
+  background: rgba(13, 14, 22, 0.85) !important;
+  border: 1px solid rgba(79, 70, 229, 0.28) !important;
+  color: rgba(240, 244, 255, 0.88) !important;
+  transition: border-color 0.25s ease;
 }
 
 .app-select:focus {
-  border-color: rgba(140, 120, 200, 0.3) !important;
+  border-color: rgba(103, 232, 249, 0.5) !important;
 }
 
 .app-select option {
-  background: rgb(16, 16, 24);
-  color: rgba(240, 237, 237, 0.85);
+  background: rgb(10, 11, 18);
+  color: rgba(240, 244, 255, 0.88);
 }
 
 /* Details/accordion */
 .app-details {
-  border-color: rgba(140, 120, 200, 0.1) !important;
+  border-color: rgba(79, 70, 229, 0.24) !important;
 }
 
 .app-details summary:hover {
-  background: rgba(140, 100, 220, 0.06) !important;
+  background: rgba(79, 70, 229, 0.09) !important;
 }
 
 /* Kbd styling */
 .app-kbd {
-  background: rgba(140, 100, 220, 0.1) !important;
-  border: 1px solid rgba(140, 120, 200, 0.15) !important;
-  color: rgba(240, 237, 237, 0.8) !important;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  background: rgba(79, 70, 229, 0.14) !important;
+  border: 1px solid rgba(79, 70, 229, 0.35) !important;
+  color: rgba(199, 210, 254, 0.95) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    Protected Layout Shell
    ═══════════════════════════════════════════════════════════════════ */
 .app-shell {
-  background: hsl(240 15% 4.5%);
+  background: #05060a;
   min-height: 100vh;
 }
 
@@ -1385,7 +1494,7 @@ html {
   bottom: 0;
   background: radial-gradient(
     ellipse at 50% 0%,
-    rgba(100, 70, 220, 0.04) 0%,
+    rgba(79, 70, 229, 0.06) 0%,
     transparent 60%
   );
   pointer-events: none;
@@ -1930,32 +2039,34 @@ html {
 }
 
 .contact-form__label {
-  font-size: 0.78rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(180, 160, 255, 0.8);
+  color: rgba(165, 180, 252, 0.9);
 }
 
 .contact-form__input {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(79, 70, 229, 0.3);
   border-radius: 8px;
   padding: 0.75rem 1rem;
-  color: rgba(240, 237, 237, 0.9);
+  color: rgba(240, 244, 255, 0.92);
   font-size: 0.95rem;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
   outline: none;
   width: 100%;
 }
 
 .contact-form__input::placeholder {
-  color: rgba(240, 237, 237, 0.25);
+  color: rgba(240, 244, 255, 0.28);
 }
 
 .contact-form__input:focus {
-  border-color: rgba(140, 100, 255, 0.6);
-  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(103, 232, 249, 0.55);
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: 0 0 0 2px rgba(103, 232, 249, 0.12);
 }
 
 .contact-form__textarea {
@@ -1965,19 +2076,23 @@ html {
 
 .contact-form__submit {
   align-self: flex-start;
-  background: linear-gradient(135deg, rgba(140, 100, 255, 0.9), rgba(100, 70, 220, 0.9));
+  background: linear-gradient(135deg, rgba(90, 60, 200, 0.9), rgba(60, 80, 220, 0.9));
   color: #fff;
-  border: none;
+  border: 1px solid rgba(140, 120, 255, 0.25);
   border-radius: 8px;
-  padding: 0.75rem 2rem;
-  font-size: 0.9rem;
+  padding: 0.75rem 2.2rem;
+  font-size: 0.82rem;
   font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s;
+  transition: box-shadow 0.25s, transform 0.15s, border-color 0.25s;
+  box-shadow: 0 0 18px rgba(79, 70, 229, 0.18);
 }
 
 .contact-form__submit:hover {
-  opacity: 0.88;
+  border-color: rgba(160, 140, 255, 0.45);
+  box-shadow: 0 0 30px rgba(79, 70, 229, 0.4);
   transform: translateY(-1px);
 }
 
