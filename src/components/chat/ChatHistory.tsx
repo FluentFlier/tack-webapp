@@ -38,6 +38,10 @@ export function ChatHistory({
    * pre-loaded history messages are not animated. Any message with an index
    * at or above this count (appended after the initial load) is treated as new.
    * Stays null until the first non-empty messages array arrives.
+   *
+   * The conversation page passes key={conversationId}, so this component
+   * remounts (and this count resets) whenever the user switches conversations
+   * — history from a newly opened conversation never animates.
    */
   const [initialCount, setInitialCount] = useState<number | null>(null);
 

@@ -41,6 +41,7 @@ export default function ConversationPage() {
         }
       />
       <ChatHistory
+        key={conversationId}
         messages={messages}
         loading={loading}
         streaming={streaming}
