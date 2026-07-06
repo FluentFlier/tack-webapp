@@ -70,6 +70,11 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Contain document-level horizontal overflow (e.g. off-screen decorative
+       glows) so no horizontal scrollbar appears at the bottom of the page.
+       `clip` (not `hidden`) avoids creating a scroll container, so sticky
+       headers and Lenis smooth scroll are unaffected. */
+    overflow-x: clip;
   }
 
   ::selection {
@@ -113,6 +118,7 @@
    Enum mapping: small→14px, medium→16px, large→20px, x-large→24px */
 html {
   font-size: var(--base-font-size, 16px);
+  overflow-x: clip;
 }
 
 /* ── Color-Blindness Palettes ─────────────────────────────────────
@@ -1088,6 +1094,7 @@ html {
 /* ── Scrollbar Styling ─────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
