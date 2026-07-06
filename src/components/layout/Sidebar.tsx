@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Plus, MessageSquare, Trash2 } from "lucide-react";
+import { Plus, MessageSquare, Trash2, ChevronRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { insforge } from "@/lib/insforge";
 import { useAuth } from "@insforge/nextjs";
@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 export function Sidebar() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(false);
+  // Previous chats are collapsed by default; the user opts in to showing them.
+  const [showHistory, setShowHistory] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { isSignedIn } = useAuth();
@@ -81,8 +83,27 @@ export function Sidebar() {
         </Link>
       </div>
 
+      <div className="px-3">
+        <button
+          type="button"
+          onClick={() => setShowHistory((v) => !v)}
+          aria-expanded={showHistory}
+          aria-controls="chat-history-list"
+          className="app-sidebar__history-toggle flex w-full items-center gap-2 px-3 py-2 text-sm text-muted-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded-md"
+        >
+          {showHistory ? (
+            <ChevronDown className="h-4 w-4 shrink-0" aria-hidden="true" />
+          ) : (
+            <ChevronRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+          )}
+          <span>{showHistory ? "Hide previous chats" : "Show previous chats"}</span>
+        </button>
+      </div>
+
       <nav
+        id="chat-history-list"
         aria-label="Chat history"
+        hidden={!showHistory}
         className="flex-1 overflow-y-auto px-2 pb-4"
       >
         {loading ? (

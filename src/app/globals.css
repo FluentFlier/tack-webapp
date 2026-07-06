@@ -1225,6 +1225,15 @@ html {
   border-right: 1px solid rgba(79, 70, 229, 0.14) !important;
 }
 
+.app-sidebar__history-toggle {
+  color: rgba(240, 244, 255, 0.6);
+}
+
+.app-sidebar__history-toggle:hover {
+  color: rgba(240, 244, 255, 0.95);
+  background: rgba(79, 70, 229, 0.12);
+}
+
 .app-sidebar__new-chat {
   background: rgba(79, 70, 229, 0.13) !important;
   border: 1px solid rgba(79, 70, 229, 0.35) !important;
