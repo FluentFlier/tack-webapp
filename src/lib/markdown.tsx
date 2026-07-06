@@ -1,15 +1,16 @@
 import React from "react";
 
 // Tailwind classes reused from ChatMessage.tsx colour scheme
+// (Interstellar palette: off-white #F0F4FF body tints, cyan-ice links)
 const CLS = {
-  h2: "font-bold text-base mt-4 mb-1 text-[rgba(240,237,237,0.92)]",
-  h3: "font-semibold text-sm mt-3 mb-1 text-[rgba(240,237,237,0.88)]",
-  h4: "font-semibold text-xs mt-2 mb-1 text-[rgba(240,237,237,0.85)]",
-  p: "text-sm leading-relaxed text-[rgba(240,237,237,0.72)]",
-  ul: "list-disc list-outside pl-5 space-y-0.5 text-sm text-[rgba(240,237,237,0.72)]",
-  ol: "list-decimal list-outside pl-5 space-y-0.5 text-sm text-[rgba(240,237,237,0.72)]",
+  h2: "font-semibold text-base tracking-tight mt-5 mb-1.5 text-[rgba(240,244,255,0.95)]",
+  h3: "font-semibold text-sm tracking-tight mt-4 mb-1 text-[rgba(240,244,255,0.9)]",
+  h4: "font-semibold text-xs uppercase tracking-wide mt-3 mb-1 text-[rgba(240,244,255,0.82)]",
+  p: "text-sm leading-relaxed text-[rgba(240,244,255,0.78)]",
+  ul: "list-disc list-outside pl-5 space-y-1 text-sm text-[rgba(240,244,255,0.78)] marker:text-[rgba(129,140,248,0.7)]",
+  ol: "list-decimal list-outside pl-5 space-y-1 text-sm text-[rgba(240,244,255,0.78)] marker:text-[rgba(129,140,248,0.7)]",
   li: "leading-relaxed",
-  a: "text-[hsl(255,60%,70%)] underline underline-offset-2 hover:text-[hsl(255,60%,80%)] focus:outline-none focus:ring-2 focus:ring-ring break-all transition-colors",
+  a: "text-[rgba(103,232,249,0.9)] underline underline-offset-2 decoration-[rgba(103,232,249,0.4)] hover:text-[#a5f3fc] focus:outline-none focus:ring-2 focus:ring-ring break-all transition-colors",
 };
 
 const TAKEAWAY_RE =

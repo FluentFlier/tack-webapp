@@ -35,11 +35,11 @@ export function CommandPalette({
           onClick={() => onSelect(`/${cmd.name} `)}
           className="app-command-palette__item flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm focus:outline-none transition-colors"
         >
-          <span className="font-mono text-xs text-[hsl(255,60%,70%)]">
+          <span className="font-mono text-xs text-[rgba(103,232,249,0.9)]">
             /{cmd.name}
           </span>
-          <span className="text-muted-foreground">—</span>
-          <span className="text-[rgba(240,237,237,0.75)]">{cmd.description}</span>
+          <span className="text-muted-foreground" aria-hidden="true">—</span>
+          <span className="text-[rgba(240,244,255,0.78)]">{cmd.description}</span>
         </button>
       ))}
     </div>

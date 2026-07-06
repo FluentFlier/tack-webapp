@@ -124,22 +124,29 @@ export default function Page() {
     <>
       <Header />
       <main className="min-h-screen bg-background" style={styleBackgroundColorDict}>
-        <div className="max-w-2xl mx-auto p-6 space-y-6">
+        <div className="max-w-2xl mx-auto px-6 py-10 space-y-6">
 
           <div>
-            <h1 className="text-3xl font-bold" style={styleTextColorDict}>PDF Reader Settings</h1>
+            <p
+              aria-hidden="true"
+              style={styleTextColorDict}
+              className="font-mono text-[0.66rem] uppercase tracking-[0.2em] opacity-60 mb-2"
+            >
+              Document Access
+            </p>
+            <h1 className="font-serif text-4xl font-medium tracking-tight" style={styleTextColorDict}>PDF Reader Settings</h1>
             <Link href="/pdf-reading">
-              <Button style={{...styleMiddlegroundColorDict, ...styleTextColorDict}} variant="ghost" size="sm" className="mt-2 gap-2 text-muted-foreground hover:text-foreground">
+              <Button style={{...styleMiddlegroundColorDict, ...styleTextColorDict}} variant="ghost" size="sm" className="mt-3 gap-2 rounded-lg border border-[rgba(99,102,241,0.3)] text-muted-foreground hover:text-foreground">
                 <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                 Back to PDF Reading
               </Button>
             </Link>
-            <h4 className="font-bold" style={styleTextColorDict}>Note: These settings only apply to the PDF reader and will not be saved to your account. For now they are only saved in your browser</h4>
+            <h4 className="mt-4 rounded-lg border border-[rgba(99,102,241,0.3)] bg-[rgba(79,70,229,0.08)] px-4 py-3 text-sm font-medium leading-relaxed" style={styleTextColorDict}>Note: These settings only apply to the PDF reader and will not be saved to your account. For now they are only saved in your browser</h4>
           </div>
 
-          <Card style={styleMiddlegroundColorDict}>
+          <Card style={styleMiddlegroundColorDict} className="rounded-[14px] border-[rgba(99,102,241,0.3)]">
             <CardHeader style={styleTextColorDict}>
-              <CardTitle>AI Features</CardTitle>
+              <CardTitle className="font-serif text-lg font-medium tracking-normal">AI Features</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4" style={styleMiddlegroundColorDict}>
               <div className="flex items-center justify-between">
@@ -157,9 +164,9 @@ export default function Page() {
             </CardContent>
           </Card>
 
-          <Card style={styleMiddlegroundColorDict}>
+          <Card style={styleMiddlegroundColorDict} className="rounded-[14px] border-[rgba(99,102,241,0.3)]">
             <CardHeader style={styleTextColorDict}>
-              <CardTitle>Display</CardTitle>
+              <CardTitle className="font-serif text-lg font-medium tracking-normal">Display</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">

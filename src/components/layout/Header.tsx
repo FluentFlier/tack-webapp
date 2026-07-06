@@ -39,22 +39,22 @@ export function Header() {
         <div aria-label="" className="flex items-center gap-3">
           <SignedIn>
             <Link href="/chat" aria-label="Go to chat">
-              <Button variant="ghost" size="sm" className="text-[rgba(240,237,237,0.6)] hover:text-[rgba(240,237,237,0.9)] hover:bg-[rgba(140,100,220,0.08)]">
+              <Button variant="ghost" size="sm" className="app-header__nav-btn">
                 Chat
               </Button>
             </Link>
             <Link href="/pdf-reading" aria-label="Go to PDF reader">
-              <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" size="sm" className="app-header__nav-btn">
                 PDF Reader
               </Button>
             </Link>
             <Link href="/settings" aria-label="Settings">
-              <Button variant="ghost" size="sm" className="text-[rgba(240,237,237,0.6)] hover:text-[rgba(240,237,237,0.9)] hover:bg-[rgba(140,100,220,0.08)]">
+              <Button variant="ghost" size="sm" className="app-header__nav-btn">
                 <Settings className="h-4 w-4 mr-1.5" aria-hidden="true" />
                 Settings
               </Button>
             </Link>
-            <div aria-label="User menu" className="ml-2 pl-2 border-l border-border/50">
+            <div aria-label="User menu" className="ml-2 pl-3 border-l border-[rgba(79,70,229,0.25)]">
               <span aria-label="User Profile Menu"></span>
               <UserButton />
             </div>

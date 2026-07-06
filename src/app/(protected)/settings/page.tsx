@@ -161,7 +161,10 @@ export default function SettingsPage() {
       <LiveRegion message={statusMessage} politeness="assertive" />
 
       <div>
-        <h1 className="app-settings-title text-3xl">Settings</h1>
+        <p className="app-eyebrow mb-2" aria-hidden="true">
+          Preferences
+        </p>
+        <h1 className="app-settings-title text-4xl">Settings</h1>
         <p className="text-muted-foreground mt-2 text-sm">
           Customize your accessibility preferences
         </p>
@@ -178,7 +181,7 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* ── Color-Blindness Profile ── */}
-          <fieldset className="space-y-3 rounded-lg border border-[rgba(140,120,200,0.1)] p-4">
+          <fieldset className="space-y-3 rounded-lg border border-[rgba(79,70,229,0.24)] p-4">
             <legend className="px-2 text-sm font-semibold">Color-Blindness Profile</legend>
             <p className="text-xs text-muted-foreground">
               Select a color palette optimized for your vision. Changes apply on save.

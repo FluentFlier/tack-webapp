@@ -26,7 +26,7 @@ export function ChatMessage({ message, onRetry, loading }: ChatMessageProps) {
   return (
     <div
       className={cn(
-        "flex gap-3 px-4 py-4",
+        "app-msg-enter flex gap-3 px-4 py-5",
         isAssistant && "app-msg--assistant",
         isFailed && "opacity-70"
       )}
@@ -43,18 +43,23 @@ export function ChatMessage({ message, onRetry, loading }: ChatMessageProps) {
         {isAssistant ? (
           <Bot className="h-4 w-4 text-white" />
         ) : (
-          <User className="h-4 w-4 text-[rgba(240,237,237,0.6)]" />
+          <User className="h-4 w-4 text-[rgba(240,244,255,0.6)]" />
         )}
       </div>
-      <div className="flex-1 space-y-1 overflow-hidden">
-        <p className="text-sm font-medium text-[rgba(240,237,237,0.85)]">
+      <div className="flex-1 space-y-1.5 overflow-hidden">
+        <p
+          className={cn(
+            "app-msg__speaker",
+            isAssistant ? "app-msg__speaker--bot" : "app-msg__speaker--user"
+          )}
+        >
           {isAssistant ? "Tack" : "You"}
         </p>
         <div className="max-w-none">
           {isAssistant ? (
             renderMarkdown(message.content)
           ) : (
-            <p className="text-sm whitespace-pre-wrap text-[rgba(240,237,237,0.72)]">
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-[rgba(240,244,255,0.78)]">
               {message.content}
             </p>
           )}
@@ -70,7 +75,7 @@ export function ChatMessage({ message, onRetry, loading }: ChatMessageProps) {
                 onClick={() => onRetry(message.id)}
                 disabled={loading}
                 aria-label="Retry sending message"
-                className="flex items-center gap-1 text-xs text-[hsl(255,60%,70%)] hover:text-[hsl(255,60%,80%)] focus:outline-none focus:ring-2 focus:ring-ring rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-1 text-xs text-[rgba(103,232,249,0.9)] hover:text-[#a5f3fc] focus:outline-none focus:ring-2 focus:ring-ring rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <RotateCcw className="h-3 w-3" aria-hidden="true" />
                 Retry
@@ -85,7 +90,7 @@ export function ChatMessage({ message, onRetry, loading }: ChatMessageProps) {
               href={message.metadata.source_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[hsl(255,60%,70%)] underline focus:outline-none focus:ring-2 focus:ring-ring"
+              className="text-[rgba(103,232,249,0.9)] underline underline-offset-2 decoration-[rgba(103,232,249,0.4)] hover:text-[#a5f3fc] focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
             >
               {message.metadata.source_url}
             </a>

@@ -72,7 +72,7 @@ function ReaderContent() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-4">
+    <div className="max-w-3xl mx-auto px-6 py-10 space-y-6">
       <LiveRegion message={statusMessage} />
 
       <nav aria-label="Reader navigation" className="flex items-center gap-2">
@@ -85,10 +85,17 @@ function ReaderContent() {
       </nav>
 
       <article aria-label={content.title}>
-        <header className="space-y-2 mb-6">
-          <h1 className="text-3xl font-bold font-serif italic mb-4">{content.title}</h1>
+        <header className="space-y-2 mb-8 border-b border-[rgba(79,70,229,0.2)] pb-6">
+          <p className="app-eyebrow mb-3" aria-hidden="true">
+            Reader Mode
+          </p>
+          <h1 className="app-page-title text-4xl leading-tight mb-4 pb-1">
+            {content.title}
+          </h1>
           {content.byline && (
-            <p className="text-muted-foreground text-sm">By {content.byline}</p>
+            <p className="font-mono text-xs uppercase tracking-[0.14em] text-[rgba(240,244,255,0.55)]">
+              By {content.byline}
+            </p>
           )}
           {content.siteName && (
             <p className="text-muted-foreground text-sm">
@@ -97,7 +104,7 @@ function ReaderContent() {
                 href={content.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary underline underline-offset-2 decoration-primary/30 hover:decoration-primary/60 focus:outline-none focus:ring-2 focus:ring-ring"
+                className="text-[rgba(103,232,249,0.9)] underline underline-offset-2 decoration-[rgba(103,232,249,0.4)] hover:text-[#a5f3fc] focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
               >
                 View original
               </a>
@@ -106,15 +113,17 @@ function ReaderContent() {
         </header>
 
         {content.excerpt && (
-          <div className="border-l-2 border-primary/40 pl-4 mb-6">
-            <p className="text-muted-foreground italic">{content.excerpt}</p>
+          <div className="border-l-2 border-[rgba(103,232,249,0.5)] bg-[rgba(79,70,229,0.06)] rounded-r-lg pl-4 pr-4 py-3 mb-8">
+            <p className="text-[rgba(240,244,255,0.65)] italic leading-relaxed">
+              {content.excerpt}
+            </p>
           </div>
         )}
 
-        <div className="prose prose-lg dark:prose-invert max-w-none leading-relaxed">
+        <div className="max-w-none text-[1.05rem] leading-[1.85] text-[rgba(240,244,255,0.8)]">
           {content.content.split("\n\n").map((paragraph, i) =>
             paragraph.trim() ? (
-              <p key={i} className="mb-4">{paragraph.trim()}</p>
+              <p key={i} className="mb-5">{paragraph.trim()}</p>
             ) : null
           )}
         </div>

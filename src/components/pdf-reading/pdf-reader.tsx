@@ -553,12 +553,19 @@ export default function Page() {
     <>
       <Header />
       <main style={styleDictBackground} className="min-h-screen bg-background">
-        <div className="max-w-3xl mx-auto p-6 space-y-6">
+        <div className="max-w-3xl mx-auto px-6 py-10 space-y-6">
 
           <div>
-            <h1 style={styleDictTextColor} className="text-3xl font-bold">PDF Reading</h1>
+            <p
+              aria-hidden="true"
+              style={styleDictTextColor}
+              className="font-mono text-[0.66rem] uppercase tracking-[0.2em] opacity-60 mb-2"
+            >
+              Document Access
+            </p>
+            <h1 style={styleDictTextColor} className="font-serif text-4xl font-medium tracking-tight">PDF Reading</h1>
             <Link style={styleDictTextColor} href="/pdf-reading-settings">
-              <Button style={{...styleDictMiddleground, ...styleDictTextColor}} variant="ghost" size="sm" className="mt-2 gap-2 text-muted-foreground hover:text-foreground">
+              <Button style={{...styleDictMiddleground, ...styleDictTextColor}} variant="ghost" size="sm" className="mt-3 gap-2 rounded-lg border border-[rgba(99,102,241,0.3)] text-muted-foreground hover:text-foreground">
                 <Settings className="h-4 w-4" aria-hidden="true" />
                 PDF Reader Settings
               </Button>
@@ -568,7 +575,7 @@ export default function Page() {
           <div
             role="alert"
             style={{ ...styleDictTextColor, borderColor: "rgba(255, 180, 90, 0.45)" }}
-            className="mb-4 rounded-md border-l-4 bg-amber-500/10 p-4 text-sm"
+            className="mb-4 rounded-lg border-l-4 bg-amber-500/10 p-4 text-sm leading-relaxed"
           >
             <p className="font-semibold mb-1">Before uploading, please read:</p>
             <ul className="list-disc pl-5 space-y-1">
@@ -577,9 +584,9 @@ export default function Page() {
             </ul>
           </div>
 
-          <Card style={styleDictMiddleground}>
+          <Card style={styleDictMiddleground} className="rounded-[14px] border-[rgba(99,102,241,0.3)]">
             <CardHeader>
-              <CardTitle style={styleDictTextColor}>Upload PDF</CardTitle>
+              <CardTitle style={styleDictTextColor} className="font-serif text-lg font-medium tracking-normal">Upload PDF</CardTitle>
             </CardHeader>
             <CardContent>
               <Label htmlFor="pdf-upload" style={styleDictTextColor}>Select a PDF file — the text content will appear below.</Label>
@@ -600,9 +607,9 @@ export default function Page() {
             </CardContent>
           </Card>
 
-          <Card style={styleDictMiddleground}>
+          <Card style={styleDictMiddleground} className="rounded-[14px] border-[rgba(99,102,241,0.3)]">
             <CardHeader>
-              <CardTitle style={styleDictTextColor}>Output</CardTitle>
+              <CardTitle style={styleDictTextColor} className="font-serif text-lg font-medium tracking-normal">Output</CardTitle>
             </CardHeader>
             <CardContent>
               {/* Inline AI error notice — replaces blocking alert() */}
@@ -639,7 +646,7 @@ export default function Page() {
               )}
 
               {!loading && !error && readableHtml && (
-                <div className="border border-border rounded-lg p-4 space-y-4" style={styleDictMiddleground}>
+                <div className="border border-[rgba(99,102,241,0.28)] rounded-lg p-5 space-y-4" style={styleDictMiddleground}>
                   {settings.AIFullDocumentSummary && (
                     <>
                       <h3 className="text-md font-medium mb-1" style={styleDictTextColor}>Full document summary</h3>

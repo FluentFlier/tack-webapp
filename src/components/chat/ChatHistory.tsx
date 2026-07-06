@@ -41,7 +41,7 @@ export function ChatHistory({
     return (
       <div className="flex flex-1 items-center justify-center p-8">
         <div className="text-center max-w-md">
-          <h2 className="app-chat-welcome text-2xl mb-3">Welcome to Tack</h2>
+          <h2 className="app-chat-welcome text-3xl mb-4">Welcome to Tack</h2>
           <p className="text-muted-foreground text-sm leading-relaxed">
             Start a conversation or try a command like{" "}
             <kbd className="app-kbd rounded px-1.5 py-0.5 text-xs font-mono">
@@ -49,7 +49,7 @@ export function ChatHistory({
             </kbd>{" "}
             to see what I can do.
           </p>
-          <p className="text-muted-foreground text-sm leading-relaxed font-bold">
+          <p className="mt-5 rounded-xl border border-[rgba(79,70,229,0.28)] bg-[rgba(79,70,229,0.07)] px-4 py-3 text-left text-xs leading-relaxed text-[rgba(240,244,255,0.72)]">
             Note: The AI features may make mistakes and provide incorrect information, do not blindly trust these features.
           </p>
         </div>
