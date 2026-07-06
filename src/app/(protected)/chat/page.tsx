@@ -15,11 +15,9 @@ export default function ChatPage() {
         message={
           loading
             ? "Tack is thinking..."
-            : error
-              ? error
-              : messages.length > 0
-                ? `Tack responded: ${messages[messages.length - 1]?.content.slice(0, 100)}`
-                : ""
+            : messages.length > 0
+              ? `Tack responded: ${messages[messages.length - 1]?.content.slice(0, 100)}`
+              : ""
         }
       />
       <ChatHistory messages={messages} loading={loading} onRetry={retryMessage} />

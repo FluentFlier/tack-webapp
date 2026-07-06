@@ -48,6 +48,8 @@ export interface UserPreferences {
 export interface ChatRequest {
   message: string;
   conversation_id?: string;
+  command?: "summarize" | "read" | "search";
+  args?: string;
 }
 
 export interface ChatResponse {

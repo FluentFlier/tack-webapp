@@ -7,11 +7,21 @@ import { renderMarkdown } from "@/lib/markdown";
 interface ChatMessageProps {
   message: Message;
   onRetry?: (id: string) => void;
+  loading?: boolean;
 }
 
-export function ChatMessage({ message, onRetry }: ChatMessageProps) {
+export function ChatMessage({ message, onRetry, loading }: ChatMessageProps) {
   const isAssistant = message.role === "assistant";
   const isFailed = message.failed === true;
+
+  // Strip block-level markdown markers so the aria-label reads naturally
+  // (e.g. "## Introduction" becomes "Introduction", "- item" becomes "item").
+  const plainContent = message.content.replace(
+    /^#{1,6}\s+|^[-*]\s+|^\d+\.\s+|\*\*/gm,
+    ""
+  );
+  const ariaSnippet =
+    plainContent.slice(0, 50) + (plainContent.length > 50 ? "..." : "");
 
   return (
     <div
@@ -21,7 +31,7 @@ export function ChatMessage({ message, onRetry }: ChatMessageProps) {
         isFailed && "opacity-70"
       )}
       role="article"
-      aria-label={`${isAssistant ? "Tack" : "You"}: ${message.content.slice(0, 50)}${message.content.length > 50 ? "..." : ""}`}
+      aria-label={`${isAssistant ? "Tack" : "You"}: ${ariaSnippet}`}
     >
       <div
         className={cn(
@@ -58,8 +68,9 @@ export function ChatMessage({ message, onRetry }: ChatMessageProps) {
               <button
                 type="button"
                 onClick={() => onRetry(message.id)}
+                disabled={loading}
                 aria-label="Retry sending message"
-                className="flex items-center gap-1 text-xs text-[hsl(255,60%,70%)] hover:text-[hsl(255,60%,80%)] focus:outline-none focus:ring-2 focus:ring-ring rounded transition-colors"
+                className="flex items-center gap-1 text-xs text-[hsl(255,60%,70%)] hover:text-[hsl(255,60%,80%)] focus:outline-none focus:ring-2 focus:ring-ring rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <RotateCcw className="h-3 w-3" aria-hidden="true" />
                 Retry

@@ -53,6 +53,8 @@ export const COMMANDS: SlashCommand[] = [
     description: "Start a new conversation",
     usage: "/clear",
     execute: () => {
+      // useChat intercepts /clear by name before execute() is ever called;
+      // this sentinel is never reached in practice but satisfies the SlashCommand interface.
       return "__COMMAND__:clear";
     },
   },

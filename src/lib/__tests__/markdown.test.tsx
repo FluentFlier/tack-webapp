@@ -130,4 +130,32 @@ describe("renderMarkdown", () => {
     const nodes = renderMarkdown("");
     expect(nodes.length).toBe(0);
   });
+
+  // ── XSS guard ─────────────────────────────────────────────────────────────
+
+  it("javascript: links are NOT rendered as anchors (XSS guard)", () => {
+    const out = html("[click me](javascript:alert(1))");
+    // Must not emit a javascript: href attribute — that is the XSS vector
+    expect(out).not.toMatch(/href=["']javascript:/i);
+    // The link text must still be visible (rendered as plain text, not an anchor)
+    expect(out).toContain("click me");
+    // No <a> tag should be present for this input
+    expect(out).not.toContain("<a ");
+  });
+
+  // ── Trailing hashes in headings ───────────────────────────────────────────
+
+  it("trailing hashes on a heading are stripped", () => {
+    const out = html("## Introduction ##");
+    expect(out).toContain("Introduction");
+    expect(out).not.toContain("##");
+  });
+
+  it("trailing hashes with no space are not stripped (not trailing hash syntax)", () => {
+    // "## Foo##" has no space before the trailing hashes — HEADING_RE captures
+    // "Foo##" as text and our strip regex requires a leading space, so it is
+    // left as-is, which is the expected behaviour.
+    const out = html("## Foo##");
+    expect(out).toContain("<h2");
+  });
 });

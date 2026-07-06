@@ -22,6 +22,10 @@ const UL_RE = /^[-*]\s+(.+)$/;
 
 function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
   // Tokenise: markdown links first, then bold, then bare URLs.
+  // Known limitation: bare URLs containing unescaped parentheses
+  // (e.g. https://en.wikipedia.org/wiki/Rust_(programming_language)) are
+  // truncated at the closing paren. Use explicit Markdown link syntax as a
+  // workaround: [Rust](https://en.wikipedia.org/wiki/Rust_(programming_language))
   const TOKEN_RE =
     /\[([^\]]+)\]\((https?:\/\/[^)]+)\)|\*\*([^*]+)\*\*|(https?:\/\/[^\s,)[\]]+)/g;
 
@@ -123,13 +127,14 @@ function parseBlocks(content: string): Block[] {
   while (i < lines.length) {
     const line = lines[i];
 
-    // Markdown heading
+    // Markdown heading — strip optional trailing hashes (e.g. "## Intro ##")
     const hm = line.match(HEADING_RE);
     if (hm) {
       const hashes = hm[1].length;
       const level: 2 | 3 | 4 =
         hashes <= 2 ? 2 : hashes === 3 ? 3 : 4;
-      blocks.push({ kind: "heading", level, text: hm[2] });
+      const text = hm[2].replace(/\s+#+\s*$/, "");
+      blocks.push({ kind: "heading", level, text });
       i++;
       continue;
     }

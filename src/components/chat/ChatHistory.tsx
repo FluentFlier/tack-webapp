@@ -29,9 +29,9 @@ export function ChatHistory({ messages, loading = false, onRetry }: ChatHistoryP
             </kbd>{" "}
             to see what I can do.
           </p>
-          <h3 className="text-muted-foreground text-sm leading-relaxed bold">
+          <p className="text-muted-foreground text-sm leading-relaxed font-bold">
             Note: The AI features may make mistakes and provide incorrect information, do not blindly trust these features.
-          </h3>
+          </p>
         </div>
       </div>
     );
@@ -45,7 +45,7 @@ export function ChatHistory({ messages, loading = false, onRetry }: ChatHistoryP
       aria-live="polite"
     >
       {messages.map((msg) => (
-        <ChatMessage key={msg.id} message={msg} onRetry={onRetry} />
+        <ChatMessage key={msg.id} message={msg} onRetry={onRetry} loading={loading} />
       ))}
       {loading && (
         <div className="app-chat-thinking flex gap-3 px-4 py-4" role="status">
