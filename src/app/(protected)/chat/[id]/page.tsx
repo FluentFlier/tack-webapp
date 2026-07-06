@@ -18,6 +18,7 @@ export default function ConversationPage() {
     sendMessage,
     loadMessages,
     retryMessage,
+    streaming,
     streamingMessageId,
     streamStatus,
   } = useChat(conversationId);
@@ -42,6 +43,7 @@ export default function ConversationPage() {
       <ChatHistory
         messages={messages}
         loading={loading}
+        streaming={streaming}
         onRetry={retryMessage}
         streamingMessageId={streamingMessageId}
       />

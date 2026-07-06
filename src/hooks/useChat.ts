@@ -16,6 +16,12 @@ export function useChat(initialConversationId?: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   /**
+   * True from the first streamed token until the terminal event (done/error).
+   * Use this to suppress the "Tack is thinking..." indicator once content is
+   * flowing — the placeholder message in the message list serves that role.
+   */
+  const [streaming, setStreaming] = useState(false);
+  /**
    * Live announcement text for the screen-reader LiveRegion.
    * Set to status messages from the server and key lifecycle strings
    * ("Response started", "Response complete"). Never set per token.
@@ -139,6 +145,9 @@ export function useChat(initialConversationId?: string) {
           const decoder = new TextDecoder();
           let buffer = "";
           let firstToken = true;
+          // Tracks whether a done/error event arrived before the stream closed.
+          // If the server closes the connection without one, we surface an error.
+          let receivedTerminalEvent = false;
 
           // Add a placeholder streaming message (grows as tokens arrive).
           const streamingMsg: Message = {
@@ -164,6 +173,7 @@ export function useChat(initialConversationId?: string) {
                 const payload = JSON.parse(evt.data) as { delta: string };
                 if (firstToken) {
                   firstToken = false;
+                  setStreaming(true);
                   // Announce response start once — not on every token.
                   setStreamStatus("Response started");
                 }
@@ -199,6 +209,8 @@ export function useChat(initialConversationId?: string) {
                   window.dispatchEvent(new CustomEvent("sidebar:refresh"));
                 }
                 setStreamStatus("Response complete");
+                receivedTerminalEvent = true;
+                setStreaming(false);
               } else if (evt.event === "error") {
                 const payload = JSON.parse(evt.data) as { error: string };
                 // Remove the streaming placeholder and mark user msg failed.
@@ -211,8 +223,23 @@ export function useChat(initialConversationId?: string) {
                 );
                 setError(payload.error || "Failed to send message. Please try again.");
                 setStreamStatus("");
+                receivedTerminalEvent = true;
+                setStreaming(false);
               }
             }
+          }
+
+          // If the stream closed without a done/error event, the connection
+          // dropped mid-reply. Remove the placeholder and surface an error.
+          if (!receivedTerminalEvent) {
+            setMessages((prev) =>
+              prev
+                .filter((m) => m.id !== STREAMING_ID)
+                .map((m) => (m.id === msgId ? { ...m, failed: true } : m)),
+            );
+            setError("Connection closed unexpectedly. Please try again.");
+            setStreamStatus("");
+            setStreaming(false);
           }
         } else {
           // ── JSON fallback path (old clients / SSE unavailable) ──────────
@@ -240,6 +267,8 @@ export function useChat(initialConversationId?: string) {
         setStreamStatus("");
       } finally {
         setLoading(false);
+        // Safety net: ensure streaming resets even if a terminal handler was skipped.
+        setStreaming(false);
       }
     },
     [conversationId],
@@ -276,6 +305,8 @@ export function useChat(initialConversationId?: string) {
     conversationId,
     loading,
     error,
+    /** True from the first token until the terminal SSE event (done/error). */
+    streaming,
     /** Stable id of the in-flight streaming message, or null when not streaming. */
     streamingMessageId: messages.some((m) => m.id === STREAMING_ID)
       ? STREAMING_ID

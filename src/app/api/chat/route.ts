@@ -274,10 +274,12 @@ export async function POST(request: NextRequest) {
       edgeFunctionToken: token,
     });
 
-    // Create or use existing conversation
-    let convId = conversation_id;
-    const isNewConversation = !convId;
-    if (!convId) {
+    // Create or use existing conversation.
+    // resolvedConvId is always a string: either supplied by the caller (and
+    // validated as a UUID by chatSchema) or assigned from the newly-created row.
+    const isNewConversation = !conversation_id;
+    let resolvedConvId: string;
+    if (!conversation_id) {
       const { data: conv, error: convError } = await insforge.database
         .from("conversations")
         .insert({ user_id: userId, title: message.slice(0, 100) })
@@ -290,12 +292,10 @@ export async function POST(request: NextRequest) {
           { status: 500 },
         );
       }
-      convId = conv.id;
+      resolvedConvId = conv.id;
+    } else {
+      resolvedConvId = conversation_id;
     }
-
-    // convId is guaranteed to be a string from here on (either from the
-    // request or from the newly created conversation above).
-    const resolvedConvId = convId as string;
 
     // ── Load history ────────────────────────────────────────────────────────
     let historyMessages: MessageRow[] = [];
@@ -377,7 +377,10 @@ export async function POST(request: NextRequest) {
             );
           };
 
-          // 90-second server-side timeout + client-disconnect guard
+          // SSE uses a 90-second timeout (vs 60 s for JSON) because the
+          // client receives tokens as they arrive, so slow models and long
+          // scrape/search steps each need their own slice of that window.
+          // The JSON path is a single round-trip where 60 s is ample.
           const abort = new AbortController();
           const timeoutId = setTimeout(() => abort.abort(), 90_000);
           const onClientAbort = () => abort.abort();
@@ -416,6 +419,11 @@ export async function POST(request: NextRequest) {
             ];
 
             // ── Stream AI tokens ─────────────────────────────────────────────
+            // Note: @insforge/sdk's ChatCompletionRequest schema does not expose
+            // a `signal` option, so we cannot pass abort.signal to cancel the
+            // upstream fetch early. The abort.signal.aborted check in the loop
+            // below stops consuming tokens, but the upstream request runs to
+            // completion. This is a known SDK limitation.
             const aiStream = await insforge.ai.chat.completions.create({
               model: "openai/gpt-4o-mini",
               messages: messagesToSend,
@@ -434,6 +442,10 @@ export async function POST(request: NextRequest) {
             }
 
             // ── Persist assistant message ────────────────────────────────────
+            // Skip persistence if the client disconnected: partial content
+            // should not be saved, and there is no client to receive the done event.
+            if (abort.signal.aborted) return;
+
             const { data: savedMessage, error: msgError } =
               await insforge.database
                 .from("messages")
@@ -515,6 +527,8 @@ export async function POST(request: NextRequest) {
       { role: "user", content: aiUserMessage },
     ];
 
+    // 60-second timeout is sufficient for a single non-streaming round-trip.
+    // See the SSE path above for why that path uses 90 s instead.
     const completion = await withTimeout(
       insforge.ai.chat.completions.create({
         model: "openai/gpt-4o-mini",

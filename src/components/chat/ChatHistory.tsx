@@ -7,6 +7,12 @@ import type { Message } from "@/types";
 interface ChatHistoryProps {
   messages: Message[];
   loading?: boolean;
+  /**
+   * True while SSE tokens are flowing (first token → terminal event).
+   * When streaming, the "Tack is thinking..." indicator is hidden because
+   * the growing placeholder message already shows progress.
+   */
+  streaming?: boolean;
   onRetry?: (id: string) => void;
   /**
    * The id of the message currently being streamed in (e.g. "streaming").
@@ -21,6 +27,7 @@ interface ChatHistoryProps {
 export function ChatHistory({
   messages,
   loading = false,
+  streaming = false,
   onRetry,
   streamingMessageId,
 }: ChatHistoryProps) {
@@ -55,7 +62,6 @@ export function ChatHistory({
       className="flex-1 overflow-y-auto"
       role="log"
       aria-label="Chat messages"
-      aria-live="polite"
     >
       {messages.map((msg) =>
         msg.id === streamingMessageId ? (
@@ -68,7 +74,7 @@ export function ChatHistory({
           <ChatMessage key={msg.id} message={msg} onRetry={onRetry} loading={loading} />
         ),
       )}
-      {loading && (
+      {loading && !streaming && (
         <div className="app-chat-thinking flex gap-3 px-4 py-4" role="status">
           <div className="app-msg__avatar--bot flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
             <span className="app-chat-thinking__dot animate-pulse text-xs" aria-hidden="true">
