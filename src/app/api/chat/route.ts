@@ -294,6 +294,25 @@ export async function POST(request: NextRequest) {
       }
       resolvedConvId = conv.id;
     } else {
+      // Verify the conversation belongs to the authenticated user before
+      // loading its history or writing to it. The InsForge tables are not
+      // token-scoped (see conversations/[id]/messages route, which performs
+      // the same check), so without this an authenticated user who knows
+      // another user's conversation_id could read their history or inject
+      // messages into their thread.
+      const { data: conv, error: convError } = await insforge.database
+        .from("conversations")
+        .select("id")
+        .eq("id", conversation_id)
+        .eq("user_id", userId)
+        .single();
+
+      if (convError || !conv) {
+        return NextResponse.json(
+          { error: "Conversation not found" },
+          { status: 404 },
+        );
+      }
       resolvedConvId = conversation_id;
     }
 
