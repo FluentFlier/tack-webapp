@@ -23,7 +23,8 @@ export class ImageFetchError extends Error {
  *
  * Safety constraints (any violation throws ImageFetchError):
  * - Redirects are rejected (redirect: "manual")
- * - Content-Type must start with "image/"
+ * - Content-Type must be one of the raster types in ALLOWED_MIME_TYPES
+ *   (SVG is excluded: XML, not pixels — vision models cannot read it)
  * - Body size is capped at MAX_IMAGE_BYTES (checked via Content-Length header
  *   and enforced while streaming the body)
  * - 10-second AbortSignal timeout
