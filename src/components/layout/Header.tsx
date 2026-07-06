@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@insforge/nextjs";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export function Header() {
   return (
@@ -54,12 +55,14 @@ export function Header() {
                 Settings
               </Button>
             </Link>
-            <div aria-label="User menu" className="ml-2 pl-3 border-l border-[rgba(79,70,229,0.25)]">
+            <ThemeToggle />
+            <div aria-label="User menu" className="ml-1 pl-3 border-l border-[hsl(var(--border))]">
               <span aria-label="User Profile Menu"></span>
               <UserButton />
             </div>
           </SignedIn>
           <SignedOut>
+            <ThemeToggle />
             <SignInButton>
               <button className="landing-signin-btn" type="button">Sign In</button>
             </SignInButton>

@@ -4,61 +4,81 @@
 
 @layer base {
   :root {
-    /* ─── Interstellar Observatory Palette ───
-       Aligned with the landing page: near-black base, electric indigo
-       primary (#4F46E5 family), cyan-ice focus ring (#67E8F9). */
-    --background: 240 15% 4.5%;         /* #0a0a0f */
-    --foreground: 220 10% 92%;          /* soft white */
-    --card: 240 12% 8%;                 /* slightly lighter dark */
-    --card-foreground: 220 10% 92%;
-    --popover: 240 12% 8%;
-    --popover-foreground: 220 10% 92%;
-    --primary: 244 68% 60%;             /* electric indigo */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 10% 14%;
-    --secondary-foreground: 220 10% 88%;
-    --muted: 240 10% 12%;
-    --muted-foreground: 222 10% 62%;
-    --accent: 244 30% 19%;              /* muted indigo hover surface */
-    --accent-foreground: 224 30% 92%;
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 242 14% 17%;
-    --input: 242 14% 17%;
-    --ring: 187 80% 62%;                /* cyan-ice focus */
-    --chart-1: 255 65% 60%;
-    --chart-2: 200 60% 50%;
-    --chart-3: 340 55% 55%;
-    --chart-4: 45 70% 55%;
-    --chart-5: 180 50% 45%;
-    --radius: 0.5rem
+    /* ─── Pine & Oat — LIGHT theme ──────────────────────────────────
+       Contrast verified:
+         #1c1e19 on #f3f1ea → ~15.9 : 1  ✓ AAA
+         #2c5f4f on #f3f1ea → ~6.7  : 1  ✓ AA
+         #234c3f used as focus ring, checked against all surfaces.    */
+    --background: 47 27% 94%;           /* #f3f1ea warm oat            */
+    --foreground: 84 9% 11%;            /* #1c1e19 warm near-black      */
+    --card: 50 43% 97%;                 /* #fbfaf5 near-white surface   */
+    --card-foreground: 84 9% 11%;
+    --popover: 50 43% 97%;
+    --popover-foreground: 84 9% 11%;
+    --primary: 161 37% 27%;             /* #2c5f4f deep pine green      */
+    --primary-foreground: 50 43% 97%;   /* #fbfaf5                      */
+    --secondary: 47 24% 92%;            /* soft oat tint                */
+    --secondary-foreground: 84 9% 11%;
+    --muted: 50 43% 97%;                /* surface                      */
+    --muted-foreground: 94 5% 37%;      /* #5f645b warm grey-green      */
+    --accent: 161 37% 27%;              /* pine                         */
+    --accent-foreground: 50 43% 97%;
+    --destructive: 9 55% 41%;           /* readable red ~#a3402f        */
+    --destructive-foreground: 0 0% 98%;
+    --border: 45 22% 85%;               /* #e2ded2 warm hairline        */
+    --input: 45 22% 85%;
+    --ring: 161 37% 22%;                /* #234c3f focus                */
+    --chart-1: 161 37% 27%;
+    --chart-2: 47 27% 60%;
+    --chart-3: 84 9% 40%;
+    --chart-4: 161 30% 45%;
+    --chart-5: 47 20% 70%;
+    --radius: 0.5rem;
+
+    /* ── Editorial extras ─────────────────────────────────────────── */
+    --hairline:      45 22% 85%;             /* == --border in light        */
+    --user-tint:     rgba(44, 95, 79, 0.06); /* pine wash for user rows     */
+    --focus:         161 37% 22%;            /* == --ring                   */
+    --accent-strong: 161 37% 22%;            /* #234c3f deeper pine hover   */
+    --font-display:  var(--font-serif);
   }
 
-  .dark {
-    --background: 240 15% 4.5%;
-    --foreground: 220 10% 92%;
-    --card: 240 12% 8%;
-    --card-foreground: 220 10% 92%;
-    --popover: 240 12% 8%;
-    --popover-foreground: 220 10% 92%;
-    --primary: 244 68% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 10% 14%;
-    --secondary-foreground: 220 10% 88%;
-    --muted: 240 10% 12%;
-    --muted-foreground: 222 10% 62%;
-    --accent: 244 30% 19%;
-    --accent-foreground: 224 30% 92%;
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 242 14% 17%;
-    --input: 242 14% 17%;
-    --ring: 187 80% 62%;
-    --chart-1: 255 65% 60%;
-    --chart-2: 200 60% 50%;
-    --chart-3: 340 55% 55%;
-    --chart-4: 45 70% 55%;
-    --chart-5: 180 50% 45%
+  [data-theme="dark"] {
+    /* ─── Pine & Oat — DARK theme ───────────────────────────────────
+       Contrast verified:
+         #ece6da on #17140f → ~15.4 : 1  ✓ AAA
+         #86bda9 on #17140f → ~9.5  : 1  ✓ AAA                       */
+    --background: 38 21% 7%;            /* #17140f warm espresso        */
+    --foreground: 40 32% 89%;           /* #ece6da warm bone            */
+    --card: 38 22% 10%;                 /* #1f1b14 slightly lighter     */
+    --card-foreground: 40 32% 89%;
+    --popover: 38 22% 10%;
+    --popover-foreground: 40 32% 89%;
+    --primary: 158 29% 63%;             /* #86bda9 sage/mint            */
+    --primary-foreground: 38 21% 7%;    /* #17140f                      */
+    --secondary: 38 15% 14%;            /* dark muted tint              */
+    --secondary-foreground: 40 32% 89%;
+    --muted: 38 22% 10%;                /* surface                      */
+    --muted-foreground: 39 14% 60%;     /* #a89e8c warm mid-tone        */
+    --accent: 158 29% 63%;              /* sage                         */
+    --accent-foreground: 38 21% 7%;
+    --destructive: 9 72% 62%;           /* readable red on dark bg      */
+    --destructive-foreground: 0 0% 98%;
+    --border: 40 8% 22%;                /* warm dark separator          */
+    --input: 40 8% 22%;
+    --ring: 158 29% 63%;                /* #86bda9 sage focus           */
+    --chart-1: 158 29% 63%;
+    --chart-2: 40 32% 70%;
+    --chart-3: 39 14% 50%;
+    --chart-4: 157 31% 71%;
+    --chart-5: 38 21% 35%;
+
+    /* ── Editorial extras ─────────────────────────────────────────── */
+    --hairline:      rgba(236, 231, 219, 0.10); /* translucent warm separator */
+    --user-tint:     rgba(134, 189, 169, 0.08); /* sage wash for user rows    */
+    --focus:         158 29% 63%;               /* == --ring                  */
+    --accent-strong: 157 31% 71%;               /* #9fccbb brighter sage hover*/
+    --font-display:  var(--font-serif);
   }
 
   * {
@@ -78,7 +98,7 @@
   }
 
   ::selection {
-    background-color: hsl(244 68% 60% / 0.35);
+    background-color: hsl(var(--primary) / 0.2);
   }
 
   /* #main-content (the full-page wrapper) is focused programmatically after
@@ -1092,12 +1112,11 @@ html {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   APP-WIDE INTERSTELLAR THEME
-   These styles extend the design tokens above to give every page
-   the same near-black / indigo-glass / cyan-ice look as the landing
-   page ("Interstellar Observatory"). Accent logic:
-     structure + surfaces  →  indigo  rgba(79, 70, 229, …)
-     interaction + focus   →  cyan    rgba(103, 232, 249, …)
+   APP-WIDE THEME — Pine & Oat editorial
+   Token-driven: reads --background, --card, --border, --foreground,
+   --muted-foreground, --primary, --primary-foreground, --ring,
+   --accent, --accent-strong, --muted from globals.css :root / [data-theme].
+   Shell usable in both light and dark; components refined in T2+.
    ═══════════════════════════════════════════════════════════════════ */
 
 /* ── Scrollbar Styling ─────────────────────────────────────────── */
@@ -1111,55 +1130,53 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.25);
+  background: hsl(var(--border));
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.45);
+  background: hsl(var(--muted-foreground) / 0.5);
 }
 
 /* ── Selection Highlight ───────────────────────────────────────── */
 ::selection {
-  background: rgba(79, 70, 229, 0.4);
+  background: hsl(var(--primary) / 0.2);
   color: inherit;
 }
 
 /* ── Shared primitives ─────────────────────────────────────────── */
 
-/* Serif gradient page title (Settings, Reader, …) — mirrors the
-   landing hero heading treatment. */
+/* Serif display page title — foreground→primary gradient for both themes.
+   a11y overrides below ensure high-contrast and forced-colors modes win. */
 .app-page-title {
   font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
   font-weight: 400;
   letter-spacing: -0.01em;
   background: linear-gradient(
-    180deg,
-    rgba(240, 244, 255, 0.98) 0%,
-    rgba(165, 180, 252, 0.62) 100%
+    160deg,
+    hsl(var(--foreground)) 0%,
+    hsl(var(--primary)) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Mono eyebrow microlabel — mirrors .iso-eyebrow on the landing page. */
+/* Mono eyebrow microlabel */
 .app-eyebrow {
   font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.66rem;
   font-weight: 400;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(103, 232, 249, 0.75);
+  color: hsl(var(--primary));
 }
 
-/* Glass panel — mirrors .iso-glass. */
+/* Surface panel */
 .app-panel {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(79, 70, 229, 0.28);
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
   border-radius: 14px;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
 }
 
 /* One-shot entrance for chat messages. The global .reduced-motion and
@@ -1181,13 +1198,11 @@ html {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Header — Translucent Dark Glass
+   Header
    ═══════════════════════════════════════════════════════════════════ */
 .app-header {
-  background: rgba(5, 6, 10, 0.82) !important;
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  border-bottom: 1px solid rgba(79, 70, 229, 0.18) !important;
+  background: hsl(var(--card)) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
 }
 
 .app-header__logo {
@@ -1195,74 +1210,73 @@ html {
   letter-spacing: 0.15em;
   font-weight: 600;
   font-size: 1.05rem;
-  color: rgba(240, 244, 255, 0.92);
+  color: hsl(var(--foreground));
 }
 
 .app-header__logo-icon {
-  color: #818cf8;
+  color: hsl(var(--primary));
 }
 
-/* Header nav link buttons — quiet uppercase, echoing the landing nav */
+/* Header nav link buttons */
 .app-header__nav-btn {
   font-size: 0.72rem !important;
   font-weight: 400 !important;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(240, 244, 255, 0.6);
-  transition: color 0.25s ease, background 0.25s ease;
+  color: hsl(var(--muted-foreground));
+  transition: color 0.2s ease, background 0.2s ease;
 }
 
 .app-header__nav-btn:hover {
-  color: rgba(240, 244, 255, 0.95);
-  background: rgba(79, 70, 229, 0.14);
+  color: hsl(var(--foreground));
+  background: hsl(var(--accent) / 0.08);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Sidebar — Dark Panel with Indigo Accents
+   Sidebar
    ═══════════════════════════════════════════════════════════════════ */
 .app-sidebar {
-  background: rgba(7, 8, 14, 0.95) !important;
-  border-right: 1px solid rgba(79, 70, 229, 0.14) !important;
+  background: hsl(var(--background)) !important;
+  border-right: 1px solid hsl(var(--border)) !important;
 }
 
 .app-sidebar__history-toggle {
-  color: rgba(240, 244, 255, 0.6);
+  color: hsl(var(--muted-foreground));
 }
 
 .app-sidebar__history-toggle:hover {
-  color: rgba(240, 244, 255, 0.95);
-  background: rgba(79, 70, 229, 0.12);
+  color: hsl(var(--foreground));
+  background: hsl(var(--accent) / 0.08);
 }
 
 .app-sidebar__new-chat {
-  background: rgba(79, 70, 229, 0.13) !important;
-  border: 1px solid rgba(79, 70, 229, 0.35) !important;
-  color: rgba(240, 244, 255, 0.88) !important;
-  transition: all 0.3s ease !important;
+  background: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  transition: all 0.2s ease !important;
 }
 
 .app-sidebar__new-chat:hover {
-  background: rgba(79, 70, 229, 0.24) !important;
-  border-color: rgba(103, 232, 249, 0.4) !important;
-  box-shadow: 0 0 18px rgba(79, 70, 229, 0.18);
+  background: hsl(var(--accent-strong)) !important;
+  border-color: hsl(var(--accent-strong)) !important;
 }
 
 .app-sidebar__item {
-  color: rgba(240, 244, 255, 0.55);
-  transition: all 0.25s ease;
+  color: hsl(var(--muted-foreground));
+  transition: all 0.2s ease;
   border-radius: 8px;
   border-left: 2px solid transparent;
 }
 
 .app-sidebar__item:hover {
-  background: rgba(79, 70, 229, 0.1);
-  color: rgba(240, 244, 255, 0.88);
+  background: hsl(var(--accent) / 0.08);
+  color: hsl(var(--foreground));
 }
 
 .app-sidebar__item--active {
-  background: rgba(79, 70, 229, 0.16) !important;
-  color: rgba(240, 244, 255, 0.95) !important;
-  border-left: 2px solid rgba(103, 232, 249, 0.8);
+  background: hsl(var(--accent) / 0.12) !important;
+  color: hsl(var(--foreground)) !important;
+  border-left: 2px solid hsl(var(--primary));
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1275,9 +1289,9 @@ html {
   font-weight: 400;
   letter-spacing: -0.01em;
   background: linear-gradient(
-    180deg,
-    rgba(240, 244, 255, 0.98) 0%,
-    rgba(165, 180, 252, 0.6) 100%
+    160deg,
+    hsl(var(--foreground)) 0%,
+    hsl(var(--primary)) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -1286,25 +1300,20 @@ html {
 
 /* Assistant message row */
 .app-msg--assistant {
-  background: rgba(79, 70, 229, 0.055);
-  border-bottom: 1px solid rgba(79, 70, 229, 0.1);
+  background: hsl(var(--accent) / 0.04);
+  border-bottom: 1px solid hsl(var(--border));
 }
 
 /* Assistant avatar */
 .app-msg__avatar--bot {
-  background: linear-gradient(
-    135deg,
-    rgba(79, 70, 229, 0.85),
-    rgba(37, 99, 235, 0.85)
-  ) !important;
-  border: 1px solid rgba(129, 140, 248, 0.35) !important;
-  box-shadow: 0 0 14px rgba(79, 70, 229, 0.25);
+  background: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary) / 0.5) !important;
 }
 
 /* User avatar */
 .app-msg__avatar--user {
-  background: rgba(240, 244, 255, 0.08) !important;
-  border: 1px solid rgba(240, 244, 255, 0.14) !important;
+  background: hsl(var(--muted)) !important;
+  border: 1px solid hsl(var(--border)) !important;
 }
 
 /* Speaker microlabels above each message */
@@ -1317,62 +1326,57 @@ html {
 }
 
 .app-msg__speaker--bot {
-  color: rgba(103, 232, 249, 0.85);
+  color: hsl(var(--primary));
 }
 
 .app-msg__speaker--user {
-  color: rgba(240, 244, 255, 0.55);
+  color: hsl(var(--muted-foreground));
 }
 
 /* Thinking indicator */
 .app-chat-thinking {
-  background: rgba(79, 70, 229, 0.07);
+  background: hsl(var(--accent) / 0.06);
 }
 
 .app-chat-thinking__dot {
-  color: #67e8f9;
+  color: hsl(var(--primary));
 }
 
 /* Chat input area */
 .app-chat-input-area {
-  border-top: 1px solid rgba(79, 70, 229, 0.18) !important;
-  background: rgba(5, 6, 10, 0.6);
-  backdrop-filter: blur(12px);
+  border-top: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--card));
 }
 
 .app-chat-textarea {
-  background: rgba(13, 14, 22, 0.85) !important;
-  border: 1px solid rgba(79, 70, 229, 0.28) !important;
+  background: hsl(var(--background)) !important;
+  border: 1px solid hsl(var(--border)) !important;
   border-radius: 10px !important;
-  color: rgba(240, 244, 255, 0.92) !important;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
+  color: hsl(var(--foreground)) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .app-chat-textarea:focus {
-  border-color: rgba(103, 232, 249, 0.5) !important;
-  box-shadow: 0 0 0 2px rgba(103, 232, 249, 0.12) !important;
+  border-color: hsl(var(--primary)) !important;
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.12) !important;
 }
 
 .app-chat-textarea::placeholder {
-  color: rgba(240, 244, 255, 0.32) !important;
+  color: hsl(var(--muted-foreground) / 0.7) !important;
 }
 
-/* Send button — mirrors the landing CTA gradient */
+/* Send button */
 .app-send-btn {
-  background: linear-gradient(
-    135deg,
-    rgba(90, 60, 200, 0.85),
-    rgba(60, 80, 220, 0.85)
-  ) !important;
-  border: 1px solid rgba(140, 120, 255, 0.25) !important;
+  background: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary)) !important;
   border-radius: 10px !important;
-  color: white !important;
-  transition: all 0.3s ease !important;
+  color: hsl(var(--primary-foreground)) !important;
+  transition: all 0.2s ease !important;
 }
 
 .app-send-btn:hover:not(:disabled) {
-  box-shadow: 0 0 22px rgba(79, 70, 229, 0.4) !important;
-  border-color: rgba(160, 140, 255, 0.4) !important;
+  background: hsl(var(--accent-strong)) !important;
+  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.25) !important;
 }
 
 .app-send-btn:disabled {
@@ -1381,42 +1385,40 @@ html {
 
 /* Slash command pills */
 .app-slash-pill {
-  background: rgba(79, 70, 229, 0.1) !important;
-  border: 1px solid rgba(79, 70, 229, 0.32) !important;
-  color: rgba(240, 244, 255, 0.68) !important;
-  transition: all 0.25s ease !important;
+  background: hsl(var(--primary) / 0.08) !important;
+  border: 1px solid hsl(var(--primary) / 0.25) !important;
+  color: hsl(var(--foreground)) !important;
+  transition: all 0.2s ease !important;
 }
 
 .app-slash-pill:hover {
-  background: rgba(79, 70, 229, 0.2) !important;
-  border-color: rgba(103, 232, 249, 0.45) !important;
-  color: rgba(240, 244, 255, 0.92) !important;
-  box-shadow: 0 0 14px rgba(79, 70, 229, 0.18);
+  background: hsl(var(--primary) / 0.15) !important;
+  border-color: hsl(var(--primary) / 0.4) !important;
+  color: hsl(var(--foreground)) !important;
 }
 
 /* Command palette */
 .app-command-palette {
-  background: rgba(8, 9, 16, 0.97) !important;
-  border: 1px solid rgba(79, 70, 229, 0.38) !important;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 24px rgba(79, 70, 229, 0.1) !important;
+  background: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
 }
 
 .app-command-palette__item:hover {
-  background: rgba(79, 70, 229, 0.16) !important;
+  background: hsl(var(--accent) / 0.08) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Settings Page — Dark Cards with Subtle Borders
+   Settings Page
    ═══════════════════════════════════════════════════════════════════ */
 .app-settings-title {
   font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
   font-weight: 400;
   letter-spacing: -0.01em;
   background: linear-gradient(
-    180deg,
-    rgba(240, 244, 255, 0.98) 0%,
-    rgba(165, 180, 252, 0.62) 100%
+    160deg,
+    hsl(var(--foreground)) 0%,
+    hsl(var(--primary)) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -1441,111 +1443,83 @@ html {
 }
 
 .app-settings-card {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(79, 70, 229, 0.26) !important;
-  border-radius: 14px !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 8px !important;
+  transition: border-color 0.2s ease;
 }
 
 .app-settings-card:hover {
-  border-color: rgba(103, 232, 249, 0.3);
-  box-shadow: 0 0 28px rgba(79, 70, 229, 0.1);
+  border-color: hsl(var(--primary) / 0.4);
 }
 
 .app-settings-card__title {
   font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
   font-weight: 500;
   letter-spacing: 0.02em;
+  color: hsl(var(--foreground));
 }
 
 .app-settings-save-btn {
-  background: linear-gradient(
-    135deg,
-    rgba(90, 60, 200, 0.85) 0%,
-    rgba(60, 80, 220, 0.85) 100%
-  ) !important;
-  border: 1px solid rgba(140, 120, 255, 0.25) !important;
-  color: #f0f4ff !important;
+  background: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-size: 0.8rem !important;
-  transition: all 0.35s ease !important;
-  box-shadow: 0 0 20px rgba(79, 70, 229, 0.2) !important;
+  transition: all 0.2s ease !important;
 }
 
 .app-settings-save-btn:hover {
-  box-shadow: 0 0 32px rgba(79, 70, 229, 0.4) !important;
-  border-color: rgba(160, 140, 255, 0.4) !important;
+  background: hsl(var(--accent-strong)) !important;
+  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.2) !important;
 }
 
 /* Select dropdowns */
 .app-select {
-  background: rgba(13, 14, 22, 0.85) !important;
-  border: 1px solid rgba(79, 70, 229, 0.28) !important;
-  color: rgba(240, 244, 255, 0.88) !important;
-  transition: border-color 0.25s ease;
+  background: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+  transition: border-color 0.2s ease;
 }
 
 .app-select:focus {
-  border-color: rgba(103, 232, 249, 0.5) !important;
+  border-color: hsl(var(--primary)) !important;
 }
 
 .app-select option {
-  background: rgb(10, 11, 18);
-  color: rgba(240, 244, 255, 0.88);
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
 }
 
 /* Details/accordion */
 .app-details {
-  border-color: rgba(79, 70, 229, 0.24) !important;
+  border-color: hsl(var(--border)) !important;
 }
 
 .app-details summary:hover {
-  background: rgba(79, 70, 229, 0.09) !important;
+  background: hsl(var(--accent) / 0.06) !important;
 }
 
 /* Kbd styling */
 .app-kbd {
   font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  background: rgba(79, 70, 229, 0.14) !important;
-  border: 1px solid rgba(79, 70, 229, 0.35) !important;
-  color: rgba(199, 210, 254, 0.95) !important;
+  background: hsl(var(--muted)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--muted-foreground)) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    Protected Layout Shell
    ═══════════════════════════════════════════════════════════════════ */
 .app-shell {
-  background: #05060a;
+  background: hsl(var(--background));
   min-height: 100vh;
 }
 
-/* Subtle ambient gradient behind chat */
 .app-main {
   position: relative;
-}
-
-.app-main::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(
-    ellipse at 50% 0%,
-    rgba(79, 70, 229, 0.06) 0%,
-    transparent 60%
-  );
-  pointer-events: none;
-  z-index: 0;
-}
-
-.app-main > * {
-  position: relative;
-  z-index: 1;
+  background: hsl(var(--background));
 }
 
 /* ═══════════════════════════════════════════════════════════════════

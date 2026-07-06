@@ -37,29 +37,39 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              try {
-                var s = localStorage.getItem('tack_preferences');
-                if (s) {
-                  var p = JSON.parse(s);
-                  var r = document.documentElement;
-                  var fsMap = { small: 14, medium: 16, large: 20, 'x-large': 24 };
-                  if (p.font_size && fsMap[p.font_size]) {
-                    r.style.setProperty('--base-font-size', fsMap[p.font_size] + 'px');
+              (function(){
+                var r = document.documentElement;
+                /* ── Theme (light/dark/system) — set data-theme before first paint ── */
+                try {
+                  var th = localStorage.getItem('tack_theme');
+                  var dark = th === 'dark' ||
+                             (th !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                  r.setAttribute('data-theme', dark ? 'dark' : 'light');
+                } catch(e) {}
+                /* ── Accessibility preferences ── */
+                try {
+                  var s = localStorage.getItem('tack_preferences');
+                  if (s) {
+                    var p = JSON.parse(s);
+                    var fsMap = { small: 14, medium: 16, large: 20, 'x-large': 24 };
+                    if (p.font_size && fsMap[p.font_size]) {
+                      r.style.setProperty('--base-font-size', fsMap[p.font_size] + 'px');
+                    }
+                    var profile = p.color_profile || (p.high_contrast ? 'high-contrast' : 'default');
+                    if (profile && profile !== 'default') {
+                      r.setAttribute('data-color-profile', profile);
+                    }
+                    if (profile === 'custom' && p.custom_fg && p.custom_bg) {
+                      r.style.setProperty('--custom-fg', p.custom_fg);
+                      r.style.setProperty('--custom-bg', p.custom_bg);
+                    }
+                    if (p.reduced_motion) {
+                      r.classList.add('reduced-motion');
+                      r.style.setProperty('--motion-duration', '0.001ms');
+                    }
                   }
-                  var profile = p.color_profile || (p.high_contrast ? 'high-contrast' : 'default');
-                  if (profile && profile !== 'default') {
-                    r.setAttribute('data-color-profile', profile);
-                  }
-                  if (profile === 'custom' && p.custom_fg && p.custom_bg) {
-                    r.style.setProperty('--custom-fg', p.custom_fg);
-                    r.style.setProperty('--custom-bg', p.custom_bg);
-                  }
-                  if (p.reduced_motion) {
-                    r.classList.add('reduced-motion');
-                    r.style.setProperty('--motion-duration', '0.001ms');
-                  }
-                }
-              } catch(e) {}
+                } catch(e) {}
+              })();
             `,
           }}
         />
