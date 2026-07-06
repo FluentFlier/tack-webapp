@@ -8,12 +8,11 @@ import { useTheme } from "@/hooks/useTheme";
  * ThemeToggle — toggles between light and dark themes.
  *
  * - Real <button>, keyboard-operable.
- * - Fixed aria-label "Dark mode" + aria-pressed conveys current state to AT.
- * - Mounted guard prevents SSR hydration mismatch (server always renders a
- *   size-matched placeholder until the client has read the stored preference).
- * - Visible focus ring via CSS :focus-visible (ring token).
- * - Sun icon = currently dark, click to go light.
- * - Moon icon = currently light, click to go dark.
+ * - aria-pressed conveys current dark-mode state to AT.
+ * - aria-label "Dark mode" is a fixed accessible name; the visible label
+ *   shows what you'll switch TO (e.g. "Dark" in light, "Light" in dark).
+ * - Mounted guard prevents SSR hydration mismatch.
+ * - Pill shape with icon + text to match editorial header treatment.
  */
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -23,7 +22,15 @@ export function ThemeToggle() {
   // eslint-disable-next-line react-hooks/set-state-in-effect -- canonical one-shot SSR mount guard
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) return <span className="h-8 w-8" aria-hidden="true" />;
+  // Render a size-matched placeholder to prevent layout shift during SSR
+  if (!mounted) {
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 h-[30px] w-[68px] rounded-full border border-[hsl(var(--border))] opacity-0"
+        aria-hidden="true"
+      />
+    );
+  }
 
   return (
     <button
@@ -32,23 +39,28 @@ export function ThemeToggle() {
       aria-label="Dark mode"
       aria-pressed={isDark}
       className={[
-        "inline-flex items-center justify-center",
-        "h-8 w-8 rounded-sm",
+        "inline-flex items-center gap-1.5",
+        "px-3 py-1",
+        "rounded-full",
         "border border-[hsl(var(--border))]",
         "bg-transparent",
         "text-[hsl(var(--muted-foreground))]",
-        "transition-colors",
-        "hover:bg-[hsl(var(--accent)_/_0.08)] hover:text-[hsl(var(--foreground))]",
+        "text-xs font-medium tracking-wide",
+        "whitespace-nowrap",
+        "cursor-pointer",
+        "transition-colors duration-150",
+        "hover:bg-[hsl(var(--primary)_/_0.06)] hover:text-[hsl(var(--foreground))] hover:border-[hsl(var(--primary))]",
         "focus-visible:outline-none focus-visible:ring-2",
         "focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-1",
         "focus-visible:ring-offset-[hsl(var(--background))]",
       ].join(" ")}
     >
       {isDark ? (
-        <Sun className="h-4 w-4" aria-hidden="true" />
+        <Sun className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
       ) : (
-        <Moon className="h-4 w-4" aria-hidden="true" />
+        <Moon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
       )}
+      <span>{isDark ? "Light" : "Dark"}</span>
     </button>
   );
 }

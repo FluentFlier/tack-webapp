@@ -1,16 +1,17 @@
 import React from "react";
 
-// Tailwind classes reused from ChatMessage.tsx colour scheme
-// (Interstellar palette: off-white #F0F4FF body tints, cyan-ice links)
+// Editorial Pine & Oat classes — token-driven so they respond to light/dark.
+// Headings use Playfair Display via .app-md-h2/h3/h4 (defined in globals.css).
+// List items use .app-md-li for the pine bullet pseudo-element.
 const CLS = {
-  h2: "font-semibold text-base tracking-tight mt-5 mb-1.5 text-[rgba(240,244,255,0.95)]",
-  h3: "font-semibold text-sm tracking-tight mt-4 mb-1 text-[rgba(240,244,255,0.9)]",
-  h4: "font-semibold text-xs uppercase tracking-wide mt-3 mb-1 text-[rgba(240,244,255,0.82)]",
-  p: "text-sm leading-relaxed text-[rgba(240,244,255,0.78)]",
-  ul: "list-disc list-outside pl-5 space-y-1 text-sm text-[rgba(240,244,255,0.78)] marker:text-[rgba(129,140,248,0.7)]",
-  ol: "list-decimal list-outside pl-5 space-y-1 text-sm text-[rgba(240,244,255,0.78)] marker:text-[rgba(129,140,248,0.7)]",
-  li: "leading-relaxed",
-  a: "text-[rgba(103,232,249,0.9)] underline underline-offset-2 decoration-[rgba(103,232,249,0.4)] hover:text-[#a5f3fc] focus:outline-none focus:ring-2 focus:ring-ring break-all transition-colors",
+  h2: "app-md-h2",
+  h3: "app-md-h3",
+  h4: "app-md-h4",
+  p: "text-[0.9375rem] leading-[1.78] text-foreground mb-3.5",
+  ul: "list-none pl-0 my-1 mb-4 text-[0.9375rem] text-foreground",
+  ol: "list-decimal list-outside pl-5 space-y-2 my-1 mb-4 text-[0.9375rem] text-foreground",
+  li: "app-md-li",
+  a: "text-[hsl(var(--primary))] underline underline-offset-2 decoration-[1px] font-medium hover:text-[hsl(var(--accent-strong))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] break-all transition-colors",
 };
 
 const TAKEAWAY_RE =

@@ -54,53 +54,60 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
 
   return (
     <div className="app-chat-input-area">
-      {/* Quick-access slash command buttons */}
-      {!showCommands && (
-        <SlashCommandButtons
-          onSelect={handleCommandSelect}
-          disabled={disabled}
-        />
-      )}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit();
-        }}
-        className="relative flex items-end gap-2 max-w-3xl mx-auto px-4 pb-4"
-      >
+      {/* Relative wrapper so CommandPalette can position absolute above input */}
+      <div className="relative max-w-[740px] mx-auto">
+        {/* Command palette — absolute, appears above input row when typing "/" */}
         <CommandPalette
           filter={commandFilter}
           onSelect={handleCommandSelect}
           visible={showCommands}
         />
-        <label htmlFor="chat-input" className="sr-only">
-          Type your message or a slash command
-        </label>
-        <Textarea
-          ref={textareaRef}
-          id="chat-input"
-          value={input}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          placeholder="Type a message or /help for commands..."
-          disabled={disabled}
-          rows={1}
-          className="app-chat-textarea min-h-[44px] max-h-32 resize-none"
-          aria-describedby="input-hint"
-        />
-        <span id="input-hint" className="sr-only">
-          Press Enter to send, Shift+Enter for a new line. Type / for commands.
-        </span>
-        <Button
-          type="submit"
-          size="icon"
-          disabled={disabled || !input.trim()}
-          aria-label="Send message"
-          className="app-send-btn shrink-0 h-[44px] w-[44px]"
+
+        {/* Input row: bordered container wrapping textarea + send button */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+          className="app-chat-input-row"
         >
-          <SendHorizontal className="h-4 w-4" aria-hidden="true" />
-        </Button>
-      </form>
+          <label htmlFor="chat-input" className="sr-only">
+            Type your message or a slash command
+          </label>
+          <Textarea
+            ref={textareaRef}
+            id="chat-input"
+            value={input}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            placeholder="Message Tack, or type / for commands"
+            disabled={disabled}
+            rows={1}
+            className="app-chat-textarea min-h-[44px] max-h-32 resize-none"
+            aria-describedby="input-hint"
+          />
+          <span id="input-hint" className="sr-only">
+            Press Enter to send, Shift+Enter for a new line. Type / for commands.
+          </span>
+          <Button
+            type="submit"
+            disabled={disabled || !input.trim()}
+            aria-label="Send message"
+            className="app-send-btn"
+          >
+            <SendHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Send</span>
+          </Button>
+        </form>
+
+        {/* Quick-access slash command chips — below the input row */}
+        {!showCommands && (
+          <SlashCommandButtons
+            onSelect={handleCommandSelect}
+            disabled={disabled}
+          />
+        )}
+      </div>
     </div>
   );
 }

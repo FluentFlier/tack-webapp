@@ -39,7 +39,7 @@ export function SlashCommandButtons({
 }: SlashCommandButtonsProps) {
   return (
     <div
-      className="flex flex-wrap gap-2 px-4 pb-2 max-w-3xl mx-auto"
+      className="flex flex-wrap gap-1.5 pt-2"
       role="toolbar"
       aria-label="Quick commands"
     >
@@ -57,16 +57,14 @@ export function SlashCommandButtons({
             aria-label={`${cmd.description} — /${cmd.name}`}
             className="
               app-slash-pill
-              inline-flex items-center gap-1.5
-              rounded-full px-3 py-1.5
-              text-xs font-medium
-              focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1
+              inline-flex items-center gap-1
+              focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))]
               active:scale-[0.97]
               disabled:opacity-40 disabled:pointer-events-none
             "
           >
-            {Icon && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}
-            <span>{label}</span>
+            {Icon && <Icon className="h-3 w-3" aria-hidden="true" />}
+            <span>/{cmd.name}</span>
           </button>
         );
       })}

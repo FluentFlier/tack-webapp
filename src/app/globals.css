@@ -1206,18 +1206,46 @@ html {
 }
 
 .app-header__logo {
-  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
-  letter-spacing: 0.15em;
-  font-weight: 600;
-  font-size: 1.05rem;
+  font-family: var(--font-display, 'Playfair Display', Georgia, serif);
+  letter-spacing: -0.025em;
+  font-weight: 700;
+  font-size: 1.45rem;
   color: hsl(var(--foreground));
+  line-height: 1;
+  text-decoration: none;
 }
 
-.app-header__logo-icon {
+.app-header__logo-dot {
   color: hsl(var(--primary));
 }
 
-/* Header nav link buttons */
+/* Nav links — lean uppercase Inter, hairline border on active */
+.app-header__nav-link {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+  text-decoration: none;
+  padding: 0.375rem 0.625rem;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.app-header__nav-link:hover {
+  color: hsl(var(--foreground));
+  background: hsl(var(--primary) / 0.06);
+}
+
+.app-header__nav-link[aria-current="page"] {
+  color: hsl(var(--primary));
+  border-color: hsl(var(--border));
+  background: hsl(var(--primary) / 0.06);
+  font-weight: 600;
+}
+
+/* Kept for backward compatibility with any remaining Button usage */
 .app-header__nav-btn {
   font-size: 0.72rem !important;
   font-weight: 400 !important;
@@ -1230,6 +1258,14 @@ html {
 .app-header__nav-btn:hover {
   color: hsl(var(--foreground));
   background: hsl(var(--accent) / 0.08);
+}
+
+/* Nav divider */
+.app-header__nav-divider {
+  width: 1px;
+  height: 18px;
+  background: hsl(var(--border));
+  flex-shrink: 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1280,49 +1316,75 @@ html {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Chat Area
+   Chat Area — Editorial Pine & Oat
+   Hairline dividers, user-tint rows, no heavy cards.
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Welcome state */
+/* Welcome state — serif gradient headline */
 .app-chat-welcome {
   font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  background: linear-gradient(
-    160deg,
-    hsl(var(--foreground)) 0%,
-    hsl(var(--primary)) 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: hsl(var(--foreground));
 }
 
-/* Assistant message row */
+/* ── Message rows ─────────────────────────────────────────────────── */
+
+/* Both rows get generous padding and a hairline bottom border */
+.app-msg--user,
 .app-msg--assistant {
-  background: hsl(var(--accent) / 0.04);
+  padding-top: 1.375rem;
+  padding-bottom: 1.375rem;
   border-bottom: 1px solid hsl(var(--border));
 }
 
-/* Assistant avatar */
+/* User row: faint pine/sage tint */
+.app-msg--user {
+  background: var(--user-tint);
+}
+
+/* Assistant row: no special background */
+.app-msg--assistant {
+  background: transparent;
+}
+
+/* ── Avatar dots (decorative, aria-hidden) ──────────────────────── */
+/* Shrink to a tiny 8×8 dot to de-emphasise the circle avatar */
+.app-msg__avatar--bot,
+.app-msg__avatar--user {
+  width: 8px !important;
+  height: 8px !important;
+  min-width: 8px !important;
+  border-radius: 50% !important;
+  border: none !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  margin-top: 0.55em;
+  align-self: flex-start;
+}
+
+/* Hide the icon inside — avatar is purely decorative */
+.app-msg__avatar--bot > *,
+.app-msg__avatar--user > * {
+  display: none !important;
+}
+
 .app-msg__avatar--bot {
   background: hsl(var(--primary)) !important;
-  border: 1px solid hsl(var(--primary) / 0.5) !important;
 }
 
-/* User avatar */
 .app-msg__avatar--user {
-  background: hsl(var(--muted)) !important;
-  border: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--muted-foreground) / 0.35) !important;
 }
 
-/* Speaker microlabels above each message */
+/* ── Author microlabels ──────────────────────────────────────────── */
 .app-msg__speaker {
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  font-size: 0.66rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
+  font-family: inherit; /* Inter */
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
+  margin-bottom: 0.4rem;
 }
 
 .app-msg__speaker--bot {
@@ -1333,79 +1395,198 @@ html {
   color: hsl(var(--muted-foreground));
 }
 
-/* Thinking indicator */
+/* ── Thinking indicator ──────────────────────────────────────────── */
 .app-chat-thinking {
-  background: hsl(var(--accent) / 0.06);
+  padding-top: 1.375rem;
+  padding-bottom: 1.375rem;
+  background: transparent;
 }
 
 .app-chat-thinking__dot {
   color: hsl(var(--primary));
 }
 
-/* Chat input area */
+/* ── Input area ──────────────────────────────────────────────────── */
 .app-chat-input-area {
   border-top: 1px solid hsl(var(--border)) !important;
   background: hsl(var(--card));
+  padding: 0.75rem 1.75rem 1rem;
 }
 
+/* Bordered container that wraps textarea + send button */
+.app-chat-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  border: 1.5px solid hsl(var(--border));
+  border-radius: 6px;
+  background: hsl(var(--background));
+  padding: 0.4375rem 0.4375rem 0.4375rem 0.875rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  max-width: 740px;
+  margin: 0 auto;
+}
+
+.app-chat-input-row:focus-within {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.08);
+}
+
+/* Textarea: transparent inside the bordered container */
 .app-chat-textarea {
-  background: hsl(var(--background)) !important;
-  border: 1px solid hsl(var(--border)) !important;
-  border-radius: 10px !important;
+  flex: 1;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   color: hsl(var(--foreground)) !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  outline: none !important;
+  transition: none !important;
+  padding: 0.25rem 0 !important;
 }
 
 .app-chat-textarea:focus {
-  border-color: hsl(var(--primary)) !important;
-  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.12) !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .app-chat-textarea::placeholder {
   color: hsl(var(--muted-foreground) / 0.7) !important;
 }
 
-/* Send button */
+/* Send button — pill with text */
 .app-send-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  padding: 0.4375rem 0.875rem !important;
+  height: auto !important;
+  width: auto !important;
+  border: none !important;
+  border-radius: 4px !important;
   background: hsl(var(--primary)) !important;
-  border: 1px solid hsl(var(--primary)) !important;
-  border-radius: 10px !important;
   color: hsl(var(--primary-foreground)) !important;
-  transition: all 0.2s ease !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  transition: background 0.12s ease !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
 }
 
 .app-send-btn:hover:not(:disabled) {
   background: hsl(var(--accent-strong)) !important;
-  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.25) !important;
 }
 
 .app-send-btn:disabled {
   opacity: 0.3 !important;
 }
 
-/* Slash command pills */
+/* Quick command chips (below input row) */
 .app-slash-pill {
-  background: hsl(var(--primary) / 0.08) !important;
-  border: 1px solid hsl(var(--primary) / 0.25) !important;
-  color: hsl(var(--foreground)) !important;
-  transition: all 0.2s ease !important;
+  background: hsl(var(--background)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--muted-foreground)) !important;
+  border-radius: 3px !important;
+  font-size: 0.6875rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em !important;
+  padding: 0.125rem 0.5rem !important;
+  transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease !important;
 }
 
 .app-slash-pill:hover {
-  background: hsl(var(--primary) / 0.15) !important;
-  border-color: hsl(var(--primary) / 0.4) !important;
-  color: hsl(var(--foreground)) !important;
+  color: hsl(var(--primary)) !important;
+  border-color: hsl(var(--primary)) !important;
+  background: hsl(var(--primary) / 0.06) !important;
 }
 
 /* Command palette */
 .app-command-palette {
   background: hsl(var(--card)) !important;
   border: 1px solid hsl(var(--border)) !important;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  border-radius: 6px !important;
+}
+
+.app-command-palette__item {
+  color: hsl(var(--foreground)) !important;
+  border-radius: 4px !important;
+  transition: background 0.1s ease !important;
 }
 
 .app-command-palette__item:hover {
-  background: hsl(var(--accent) / 0.08) !important;
+  background: hsl(var(--primary) / 0.08) !important;
+}
+
+/* ── Markdown rendered inside assistant messages ─────────────────── */
+
+/* h2 — Playfair Display serif heading */
+.app-md-h2 {
+  font-family: var(--font-display, 'Playfair Display', Georgia, serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  line-height: 1.28;
+  letter-spacing: -0.015em;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* h3 */
+.app-md-h3 {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  line-height: 1.35;
+  tracking-tight: true;
+  margin-top: 1.25rem;
+  margin-bottom: 0.375rem;
+}
+
+/* h4 */
+.app-md-h4 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: hsl(var(--muted-foreground));
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Unordered list item with pine bullet dot */
+.app-md-li {
+  position: relative;
+  padding-left: 1.375rem;
+  margin-bottom: 0.625rem;
+  line-height: 1.75;
+}
+
+.app-md-li::before {
+  content: '';
+  position: absolute;
+  left: 0.125rem;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  opacity: 0.8;
+}
+
+/* ── Welcome note box ─────────────────────────────────────────────── */
+.app-chat-ai-note {
+  background: hsl(var(--primary) / 0.06);
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-top: 1.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  color: hsl(var(--muted-foreground));
+  text-align: left;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1519,7 +1700,7 @@ html {
 
 .app-main {
   position: relative;
-  background: hsl(var(--background));
+  background: hsl(var(--card));
 }
 
 /* ═══════════════════════════════════════════════════════════════════

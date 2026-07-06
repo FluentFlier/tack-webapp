@@ -13,7 +13,12 @@ export default function ProtectedLayout({
       <FocusManager />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="app-main flex-1 overflow-y-auto" role="main">
+        <main
+          className="app-main flex-1 overflow-y-auto"
+          role="main"
+          id="main-content"
+          tabIndex={-1}
+        >
           {children}
         </main>
       </div>
