@@ -2261,6 +2261,12 @@ html {
 }
 
 .cpage-logo:hover { opacity: 0.75; }
+
+.cpage-logo:focus-visible {
+  outline: 2px solid hsl(var(--focus));
+  outline-offset: 2px;
+}
+
 .cpage-logo svg { flex-shrink: 0; }
 
 /* Nav links */
@@ -2286,6 +2292,11 @@ html {
 .cpage-nav__link:hover {
   color: hsl(var(--foreground));
   background: hsl(var(--primary) / 0.06);
+}
+
+.cpage-nav__link:focus-visible {
+  outline: 2px solid hsl(var(--focus));
+  outline-offset: 2px;
 }
 
 .cpage-nav__link--active {
@@ -2321,6 +2332,11 @@ html {
   background: hsl(var(--primary) / 0.06);
 }
 
+.cpage-nav__icon-btn:focus-visible {
+  outline: 2px solid hsl(var(--focus));
+  outline-offset: 2px;
+}
+
 /* Sign-in / open-chat button */
 .cpage-signin-btn {
   padding: 0.4rem 1.25rem;
@@ -2340,6 +2356,11 @@ html {
 .cpage-signin-btn:hover {
   background: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
+}
+
+.cpage-signin-btn:focus-visible {
+  outline: 2px solid hsl(var(--focus));
+  outline-offset: 2px;
 }
 
 /* Main */
@@ -2443,9 +2464,10 @@ html {
   color: hsl(var(--muted-foreground) / 0.5);
 }
 
-.cpage-form__input:focus {
+.cpage-form__input:focus-visible {
   border-color: hsl(var(--primary));
-  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.08);
+  outline: 2px solid hsl(var(--focus));
+  outline-offset: 2px;
 }
 
 /* Textarea modifier */
@@ -2474,6 +2496,11 @@ html {
 .cpage-form__submit:hover {
   background: hsl(var(--accent-strong));
   box-shadow: 0 0 0 3px hsl(var(--ring) / 0.2);
+}
+
+.cpage-form__submit:focus-visible {
+  outline: 2px solid hsl(var(--focus));
+  outline-offset: 2px;
 }
 
 /* Inline validation error */
@@ -2518,7 +2545,7 @@ html {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Contact Page (observatory legacy — kept for landing nav shared CSS)
+   Contact Page (observatory legacy — UNUSED; scheduled for removal in T4)
    ═══════════════════════════════════════════════════════════════════ */
 
 .contact-form {
