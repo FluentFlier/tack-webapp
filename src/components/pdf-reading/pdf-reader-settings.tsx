@@ -136,12 +136,12 @@ export default function Page() {
             </p>
             <h1 className="font-serif text-4xl font-medium tracking-tight" style={styleTextColorDict}>PDF Reader Settings</h1>
             <Link href="/pdf-reading">
-              <Button style={{...styleMiddlegroundColorDict, ...styleTextColorDict}} variant="ghost" size="sm" className="mt-3 gap-2 rounded-lg border border-[rgba(99,102,241,0.3)] text-muted-foreground hover:text-foreground">
+              <Button style={{...styleMiddlegroundColorDict, ...styleTextColorDict}} variant="ghost" size="sm" className="mt-3 gap-2 rounded-lg border border-border text-muted-foreground hover:text-foreground">
                 <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                 Back to PDF Reading
               </Button>
             </Link>
-            <h4 className="mt-4 rounded-lg border border-[rgba(99,102,241,0.3)] bg-[rgba(79,70,229,0.08)] px-4 py-3 text-sm font-medium leading-relaxed" style={styleTextColorDict}>Note: These settings only apply to the PDF reader and will not be saved to your account. For now they are only saved in your browser</h4>
+            <h4 className="mt-4 rounded-lg border border-border bg-primary/[0.06] px-4 py-3 text-sm font-medium leading-relaxed" style={styleTextColorDict}>Note: These settings only apply to the PDF reader and will not be saved to your account. For now they are only saved in your browser</h4>
           </div>
 
           <Card style={styleMiddlegroundColorDict} className="rounded-[14px]">

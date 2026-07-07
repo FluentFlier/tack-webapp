@@ -565,7 +565,7 @@ export default function Page() {
             </p>
             <h1 style={styleDictTextColor} className="font-serif text-4xl font-medium tracking-tight">PDF Reading</h1>
             <Link style={styleDictTextColor} href="/pdf-reading-settings">
-              <Button style={{...styleDictMiddleground, ...styleDictTextColor}} variant="ghost" size="sm" className="mt-3 gap-2 rounded-lg border border-[rgba(99,102,241,0.3)] text-muted-foreground hover:text-foreground">
+              <Button style={{...styleDictMiddleground, ...styleDictTextColor}} variant="ghost" size="sm" className="mt-3 gap-2 rounded-lg border border-border text-muted-foreground hover:text-foreground">
                 <Settings className="h-4 w-4" aria-hidden="true" />
                 PDF Reader Settings
               </Button>
@@ -624,7 +624,7 @@ export default function Page() {
                     type="button"
                     aria-label="Dismiss notice"
                     onClick={() => setAiNotice(null)}
-                    className="shrink-0 rounded p-0.5 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-current"
+                    className="shrink-0 rounded p-0.5 hover:bg-foreground/10 focus:outline-none focus:ring-2 focus:ring-current"
                   >
                     <X className="h-4 w-4" aria-hidden="true" />
                   </button>
@@ -646,7 +646,7 @@ export default function Page() {
               )}
 
               {!loading && !error && readableHtml && (
-                <div className="border border-[rgba(99,102,241,0.28)] rounded-lg p-5 space-y-4" style={styleDictMiddleground}>
+                <div className="border border-border rounded-lg p-5 space-y-4" style={styleDictMiddleground}>
                   {settings.AIFullDocumentSummary && (
                     <>
                       <h3 className="text-md font-medium mb-1" style={styleDictTextColor}>Full document summary</h3>

@@ -45,14 +45,11 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="about-root">
-      <div className="landing-orb landing-orb--purple" aria-hidden="true" />
-      <div className="landing-orb landing-orb--blue" aria-hidden="true" />
-
-      <header role="banner" className="landing-nav">
-        <div className="landing-nav__inner">
-          <Link href="/" className="landing-logo" aria-label="Tack – Home">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+    <div className="cpage-root">
+      <header role="banner" className="cpage-nav">
+        <div className="cpage-nav__inner">
+          <Link href="/" className="cpage-logo" aria-label="Tack – Home">
+            <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
               <circle cx="14" cy="14" r="13" stroke="currentColor" strokeWidth="1.5" />
               <path
                 d="M9 14.5C9 11.5 11.5 9 14 9C16.5 9 19 11.5 19 14.5C19 17.5 16.5 19 14 19"
@@ -61,60 +58,60 @@ export default function ContactPage() {
                 strokeLinecap="round"
               />
             </svg>
-            <span>TACK</span>
+            Tack
           </Link>
 
-          <nav aria-label="Main navigation" className="landing-nav__links">
-            <Link href="/" className="landing-nav__link">Home</Link>
-            <Link href="/about" className="landing-nav__link">About Us</Link>
-            <Link href="/contact" className="landing-nav__link landing-nav__link--active">Contact Us</Link>
+          <nav aria-label="Main navigation" className="cpage-nav__links">
+            <Link href="/" className="cpage-nav__link">Home</Link>
+            <Link href="/about" className="cpage-nav__link">About Us</Link>
+            <Link href="/contact" className="cpage-nav__link cpage-nav__link--active" aria-current="page">Contact Us</Link>
           </nav>
 
           <LandingNavMobile />
 
-          <div className="landing-nav__actions">
-            <button className="landing-nav__icon-btn" aria-label="Search" type="button">
+          <div className="cpage-nav__actions">
+            <button className="cpage-nav__icon-btn" aria-label="Search" type="button">
               <Search className="h-4 w-4" aria-hidden="true" />
             </button>
             <SignedOut>
               <SignInButton>
-                <button className="landing-signin-btn" type="button">Sign In</button>
+                <button className="cpage-signin-btn" type="button">Sign In</button>
               </SignInButton>
             </SignedOut>
             <SignedIn>
               <Link href="/chat">
-                <button className="landing-signin-btn" type="button">Open Chat</button>
+                <button className="cpage-signin-btn" type="button">Open Chat</button>
               </Link>
             </SignedIn>
           </div>
         </div>
       </header>
 
-      <main className="about-main">
-        <section aria-labelledby="contact-heading" className="about-section">
-          <div className="about-section__inner">
-            <p className="about-section__eyebrow">Get in Touch</p>
-            <h1 id="contact-heading" className="about-heading">
-              Contact <span className="about-heading--accent">Us</span>
+      <main className="cpage-main">
+        <section aria-labelledby="contact-heading" className="cpage-section">
+          <div className="cpage-section__inner">
+            <p className="cpage-eyebrow" aria-hidden="true">Get in Touch</p>
+            <h1 id="contact-heading" className="cpage-heading">
+              Contact <span className="cpage-heading__accent">Us</span>
             </h1>
-            <p className="about-body">
+            <p className="cpage-body">
               Have a question, feedback, or want to learn more about Tack?
               We&apos;d love to hear from you.
             </p>
 
             <form
-              className="contact-form"
+              className="cpage-form"
               aria-label="Contact form"
               noValidate
               onSubmit={handleSubmit}
             >
-              <div className="contact-form__group">
-                <label htmlFor="contact-name" className="contact-form__label">Name</label>
+              <div className="cpage-form__group">
+                <label htmlFor="contact-name" className="cpage-form__label">Name</label>
                 <input
                   id="contact-name"
                   type="text"
                   name="name"
-                  className="contact-form__input"
+                  className="cpage-form__input"
                   placeholder="Your name"
                   autoComplete="name"
                   aria-invalid={errors.name ? true : undefined}
@@ -122,17 +119,17 @@ export default function ContactPage() {
                   required
                 />
                 {errors.name && (
-                  <p id="contact-name-error" role="alert" className="contact-form__error">{errors.name}</p>
+                  <p id="contact-name-error" role="alert" className="cpage-form__error">{errors.name}</p>
                 )}
               </div>
 
-              <div className="contact-form__group">
-                <label htmlFor="contact-email" className="contact-form__label">Email</label>
+              <div className="cpage-form__group">
+                <label htmlFor="contact-email" className="cpage-form__label">Email</label>
                 <input
                   id="contact-email"
                   type="email"
                   name="email"
-                  className="contact-form__input"
+                  className="cpage-form__input"
                   placeholder="you@example.com"
                   autoComplete="email"
                   aria-invalid={errors.email ? true : undefined}
@@ -140,33 +137,33 @@ export default function ContactPage() {
                   required
                 />
                 {errors.email && (
-                  <p id="contact-email-error" role="alert" className="contact-form__error">{errors.email}</p>
+                  <p id="contact-email-error" role="alert" className="cpage-form__error">{errors.email}</p>
                 )}
               </div>
 
-              <div className="contact-form__group">
-                <label htmlFor="contact-subject" className="contact-form__label">Subject</label>
+              <div className="cpage-form__group">
+                <label htmlFor="contact-subject" className="cpage-form__label">Subject</label>
                 <input
                   id="contact-subject"
                   type="text"
                   name="subject"
-                  className="contact-form__input"
+                  className="cpage-form__input"
                   placeholder="How can we help?"
                   aria-invalid={errors.subject ? true : undefined}
                   aria-describedby={errors.subject ? "contact-subject-error" : undefined}
                   required
                 />
                 {errors.subject && (
-                  <p id="contact-subject-error" role="alert" className="contact-form__error">{errors.subject}</p>
+                  <p id="contact-subject-error" role="alert" className="cpage-form__error">{errors.subject}</p>
                 )}
               </div>
 
-              <div className="contact-form__group">
-                <label htmlFor="contact-message" className="contact-form__label">Message</label>
+              <div className="cpage-form__group">
+                <label htmlFor="contact-message" className="cpage-form__label">Message</label>
                 <textarea
                   id="contact-message"
                   name="message"
-                  className="contact-form__input contact-form__textarea"
+                  className="cpage-form__input cpage-form__textarea"
                   placeholder="Tell us more…"
                   rows={6}
                   aria-invalid={errors.message ? true : undefined}
@@ -174,16 +171,16 @@ export default function ContactPage() {
                   required
                 />
                 {errors.message && (
-                  <p id="contact-message-error" role="alert" className="contact-form__error">{errors.message}</p>
+                  <p id="contact-message-error" role="alert" className="cpage-form__error">{errors.message}</p>
                 )}
               </div>
 
-              <button type="submit" className="contact-form__submit">
+              <button type="submit" className="cpage-form__submit">
                 Send Message
               </button>
 
               {status === "sent" && (
-                <p role="status" className="contact-form__success">
+                <p role="status" className="cpage-form__success">
                   Your email client should open shortly. If it doesn&apos;t, write us at support@tack.ai.
                 </p>
               )}
@@ -191,21 +188,21 @@ export default function ContactPage() {
           </div>
         </section>
 
-        <section aria-labelledby="contact-alt-heading" className="about-section about-section--alt">
-          <div className="about-section__inner contact-alt-grid">
-            <div className="contact-alt-card">
-              <p className="about-section__eyebrow">Email</p>
-              <h2 id="contact-alt-heading" className="about-heading about-heading--sm">
-                support@<span className="about-heading--accent">tack.ai</span>
+        <section aria-labelledby="contact-alt-heading" className="cpage-section cpage-section--alt">
+          <div className="cpage-section__inner cpage-alt-grid">
+            <div className="cpage-alt-card">
+              <p className="cpage-eyebrow">Email</p>
+              <h2 id="contact-alt-heading" className="cpage-heading cpage-heading--sm">
+                support@<span className="cpage-heading__accent">tack.ai</span>
               </h2>
-              <p className="about-body">Reach our support team directly for account or technical issues.</p>
+              <p className="cpage-body">Reach our support team directly for account or technical issues.</p>
             </div>
-            <div className="contact-alt-card">
-              <p className="about-section__eyebrow">Accessibility Feedback</p>
-              <h2 className="about-heading about-heading--sm">
-                a11y@<span className="about-heading--accent">tack.ai</span>
+            <div className="cpage-alt-card">
+              <p className="cpage-eyebrow">Accessibility Feedback</p>
+              <h2 className="cpage-heading cpage-heading--sm">
+                a11y@<span className="cpage-heading__accent">tack.ai</span>
               </h2>
-              <p className="about-body">Found a barrier? Tell us and we&apos;ll fix it fast.</p>
+              <p className="cpage-body">Found a barrier? Tell us and we&apos;ll fix it fast.</p>
             </div>
           </div>
         </section>

@@ -85,7 +85,7 @@ function ReaderContent() {
       </nav>
 
       <article aria-label={content.title}>
-        <header className="space-y-2 mb-8 border-b border-[rgba(79,70,229,0.2)] pb-6">
+        <header className="space-y-2 mb-8 border-b border-border pb-6">
           <p className="app-eyebrow mb-3" aria-hidden="true">
             Reader Mode
           </p>
@@ -93,7 +93,7 @@ function ReaderContent() {
             {content.title}
           </h1>
           {content.byline && (
-            <p className="font-mono text-xs uppercase tracking-[0.14em] text-[rgba(240,244,255,0.55)]">
+            <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
               By {content.byline}
             </p>
           )}
@@ -104,7 +104,7 @@ function ReaderContent() {
                 href={content.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[rgba(103,232,249,0.9)] underline underline-offset-2 decoration-[rgba(103,232,249,0.4)] hover:text-[#a5f3fc] focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                className="text-primary underline underline-offset-2 decoration-primary/40 hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
               >
                 View original
               </a>
@@ -113,14 +113,14 @@ function ReaderContent() {
         </header>
 
         {content.excerpt && (
-          <div className="border-l-2 border-[rgba(103,232,249,0.5)] bg-[rgba(79,70,229,0.06)] rounded-r-lg pl-4 pr-4 py-3 mb-8">
-            <p className="text-[rgba(240,244,255,0.65)] italic leading-relaxed">
+          <div className="border-l-2 border-primary/50 bg-primary/[0.06] rounded-r-lg pl-4 pr-4 py-3 mb-8">
+            <p className="text-muted-foreground italic leading-relaxed">
               {content.excerpt}
             </p>
           </div>
         )}
 
-        <div className="max-w-none text-[1.05rem] leading-[1.85] text-[rgba(240,244,255,0.8)]">
+        <div className="max-w-none text-[1.05rem] leading-[1.85] text-foreground/85">
           {content.content.split("\n\n").map((paragraph, i) =>
             paragraph.trim() ? (
               <p key={i} className="mb-5">{paragraph.trim()}</p>

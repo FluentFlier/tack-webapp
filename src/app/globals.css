@@ -2214,7 +2214,311 @@ html {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Contact Page
+   Contact Page — Editorial Pine & Oat
+   Uses .cpage-* prefix; standalone so no overlap with .about-* or
+   .contact-form__* observatory classes used by the landing/T4 build.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Root shell */
+.cpage-root {
+  min-height: 100vh;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+/* Sticky editorial nav */
+.cpage-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: hsl(var(--card));
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 0 2rem;
+}
+
+.cpage-nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 64px;
+}
+
+/* Logo */
+.cpage-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: hsl(var(--foreground));
+  text-decoration: none;
+  font-family: var(--font-display, 'Playfair Display', Georgia, serif);
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  transition: opacity 0.15s ease;
+}
+
+.cpage-logo:hover { opacity: 0.75; }
+.cpage-logo svg { flex-shrink: 0; }
+
+/* Nav links */
+.cpage-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cpage-nav__link {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+  text-decoration: none;
+  padding: 0.375rem 0.625rem;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.cpage-nav__link:hover {
+  color: hsl(var(--foreground));
+  background: hsl(var(--primary) / 0.06);
+}
+
+.cpage-nav__link--active {
+  color: hsl(var(--primary));
+  border-color: hsl(var(--border));
+  background: hsl(var(--primary) / 0.06);
+  font-weight: 600;
+}
+
+/* Actions area */
+.cpage-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cpage-nav__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+
+.cpage-nav__icon-btn:hover {
+  color: hsl(var(--foreground));
+  background: hsl(var(--primary) / 0.06);
+}
+
+/* Sign-in / open-chat button */
+.cpage-signin-btn {
+  padding: 0.4rem 1.25rem;
+  border-radius: 4px;
+  border: 1.5px solid hsl(var(--primary));
+  background: transparent;
+  color: hsl(var(--primary));
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.cpage-signin-btn:hover {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+/* Main */
+.cpage-main {
+  padding-bottom: 5rem;
+}
+
+/* Sections */
+.cpage-section {
+  padding: 5rem 2rem;
+}
+
+.cpage-section--alt {
+  background: hsl(var(--card));
+  border-top: 1px solid hsl(var(--border));
+}
+
+.cpage-section__inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Eyebrow microlabel */
+.cpage-eyebrow {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.66rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: hsl(var(--primary));
+  margin: 0 0 0.75rem;
+}
+
+/* Headings — solid Playfair, no gradient (no fallback complexity needed) */
+.cpage-heading {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.25rem;
+  color: hsl(var(--foreground));
+}
+
+.cpage-heading--sm {
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+}
+
+/* Accent word inside a heading */
+.cpage-heading__accent {
+  color: hsl(var(--primary));
+}
+
+/* Body text */
+.cpage-body {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: hsl(var(--muted-foreground));
+  max-width: 580px;
+  margin: 0 0 1rem;
+}
+
+/* Form */
+.cpage-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 560px;
+  margin-top: 2rem;
+}
+
+.cpage-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cpage-form__label {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.66rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.cpage-form__input {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 4px;
+  padding: 0.625rem 0.875rem;
+  color: hsl(var(--foreground));
+  font-size: 0.9375rem;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cpage-form__input::placeholder {
+  color: hsl(var(--muted-foreground) / 0.5);
+}
+
+.cpage-form__input:focus {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.08);
+}
+
+/* Textarea modifier */
+.cpage-form__textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Submit button */
+.cpage-form__submit {
+  align-self: flex-start;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border: none;
+  border-radius: 4px;
+  padding: 0.625rem 1.75rem;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cpage-form__submit:hover {
+  background: hsl(var(--accent-strong));
+  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.2);
+}
+
+/* Inline validation error */
+.cpage-form__error {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  color: hsl(var(--destructive));
+}
+
+/* Success notice */
+.cpage-form__success {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: hsl(var(--primary) / 0.06);
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+}
+
+/* Alt section card grid */
+.cpage-alt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+}
+
+.cpage-alt-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cpage-nav__links {
+    display: none;
+  }
+
+  .cpage-section {
+    padding: 3.5rem 1.25rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Contact Page (observatory legacy — kept for landing nav shared CSS)
    ═══════════════════════════════════════════════════════════════════ */
 
 .contact-form {
