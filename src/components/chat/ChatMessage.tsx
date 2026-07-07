@@ -65,7 +65,7 @@ export function ChatMessage({ message, onRetry, loading, isNew }: ChatMessagePro
           {isAssistant ? (
             renderMarkdown(message.content)
           ) : (
-            <p className="text-[0.9375rem] leading-[1.78] whitespace-pre-wrap text-foreground italic">
+            <p className="text-[0.9375rem] leading-[1.78] whitespace-pre-wrap text-foreground">
               {message.content}
             </p>
           )}

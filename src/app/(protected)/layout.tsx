@@ -16,8 +16,6 @@ export default function ProtectedLayout({
         <main
           className="app-main flex-1 overflow-y-auto"
           role="main"
-          id="main-content"
-          tabIndex={-1}
         >
           {children}
         </main>

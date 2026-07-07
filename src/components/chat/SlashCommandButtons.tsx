@@ -58,7 +58,7 @@ export function SlashCommandButtons({
             className="
               app-slash-pill
               inline-flex items-center gap-1
-              focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))]
+              focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] focus-visible:ring-offset-1
               active:scale-[0.97]
               disabled:opacity-40 disabled:pointer-events-none
             "
