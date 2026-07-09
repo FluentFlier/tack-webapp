@@ -514,7 +514,7 @@ html {
   color: #f0eded;
   text-decoration: none;
   font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
-  font-size: 1.05rem;
+  font-size: 1.16rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   transition: opacity 0.3s ease;
@@ -1652,8 +1652,10 @@ html {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 1.2rem;
-  padding: 2rem 1rem;
+  height: 100%;
+  min-height: 480px;
+  gap: 1rem;
+  padding: 2rem 2rem;
   border-radius: 14px;
   border: 1px solid var(--iso-panel-bd);
   background: var(--iso-panel-bg);
@@ -1669,14 +1671,15 @@ html {
 
 /* Avatar */
 .iso-avatar {
-  width: 80px;
-  height: 80px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   position: relative;
+  margin-bottom: 1rem;
 }
 
 .iso-avatar--indigo {
@@ -1707,10 +1710,24 @@ html {
   letter-spacing: 0.04em;
 }
 
+.iso-avatar--image {
+  background: transparent;
+  box-shadow: 0 0 20px rgba(100, 100, 100, 0.2);
+  overflow: hidden;
+}
+
+.iso-avatar__image {
+  object-fit: cover;
+  object-position: center;
+}
+
 .iso-team-card__info {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  width: 100%;
+  flex: 1;
+  justify-content: space-between;
 }
 
 .iso-team-card__name {

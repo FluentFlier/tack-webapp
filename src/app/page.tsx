@@ -18,8 +18,8 @@ import { useRef } from "react";
 // ─── Team data ───────────────────────────────────────────────────────────────
 const team = [
   { name: "Jacob Amstutz", title: "CEO", initials: "JA", hue: "indigo" },
-  { name: "Jay Rao", title: "CTO", initials: "JR", hue: "cyan" },
-  { name: "Anushka Raghavendra", title: "COO", initials: "AR", hue: "violet" },
+  { name: "Jay Rao", title: "CTO", initials: "JR", hue: "cyan", image: "/jay.png" },
+  { name: "Anushka Raghavendra", title: "COO", initials: "AR", hue: "violet", image: "/anushka.png" },
   { name: "Vishnu", title: "CPO", initials: "V", hue: "blue" },
 ];
 
@@ -90,15 +90,7 @@ export default function Home() {
         <header role="banner" className="landing-nav">
           <div aria-label="Main navigation" className="landing-nav__inner">
             <Link href="/" className="landing-logo" aria-label="Tack – Home">
-              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-                <circle cx="14" cy="14" r="13" stroke="currentColor" strokeWidth="1.5" />
-                <path
-                  d="M9 14.5C9 11.5 11.5 9 14 9C16.5 9 19 11.5 19 14.5C19 17.5 16.5 19 14 19"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
+              <Image src="/logo.png" alt="Tack logo" width={31} height={31} />
               <span>TACK</span>
             </Link>
 
@@ -301,14 +293,28 @@ export default function Home() {
                 {team.map((member, i) => (
                   <FadeIn key={member.name} delay={i * 0.1}>
                     <li className="iso-team-card">
-                      <div
-                        className={`iso-avatar iso-avatar--${member.hue}`}
-                        aria-label={`${member.name} profile placeholder`}
-                      >
-                        <span className="iso-avatar__initials" aria-hidden="true">
-                          {member.initials}
-                        </span>
-                      </div>
+                      {member.image ? (
+                        <div className="iso-avatar iso-avatar--image" aria-label={`${member.name} photo`}>
+                          <Image
+                            src={member.image}
+                            alt={member.name}
+                            fill
+                            className="iso-avatar__image"
+                            quality={95}
+                            priority
+                            sizes="160px"
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className={`iso-avatar iso-avatar--${member.hue}`}
+                          aria-label={`${member.name} profile placeholder`}
+                        >
+                          <span className="iso-avatar__initials" aria-hidden="true">
+                            {member.initials}
+                          </span>
+                        </div>
+                      )}
                       <div className="iso-team-card__info">
                         <h3 className="iso-team-card__name">{member.name}</h3>
                         <p className="iso-team-card__title">{member.title}</p>
