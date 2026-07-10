@@ -1,7 +1,7 @@
 import React from "react";
 
 // Editorial Pine & Oat classes — token-driven so they respond to light/dark.
-// Headings use Playfair Display via .app-md-h2/h3/h4 (defined in globals.css).
+// Headings are weight-driven Inter via .app-md-h2/h3/h4 (defined in globals.css).
 // List items use .app-md-li for the pine bullet pseudo-element.
 const CLS = {
   h2: "app-md-h2",

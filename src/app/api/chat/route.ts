@@ -505,6 +505,7 @@ export async function POST(request: NextRequest) {
             }
           } catch (err) {
             if (!abort.signal.aborted) {
+              console.error("[chat] SSE stream error:", err);
               const errorMsg =
                 err instanceof Error ? err.message : "Internal server error";
               emit("error", { error: errorMsg });

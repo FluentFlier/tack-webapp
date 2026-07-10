@@ -50,13 +50,9 @@ export default function ContactPage() {
         <div className="cpage-nav__inner">
           <Link href="/" className="cpage-logo" aria-label="Tack – Home">
             <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-              <circle cx="14" cy="14" r="13" stroke="currentColor" strokeWidth="1.5" />
-              <path
-                d="M9 14.5C9 11.5 11.5 9 14 9C16.5 9 19 11.5 19 14.5C19 17.5 16.5 19 14 19"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
+              <path d="M4 23H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.35" />
+              <path d="M13.2 15.8L20 23" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <circle cx="10.5" cy="10.5" r="5" style={{ fill: "hsl(var(--primary))" }} />
             </svg>
             Tack
           </Link>

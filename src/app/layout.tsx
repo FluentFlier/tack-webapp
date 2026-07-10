@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { InsforgeProvider } from "./providers";
 
+// Ink & Paper: single family (Inter), weight-driven hierarchy.
+// JetBrains Mono retained for true monospace surfaces only (kbd, code).
 const inter = Inter({ subsets: ["latin"] });
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  display: "swap",
-});
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
@@ -39,13 +36,15 @@ export default function RootLayout({
             __html: `
               (function(){
                 var r = document.documentElement;
-                /* ── Theme (light/dark/system) — set data-theme before first paint ── */
-                try {
-                  var th = localStorage.getItem('tack_theme');
-                  var dark = th === 'dark' ||
-                             (th !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                  r.setAttribute('data-theme', dark ? 'dark' : 'light');
-                } catch(e) {}
+                /* ── Theme (light/dark/system) — set data-theme before first paint.
+                   Brand default is DARK: no stored preference resolves to dark;
+                   an explicit 'system' choice still follows the OS. ── */
+                var th = null;
+                try { th = localStorage.getItem('tack_theme'); } catch(e) {}
+                var dark = th === 'light' ? false
+                         : th === 'system' ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                         : true;
+                r.setAttribute('data-theme', dark ? 'dark' : 'light');
                 /* ── Accessibility preferences ── */
                 try {
                   var s = localStorage.getItem('tack_preferences');
@@ -74,7 +73,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body suppressHydrationWarning className={`${inter.className} ${playfair.variable} ${jetbrainsMono.variable}`}>
+      <body suppressHydrationWarning className={`${inter.className} ${jetbrainsMono.variable}`}>
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring"

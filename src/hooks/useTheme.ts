@@ -20,11 +20,13 @@ function applyThemeToRoot(resolved: ResolvedTheme): void {
 }
 
 function readStoredTheme(): Theme {
-  if (typeof window === "undefined") return "system";
+  // Brand default is dark: no stored preference resolves to "dark".
+  // (Must agree with the blocking script in layout.tsx.)
+  if (typeof window === "undefined") return "dark";
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored === "light" || stored === "dark" || stored === "system")
     return stored;
-  return "system";
+  return "dark";
 }
 
 /**

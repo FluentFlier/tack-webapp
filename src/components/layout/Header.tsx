@@ -14,7 +14,7 @@ export function Header() {
       className="app-header sticky top-0 z-40"
     >
       <div className="flex h-14 items-center justify-between px-6">
-        {/* Logo — Playfair Display serif with pine dot */}
+        {/* Logo — weight-driven Inter with green dot */}
         <Link
           href="/"
           className="app-header__logo focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-1 rounded-sm"

@@ -69,9 +69,9 @@ export default function Page() {
     "AIDefaultShortening": false,
     "AIFullDocumentSummary": false,
     "displayPageNumbers": true,
-    "backgroundColor": "#08080f",
-    "middlegroundColor": "#0e0e15",
-    "textColor": "#ffffff",
+    "backgroundColor": "#11140f",
+    "middlegroundColor": "#191c16",
+    "textColor": "#ecece6",
     "minLengthToSummarize": 200,
     "targetSummaryLength": 60, //percentage
   };
@@ -563,7 +563,7 @@ export default function Page() {
             >
               Document Access
             </p>
-            <h1 style={styleDictTextColor} className="font-serif text-4xl font-medium tracking-tight">PDF Reading</h1>
+            <h1 style={styleDictTextColor} className="text-4xl font-bold tracking-tight">PDF Reading</h1>
             <Link style={styleDictTextColor} href="/pdf-reading-settings">
               <Button style={{...styleDictMiddleground, ...styleDictTextColor}} variant="ghost" size="sm" className="mt-3 gap-2 rounded-lg border border-border text-muted-foreground hover:text-foreground">
                 <Settings className="h-4 w-4" aria-hidden="true" />
@@ -586,7 +586,7 @@ export default function Page() {
 
           <Card style={styleDictMiddleground} className="rounded-[14px]">
             <CardHeader>
-              <CardTitle style={styleDictTextColor} className="font-serif text-lg font-medium tracking-normal">Upload PDF</CardTitle>
+              <CardTitle style={styleDictTextColor} className="text-lg font-semibold tracking-normal">Upload PDF</CardTitle>
             </CardHeader>
             <CardContent>
               <Label htmlFor="pdf-upload" style={styleDictTextColor}>Select a PDF file — the text content will appear below.</Label>
@@ -609,7 +609,7 @@ export default function Page() {
 
           <Card style={styleDictMiddleground} className="rounded-[14px]">
             <CardHeader>
-              <CardTitle style={styleDictTextColor} className="font-serif text-lg font-medium tracking-normal">Output</CardTitle>
+              <CardTitle style={styleDictTextColor} className="text-lg font-semibold tracking-normal">Output</CardTitle>
             </CardHeader>
             <CardContent>
               {/* Inline AI error notice — replaces blocking alert() */}
