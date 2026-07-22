@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { ChatHistory, ChatInput } from "@/components/chat";
 import { LiveRegion } from "@/components/a11y";
+import { Button } from "@/components/ui/button";
 import { useChat } from "@/hooks/useChat";
 //import { useVoice } from "@/hooks/useVoice";
 
@@ -36,6 +38,14 @@ export default function ChatPage() {
                 : ""
         }
       />
+      {/* TACK entry point — navigates to the dedicated accessible search page. */}
+      <div className="px-4 pt-3">
+        <Button asChild variant="outline" size="sm">
+          <Link href="/tack" aria-label="Open TACK Search Engine">
+            Search Engine
+          </Link>
+        </Button>
+      </div>
       <ChatHistory messages={messages} loading={loading} />
       <ChatInput onSend={sendMessage} disabled={loading} />
       {error && (

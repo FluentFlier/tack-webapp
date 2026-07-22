@@ -1,0 +1,222 @@
+/*
+ * TACK — self-contained styles for the accessibility-first search page.
+ * Scoped via CSS Modules so nothing here affects the rest of the app.
+ * Colours reuse the app's design tokens (hsl(var(--...))) which are already
+ * WCAG-verified for contrast in both light and dark themes.
+ */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Skip link — visually hidden until focused, then pinned top-left. */
+.skipLink {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 0 0 0.5rem 0;
+  font-weight: 600;
+  text-decoration: none;
+}
+.skipLink:focus {
+  left: 0;
+  outline: 3px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+.header {
+  padding: 1.5rem 1.25rem 0.5rem;
+  max-width: 46rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  color: hsl(var(--foreground));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  border-radius: 0.25rem;
+}
+.backLink:focus-visible {
+  outline: 3px solid hsl(var(--ring));
+  outline-offset: 3px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 1rem 0 0.25rem;
+  letter-spacing: -0.01em;
+}
+
+.tagline {
+  font-size: 1rem;
+  color: hsl(var(--muted-foreground));
+  margin: 0;
+}
+
+/* ── Search form ─────────────────────────────────────────────────────── */
+.searchRegion {
+  max-width: 46rem;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+.searchForm {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.searchLabel {
+  display: block;
+  width: 100%;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.searchInput {
+  flex: 1 1 18rem;
+  min-width: 0;
+  font-size: 1.15rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+}
+.searchInput::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+.searchInput:focus-visible {
+  outline: 3px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-color: hsl(var(--ring));
+}
+
+.searchButton {
+  flex: 0 0 auto;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 0.85rem 1.5rem;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  cursor: pointer;
+}
+.searchButton:hover {
+  background: hsl(var(--accent-strong, var(--primary)));
+}
+.searchButton:focus-visible {
+  outline: 3px solid hsl(var(--ring));
+  outline-offset: 3px;
+}
+.searchButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Results ─────────────────────────────────────────────────────────── */
+.resultsRegion {
+  flex: 1;
+  max-width: 46rem;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1.25rem 3rem;
+}
+
+.status {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0.5rem 0 1rem;
+}
+
+.error {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: hsl(var(--destructive));
+  border: 2px solid hsl(var(--destructive));
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.resultsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Each result is ONE tab stop — the whole card is the link/target. */
+.resultItem {
+  display: block;
+  padding: 1rem 1.1rem;
+  border: 2px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  text-decoration: none;
+}
+.resultItem:hover {
+  border-color: hsl(var(--ring));
+}
+.resultItem:focus-visible,
+.resultItem[data-active="true"] {
+  outline: 3px solid hsl(var(--ring));
+  outline-offset: 3px;
+  border-color: hsl(var(--ring));
+}
+
+.resultTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.resultSnippet {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0 0 0.4rem;
+  color: hsl(var(--foreground));
+}
+
+.resultUrl {
+  font-size: 0.9rem;
+  color: hsl(var(--muted-foreground));
+  word-break: break-all;
+}
+
+.hint {
+  font-size: 0.95rem;
+  color: hsl(var(--muted-foreground));
+  margin: 0 0 1rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .resultItem {
+    transition: border-color 0.15s ease;
+  }
+}
