@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { ChatHistory, ChatInput } from "@/components/chat";
 import { LiveRegion } from "@/components/a11y";
+import { Button } from "@/components/ui/button";
 import { useChat } from "@/hooks/useChat";
 //import { useVoice } from "@/hooks/useVoice";
 

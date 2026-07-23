@@ -103,33 +103,22 @@ export default function Home() {
               <span>TACK</span>
             </Link>
 
-            <nav aria-label="Site navigation" className="landing-nav__links">
-              <Link href="/" className="landing-nav__link landing-nav__link--active">
-                Home
-              </Link>
-              <Link href="/#team" className="landing-nav__link">
-                About Us
-              </Link>
-              <Link href="/contact" className="landing-nav__link">
-                Contact Us
-              </Link>
-            </nav>
-
             <LandingNavMobile />
 
-            <div className="landing-nav__actions">
-              <SignedOut>
-                <SignInButton className="landing-signin-btn">Sign In</SignInButton>
-              </SignedOut>
-              <SignedIn>
-                <Link href="/chat">
-                  <button className="landing-signin-btn" type="button">Open Chat</button>
-                </Link>
-                <Link href="/pdf-reading">
-                  <button className="landing-signin-btn" type="button">PDF Reader</button>
-                </Link>
-              </SignedIn>
-            </div>
+            <nav aria-label="Site navigation" className="landing-nav__dashboard">
+              <Link href="/" className="landing-nav__dashboard-link">
+                Home
+              </Link>
+              <Link href="/chat" className="landing-nav__dashboard-link">
+                Chat
+              </Link>
+              <Link href="/search" className="landing-nav__dashboard-link">
+                Search
+              </Link>
+              <Link href="/#" className="landing-nav__dashboard-link">
+                Browser Agent
+              </Link>
+            </nav>
           </div>
         </header>
 
