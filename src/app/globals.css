@@ -501,7 +501,8 @@ html {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 1200px;
+  max-width: 100%;
+  padding: 0 2rem;
   margin: 0 auto;
   height: 72px;
 }
@@ -526,6 +527,29 @@ html {
 
 .landing-logo svg {
   opacity: 0.85;
+}
+
+/* Dashboard Navigation */
+.landing-nav__dashboard {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  margin-left: auto;
+}
+
+.landing-nav__dashboard-link {
+  color: rgba(240, 237, 237, 0.7);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: capitalize;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.landing-nav__dashboard-link:hover {
+  color: rgba(240, 237, 237, 1);
 }
 
 /* Nav links */
@@ -1134,7 +1158,6 @@ html {
    ═══════════════════════════════════════════════════════════════════ */
 .app-sidebar {
   background: rgba(10, 10, 18, 0.95) !important;
-  border-right: 1px solid rgba(140, 120, 200, 0.08) !important;
 }
 
 .app-sidebar__new-chat {

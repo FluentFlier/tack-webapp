@@ -38,14 +38,6 @@ export default function ChatPage() {
                 : ""
         }
       />
-      {/* TACK entry point — navigates to the dedicated accessible search page. */}
-      <div className="px-4 pt-3">
-        <Button asChild variant="outline" size="sm">
-          <Link href="/tack" aria-label="Open TACK Search Engine">
-            Search Engine
-          </Link>
-        </Button>
-      </div>
       <ChatHistory messages={messages} loading={loading} />
       <ChatInput onSend={sendMessage} disabled={loading} />
       {error && (
